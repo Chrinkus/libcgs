@@ -1,3 +1,11 @@
+# Vim
+
+*.swo
+*.swp
+
+# build directory
+build
+
 # http://www.gnu.org/software/automake
 
 Makefile.in
