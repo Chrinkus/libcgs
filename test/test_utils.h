@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 #define ARR_SIZE(arr) sizeof(arr) / sizeof(arr[0])
 
@@ -30,3 +31,4 @@ int run_tests(struct test* tests, int num_tests)
 	}
 	return TEST_SUCCESS;
 }
+

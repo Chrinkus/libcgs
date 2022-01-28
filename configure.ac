@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.71])
 AC_INIT([libcgs], [0.1], [https://github.com/Chrinkus/libcgs/issues])
-AM_INIT_AUTOMAKE([-Wall -Wextra foreign])
+AM_INIT_AUTOMAKE([-Wall foreign])
 LT_PREREQ([2.4.6])
 LT_INIT
 AC_CONFIG_SRCDIR([src/cgs_bst.c])

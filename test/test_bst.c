@@ -39,6 +39,8 @@ int bst_minmax_test(void* data)
 	assert(cgs_bst_min(tree) == 2);
 	assert(cgs_bst_max(tree) == 14);
 
+	assert(cgs_bst_size(tree) == 3);
+
 	cgs_bst_insert(tree, -13);
 	cgs_bst_insert(tree, 37);
 	cgs_bst_insert(tree, -6);
@@ -49,10 +51,14 @@ int bst_minmax_test(void* data)
 	assert(cgs_bst_min(tree) == -13);
 	assert(cgs_bst_max(tree) == 100);
 
+	assert(cgs_bst_size(tree) == 10);
+
 	cgs_bst_insert(tree, -67);
 	cgs_bst_insert(tree, 72);
 	assert(cgs_bst_min(tree) == -67);
 	assert(cgs_bst_max(tree) == 100);
+
+	assert(cgs_bst_size(tree) == 12);
 
 	cgs_bst_free(tree);
 

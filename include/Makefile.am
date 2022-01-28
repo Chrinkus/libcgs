@@ -1,1 +1,1 @@
-include_HEADERS = cgs_bst.h
+include_HEADERS = cgs_bst.h cgs_variant.h
