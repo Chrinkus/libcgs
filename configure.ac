@@ -24,5 +24,6 @@ AC_FUNC_MALLOC
 
 AC_CONFIG_FILES([Makefile
                  include/Makefile
-                 src/Makefile])
+                 src/Makefile
+		 test/Makefile])
 AC_OUTPUT
