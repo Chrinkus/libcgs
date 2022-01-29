@@ -1,5 +1,3 @@
-#include "config.h"
-
 #include "cgs_variant.h"
 
 #include <stddef.h>
@@ -29,5 +27,6 @@ void* cgs_variant_get_data(struct cgs_variant* var)
 	case CGS_TYPE_DOUBLE:	return (void*)&var->data.d;
 	case CGS_TYPE_STRING:	return (void*)var->data.s;
 	case CGS_TYPE_DATA:	return var->data.v;
+	default: /* never */	return NULL;
 	}
 }
