@@ -7,7 +7,7 @@ struct point {
 	int y;
 };
 
-int variant_set_test(void* data)
+int variant_set_data_test(void* data)
 {
 	(void)data;
 
@@ -36,6 +36,29 @@ int variant_set_test(void* data)
 	return TEST_SUCCESS;
 }
 
+int variant_set_type_test(void* data)
+{
+	(void)data;
+
+	int n = 42;
+	double x = 3.14159;
+
+	struct cgs_variant v = { 0 };
+
+	cgs_variant_set_type(&v, CGS_TYPE_INT);
+	cgs_variant_set_data(&v, &n);
+	int* pi = (int*)cgs_variant_get(&v);
+	assert(*pi == n);
+
+	cgs_variant_set_type(&v, CGS_TYPE_DOUBLE);
+	cgs_variant_set_data(&v, &x);
+	double* pd = (double*)cgs_variant_get(&v);
+	assert(*pd > 3.0);
+	assert(*pd < 3.2);
+	
+	return TEST_SUCCESS;
+}
+
 int variant_get_test(void* data)
 {
 	(void)data;
@@ -57,10 +80,10 @@ int variant_get_test(void* data)
 	cgs_variant_set_data(&v3, s);
 	cgs_variant_set_data(&v4, pt);
 
-	int* pi = (int*)cgs_variant_get_data(&v1);
-	double* pd = (double*)cgs_variant_get_data(&v2);
-	char* ps = (char*)cgs_variant_get_data(&v3);
-	struct point* ppt = (struct point*)cgs_variant_get_data(&v4);
+	int* pi = (int*)cgs_variant_get(&v1);
+	double* pd = (double*)cgs_variant_get(&v2);
+	char* ps = (char*)cgs_variant_get(&v3);
+	struct point* ppt = (struct point*)cgs_variant_get(&v4);
 
 	assert(*pi == n);
 	assert(*pd == x);
@@ -75,7 +98,8 @@ int variant_get_test(void* data)
 int main(void)
 {
 	struct test tests[] = {
-		{ "variant_set", variant_set_test, NULL },
+		{ "variant_set_data", variant_set_data_test, NULL },
+		{ "variant_set_type", variant_set_type_test, NULL },
 		{ "variant_get", variant_get_test, NULL },
 	};
 

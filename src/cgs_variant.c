@@ -2,6 +2,11 @@
 
 #include <stddef.h>
 
+void cgs_variant_set_type(struct cgs_variant* var, enum cgs_type type)
+{
+	var->type = type;
+}
+
 void cgs_variant_set_data(struct cgs_variant* var, void* p)
 {
 	switch (var->type) {
@@ -20,7 +25,7 @@ void cgs_variant_set_data(struct cgs_variant* var, void* p)
 	}
 }
 
-void* cgs_variant_get_data(struct cgs_variant* var)
+void* cgs_variant_get(struct cgs_variant* var)
 {
 	switch (var->type) {
 	case CGS_TYPE_INT:	return (void*)&var->data.i;

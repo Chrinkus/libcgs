@@ -44,6 +44,16 @@ struct cgs_variant {
 };
 
 /**
+ * cgs_variant_set_type
+ *
+ * Sets the type member identifying the variant as one of the cgs_type's.
+ *
+ * @param var	A pointer to the variant.
+ * @param type	A type from the enum cgs_type's.
+ */
+void cgs_variant_set_type(struct cgs_variant* var, enum cgs_type type);
+
+/**
  * cgs_variant_set_data
  *
  * Correctly set the provided data into the variant. Data is provided as a
@@ -57,12 +67,12 @@ struct cgs_variant {
 void cgs_variant_set_data(struct cgs_variant* var, void* p);
 
 /**
- * cgs_variant_get_data
+ * cgs_variant_get
  *
- * Get a read-only pointer to the variant data. Return value should be cast to
+ * Get a pointer to the variant data. Return value should be cast to
  * appropriate type by the caller.
  *
- * @param var	A read-only pointer to the variant.
+ * @param var	A pointer to the variant.
  */
-void* cgs_variant_get_data(struct cgs_variant* var);
+void* cgs_variant_get(struct cgs_variant* var);
 
