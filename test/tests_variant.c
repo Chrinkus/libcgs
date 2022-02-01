@@ -1,6 +1,6 @@
 #include "cgs_variant.h"
 
-#include "test_utils.h"
+#include "cgs_test.h"
 
 int variant_numeric_test(void* data)
 {
@@ -82,6 +82,6 @@ int main(void)
 		{ "variant_data", variant_data_test, NULL },
 	};
 
-	return run_tests(tests, ARR_SIZE(tests));
+	return cgs_run_tests(tests);
 }
 

@@ -1,5 +1,5 @@
 #include "cgs_string_utils.h"
-#include "test_utils.h"
+#include "cgs_test.h"
 
 int strdup_test(void* data)
 {
@@ -30,6 +30,6 @@ int main(void)
 		{ "strdup", strdup_test, "Ninja doesn't like gnu_strdup" },
 	};
 
-	return run_tests(tests, ARR_SIZE(tests));
+	return cgs_run_tests(tests);
 }
 

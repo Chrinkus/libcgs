@@ -1,7 +1,7 @@
 #include "cgs_bst.h"
 #include "cgs_variant.h"
 
-#include "test_utils.h"
+#include "cgs_test.h"
 
 const int garr[] = { 10, 14, 2, -13, 37, -6, 100, 0, -1, 8, -67, 72 };
 const int glen = ARR_SIZE(garr);
@@ -145,6 +145,6 @@ int main(void)
 		{ "bst_int_search", bst_int_search_test, NULL },
 	};
 
-	return run_tests(tests, ARR_SIZE(tests));
+	return cgs_run_tests(tests);
 }
 
