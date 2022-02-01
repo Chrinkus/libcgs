@@ -3,6 +3,7 @@ include_directories("${PROJECT_SOURCE_DIR}/include")
 set(test_sources
 	"tests_bst.c"
 	"tests_variant.c"
+	"tests_variant_usage.c"
 )
 
 string(LENGTH "tests_" test_prefix_len)

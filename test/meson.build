@@ -1,6 +1,7 @@
 tests = [
   ['bst', 'tests_bst.c'],
-  ['variant', 'tests_variant.c']
+  ['variant', 'tests_variant.c'],
+  ['variant_usage', 'tests_variant_usage.c']
 ]
 
 foreach t : tests

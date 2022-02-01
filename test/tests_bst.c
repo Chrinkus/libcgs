@@ -1,12 +1,18 @@
 #include "cgs_bst.h"
+#include "cgs_variant.h"
 
 #include "test_utils.h"
+
+int int_cmp(const void* a, const void* b)
+{
+	return *(int*)a - *(int*)b;
+}
 
 int bst_new_test(void* data)
 {
 	(void)data;
 
-	struct cgs_bst* tree = cgs_bst_new();
+	struct cgs_bst* tree = cgs_bst_new(int_cmp);
 	assert(tree != NULL);
 	assert(cgs_bst_size(tree) == 0);
 
@@ -19,8 +25,12 @@ int bst_insert_test(void* data)
 {
 	(void)data;
 
-	struct cgs_bst* tree = cgs_bst_new();
-	assert(cgs_bst_insert(tree, 5));
+	struct cgs_bst* tree = cgs_bst_new(int_cmp);
+	struct cgs_variant var = { 0 };
+
+	cgs_variant_set_int(&var, 5);
+
+	assert(cgs_bst_insert(tree, &var));
 	assert(cgs_bst_size(tree) == 1);
 
 	cgs_bst_free(tree);
@@ -32,32 +42,44 @@ int bst_minmax_test(void* data)
 {
 	(void)data;
 
-	struct cgs_bst* tree = cgs_bst_new();
-	cgs_bst_insert(tree, 10);
-	cgs_bst_insert(tree, 14);
-	cgs_bst_insert(tree, 2);
-	assert(cgs_bst_min(tree) == 2);
-	assert(cgs_bst_max(tree) == 14);
+	int arr[] = { 10, 14, 2, -13, 37, -6, 100, 0, -1, 8, -67, 72 };
+	int len = ARR_SIZE(arr);
 
+	struct cgs_bst* tree = cgs_bst_new(int_cmp);
+	struct cgs_variant var = { 0 };
+
+	int i = 0;
+	for ( ; i < 3; ++i) {
+		cgs_variant_set_int(&var, arr[i]);
+		cgs_bst_insert(tree, &var);
+	}
+
+	const int* min = cgs_bst_min(tree);
+	const int* max = cgs_bst_max(tree);
+	assert(*min == 2);
+	assert(*max == 14);
 	assert(cgs_bst_size(tree) == 3);
 
-	cgs_bst_insert(tree, -13);
-	cgs_bst_insert(tree, 37);
-	cgs_bst_insert(tree, -6);
-	cgs_bst_insert(tree, 100);
-	cgs_bst_insert(tree, 0);
-	cgs_bst_insert(tree, -1);
-	cgs_bst_insert(tree, 8);
-	assert(cgs_bst_min(tree) == -13);
-	assert(cgs_bst_max(tree) == 100);
+	for ( ; i < 10; ++i) {
+		cgs_variant_set_int(&var, arr[i]);
+		cgs_bst_insert(tree, &var);
+	}
 
+	min = cgs_bst_min(tree);
+	max = cgs_bst_max(tree);
+	assert(*min == -13);
+	assert(*max == 100);
 	assert(cgs_bst_size(tree) == 10);
 
-	cgs_bst_insert(tree, -67);
-	cgs_bst_insert(tree, 72);
-	assert(cgs_bst_min(tree) == -67);
-	assert(cgs_bst_max(tree) == 100);
+	for ( ; i < len; ++i) {
+		cgs_variant_set_int(&var, arr[i]);
+		cgs_bst_insert(tree, &var);
+	}
 
+	min = cgs_bst_min(tree);
+	max = cgs_bst_max(tree);
+	assert(*min == -67);
+	assert(*max == 100);
 	assert(cgs_bst_size(tree) == 12);
 
 	cgs_bst_free(tree);

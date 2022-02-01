@@ -25,16 +25,26 @@
  */
 struct cgs_bst;
 struct cgs_bst_node;
+struct cgs_variant;
+
+/**
+ * cgs_cmp
+ *
+ * A three-way comparison function. Shares the same signature as qsort compare.
+ */
+typedef int (*cgs_bst_cmp)(const void*, const void*);
 
 /**
  * cgs_bst_new
  *
- * Allocate a new binary search tree and return it. Size will be 0 and the root
- * will be NULL.
+ * Allocate a new binary search tree and return it. Size will be 0, the root
+ * will be NULL and cmp will be set.
+ *
+ * @param cmp	The comparison function to order the tree with.
  *
  * @return	An empty binary search tree.
  */
-struct cgs_bst* cgs_bst_new(void);
+struct cgs_bst* cgs_bst_new(cgs_bst_cmp cmp);
 
 /**
  * cgs_bst_free
@@ -67,7 +77,8 @@ size_t cgs_bst_size(const struct cgs_bst* tree);
  *
  * @return	Pointer to inserted node if successful, NULL on failure.
  */
-struct cgs_bst_node* cgs_bst_insert(struct cgs_bst* tree, int val);
+struct cgs_bst_node*
+cgs_bst_insert(struct cgs_bst* tree, struct cgs_variant* data);
 
 /**
  * cgs_bst_min
@@ -78,7 +89,8 @@ struct cgs_bst_node* cgs_bst_insert(struct cgs_bst* tree, int val);
  *
  * @return	Minimum value in the tree.
  */
-int cgs_bst_min(const struct cgs_bst* tree);
+const void*
+cgs_bst_min(const struct cgs_bst* tree);
 
 /**
  * cgs_bst_max
@@ -89,5 +101,6 @@ int cgs_bst_min(const struct cgs_bst* tree);
  *
  * @return	Maximum value in the tree.
  */
-int cgs_bst_max(const struct cgs_bst* tree);
+const void*
+cgs_bst_max(const struct cgs_bst* tree);
 
