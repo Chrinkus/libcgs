@@ -10,11 +10,9 @@ add_compile_options(-g -Wall -Wextra -Wpedantic)
 set(LIB_NAME "cgs")
 
 add_subdirectory(src)
-add_subdirectory(include)
 
 enable_testing()
 add_subdirectory(test)
 
 include(GNUInstallDirs)
-install(TARGETS ${LIB_NAME})
 
