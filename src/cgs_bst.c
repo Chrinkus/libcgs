@@ -60,6 +60,22 @@ cgs_bst_node_insert(struct cgs_bst_node* node, struct cgs_variant* data,
 	return node;
 }
 
+static struct cgs_variant*
+cgs_bst_node_search(struct cgs_bst_node* node, const struct cgs_variant* data,
+		cgs_bst_cmp cmp)
+{
+	for (int rc; node; ) {
+		rc = cmp(cgs_variant_get(data), cgs_variant_get(&node->data));
+		if (rc == 0)
+			return &node->data;
+		else if (rc < 0)
+			node = node->left;
+		else
+			node = node->right;
+	}
+	return NULL;
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 // Tree functions
 struct cgs_bst* cgs_bst_new(cgs_bst_cmp cmp)
@@ -92,6 +108,12 @@ cgs_bst_insert(struct cgs_bst* tree, struct cgs_variant* data)
 	++tree->size;
 
 	return tree->root;
+}
+
+struct cgs_variant*
+cgs_bst_search(struct cgs_bst* tree, const struct cgs_variant* data)
+{
+	return cgs_bst_node_search(tree->root, data, tree->cmp);
 }
 
 const void*

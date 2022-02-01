@@ -81,6 +81,21 @@ struct cgs_bst_node*
 cgs_bst_insert(struct cgs_bst* tree, struct cgs_variant* data);
 
 /**
+ * cgs_bst_search
+ *
+ * Search the tree for an entry. Uses the 3-way comparison function of the
+ * tree to find a matching variant.
+ *
+ * @param tree	Tree to search.
+ * @param data	Data to find in the tree.
+ *
+ * @return	A pointer to the variant that matches the search data or NULL
+ * 		if not found.
+ */
+struct cgs_variant*
+cgs_bst_search(struct cgs_bst* tree, const struct cgs_variant* data);
+
+/**
  * cgs_bst_min
  *
  * Get the minimum value in the tree.
