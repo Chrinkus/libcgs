@@ -4,6 +4,7 @@ set(test_sources
 	"tests_bst.c"
 	"tests_variant.c"
 	"tests_variant_usage.c"
+	"tests_string_utils.c"
 )
 
 string(LENGTH "tests_" test_prefix_len)

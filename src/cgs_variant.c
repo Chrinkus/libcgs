@@ -1,4 +1,5 @@
 #include "cgs_variant.h"
+#include "cgs_string_utils.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -19,7 +20,7 @@ void cgs_variant_set_double(struct cgs_variant* var, double x)
 void cgs_variant_set_string(struct cgs_variant* var, const char* s)
 {
 	var->type = CGS_VARIANT_TYPE_STRING;
-	var->data.s = strdup(s);
+	var->data.s = cgs_strdup(s);
 }
 
 void cgs_variant_set_data(struct cgs_variant* var, void* data)

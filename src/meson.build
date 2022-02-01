@@ -1,6 +1,10 @@
 version = meson.project_version()
 
-sources = [ 'cgs_bst.c', 'cgs_variant.c' ]
+sources = [
+  'cgs_bst.c',
+  'cgs_variant.c',
+  'cgs_string_utils.c'
+]
 
 cgs = library('cgs', sources,
   include_directories : inc,
