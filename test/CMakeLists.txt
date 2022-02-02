@@ -1,6 +1,7 @@
 include_directories("${PROJECT_SOURCE_DIR}/cgs")
 
 set(test_sources
+	"tests_array.c"
 	"tests_bst.c"
 	"tests_variant.c"
 	"tests_variant_usage.c"

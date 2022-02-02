@@ -8,6 +8,7 @@ add_library(${LIB_NAME} "${sources}")
 
 set(headers
 	"cgs.h"
+	"cgs_array.h"
 	"cgs_bst.h"
 	"cgs_string_utils.h"
 	"cgs_test.h"
