@@ -1,6 +1,6 @@
 #include "cgs_test.h"
 
-#include "cgs.h"
+#include "cgs_variant.h"
 
 struct point {
 	int x;

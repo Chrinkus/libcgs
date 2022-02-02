@@ -1,4 +1,4 @@
-include_directories("${PROJECT_SOURCE_DIR}/src")
+include_directories("${PROJECT_SOURCE_DIR}/cgs")
 
 set(test_sources
 	"tests_bst.c"

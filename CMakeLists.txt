@@ -9,7 +9,7 @@ add_compile_options(-g -Wall -Wextra -Wpedantic)
 
 set(LIB_NAME "cgs")
 
-add_subdirectory(src)
+add_subdirectory(cgs)
 
 enable_testing()
 add_subdirectory(test)
