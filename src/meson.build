@@ -1,8 +1,8 @@
 install_headers(
+  'cgs.h',
   'cgs_bst.h',
   'cgs_string_utils.h',
   'cgs_test.h',
-  'cgs_types.h',
   'cgs_variant.h',
   subdir : 'cgs'
 )

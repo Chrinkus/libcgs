@@ -1,9 +1,6 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
-#include <string.h>
+#include "cgs_test.h"
 
-#include "cgs_variant.h"
+#include "cgs.h"
 
 struct point {
 	int x;

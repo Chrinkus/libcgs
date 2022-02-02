@@ -1,17 +1,17 @@
 set(sources
 	"cgs_bst.c"
-	"cgs_variant.c"
 	"cgs_string_utils.c"
+	"cgs_variant.c"
 )
 
 add_library(${LIB_NAME} "${sources}")
 
 set(headers
+	"cgs.h"
 	"cgs_bst.h"
-	"cgs_variant.h"
-	"cgs_types.h"
 	"cgs_string_utils.h"
 	"cgs_test.h"
+	"cgs_variant.h"
 )
 
 set_target_properties(${LIB_NAME} PROPERTIES
