@@ -14,16 +14,17 @@ enum cgs_array_scalars {
 };
 
 /**
- * CGS_ARRAY_DEFINE_TYPE
+ * CGS_ARRAY_DEFINE_STRUCT
  *
- * Defines an array struct of type TYPE called NAME.
+ * Defines an array struct of type TYPE called NAME. This ensures the array
+ * type will have the expected members.
  */
-#define CGS_ARRAY_DEFINE_TYPE(name, type)	\
-	typedef struct {			\
+#define CGS_ARRAY_DEFINE_STRUCT(name, type)	\
+	 struct name {				\
 		size_t len;			\
 		size_t mem;			\
 		type*  arr;			\
-	} name
+	} 
 
 /**
  * cgs_array_init
@@ -93,4 +94,18 @@ enum cgs_array_scalars {
 			cgs_array_grow((a));	\
 		cgs_array_place((a), (val));	\
 	} while (0)
+
+/**
+ * cgs_array_get
+ *
+ * Get the value of the element at the requested index.
+ */
+#define cgs_array_get(a, index) (a)->arr[(index)]
+
+/**
+ * cgs_array_getp
+ *
+ * Get a pointer to the element at the requested index.
+ */
+#define cgs_array_getp(a, index) (&(a)->arr[(index)])
 
