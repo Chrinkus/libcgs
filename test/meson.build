@@ -1,5 +1,6 @@
 tests = [
   ['bst', 'tests_bst.c'],
+  ['array', 'tests_array.c'],
   ['variant', 'tests_variant.c'],
   ['variant_usage', 'tests_variant_usage.c'],
   ['string_utils', 'tests_string_utils.c']
