@@ -2,6 +2,7 @@ install_headers(
   'cgs.h',
   'cgs_array.h',
   'cgs_bst.h',
+  'cgs_rbt.h',
   'cgs_string_utils.h',
   'cgs_test.h',
   'cgs_variant.h',
@@ -10,6 +11,7 @@ install_headers(
 
 sources = [
   'cgs_bst.c',
+  'cgs_rbt.c',
   'cgs_string_utils.c',
   'cgs_variant.c'
 ]

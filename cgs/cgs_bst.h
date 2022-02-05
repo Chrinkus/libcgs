@@ -28,7 +28,7 @@ struct cgs_bst_node;
 struct cgs_variant;
 
 /**
- * cgs_cmp
+ * cgs_bst_cmp
  *
  * A three-way comparison function. Shares the same signature as qsort compare.
  */
