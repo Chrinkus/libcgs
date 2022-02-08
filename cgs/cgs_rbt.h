@@ -71,3 +71,41 @@ cgs_rbt_free(struct cgs_rbt* tree);
 size_t
 cgs_rbt_size(const struct cgs_rbt* tree);
 
+/**
+ * cgs_rbt_insert
+ *
+ * Insert a node into the tree.
+ *
+ * @param tree	Tree to insert node into.
+ * @param val	Value to insert into tree.
+ *
+ * @return	Pointer to inserted node if successful, NULL on failure.
+ */
+struct cgs_rbt_node*
+cgs_rbt_insert(struct cgs_rbt* tree, struct cgs_variant* data);
+
+/**
+ * cgs_rbt_min
+ *
+ * Get the minimum value in the tree.
+ *
+ * @param tree	Tree to find minimum value of.
+ *
+ * @return	Minimum value in the tree.
+ */
+const void*
+cgs_rbt_min(const struct cgs_rbt* tree);
+
+/**
+ * cgs_rbt_max
+ *
+ * Get the maximum value in the tree.
+ *
+ * @param tree	Tree to find maximum value of.
+ *
+ * @return	Maximum value in the tree.
+ */
+const void*
+cgs_rbt_max(const struct cgs_rbt* tree);
+
+

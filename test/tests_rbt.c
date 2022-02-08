@@ -1,6 +1,8 @@
 #include "cgs_rbt.h"
 #include "cgs_test.h"
 
+#include "cgs_variant.h"
+
 int int_cmp(const void* a, const void* b)
 {
 	return *(int*)a - *(int*)b;
@@ -20,10 +22,64 @@ int rbt_new_test(void* data)
 	return TEST_SUCCESS;
 }
 
+int rbt_insert_test(void* data)
+{
+	(void)data;
+
+	struct cgs_rbt* tree = cgs_rbt_new(int_cmp);
+	assert(cgs_rbt_size(tree) == 0);
+
+	struct cgs_variant v = { 0 };
+	cgs_variant_set_int(&v, 16);
+
+	cgs_rbt_insert(tree, &v);
+	assert(cgs_rbt_size(tree) == 1);
+
+	cgs_variant_set_int(&v, 23);
+	cgs_rbt_insert(tree, &v);
+	assert(cgs_rbt_size(tree) == 2);
+
+	cgs_rbt_free(tree);
+
+	return TEST_SUCCESS;
+}
+
+int rbt_minmax_test(void* data)
+{
+	(void)data;
+
+	struct cgs_rbt* tree = cgs_rbt_new(int_cmp);
+
+	struct cgs_variant v = { 0 };
+	cgs_variant_set_int(&v, 77);
+	cgs_rbt_insert(tree, &v);
+
+	const int* min = cgs_rbt_min(tree);
+	const int* max = cgs_rbt_max(tree);
+	assert(*min == 77);
+	assert(*max == 77);
+
+	int arr[] = { 2, 7, -3, 19, -1, 0, -12, 6, 100, 15 };
+	for (int i = 0; i < 10; ++i) {
+		cgs_variant_set_int(&v, arr[i]);
+		cgs_rbt_insert(tree, &v);
+	}
+
+	min = cgs_rbt_min(tree);
+	max = cgs_rbt_max(tree);
+	assert(*min == -12);
+	assert(*max == 100);
+
+	cgs_rbt_free(tree);
+	return TEST_SUCCESS;
+}
+
 int main(void)
 {
 	struct test tests[] = {
 		{ "rbt_new", rbt_new_test, NULL },
+		{ "rbt_insert", rbt_insert_test, NULL },
+		{ "rbt_minmax", rbt_minmax_test, NULL },
 	};
 
 	return cgs_run_tests(tests);
