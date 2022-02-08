@@ -57,54 +57,102 @@ cgs_rbt_node_free(struct cgs_rbt_node* node)
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 // Tree functions - private
 
+/**
+ * cgs_rbt_rotate_left
+ *
+ * Swap a node with it's right child. Only called under conditions where the
+ * "child" is guaranteed to exist.
+ */
 static void
 cgs_rbt_rotate_left(struct cgs_rbt* tree, struct cgs_rbt_node* node)
 {
-	struct cgs_rbt_node* temp = node->right;
-	node->right = temp->left;
-	if (temp && temp->left)
-		temp->left->parent = node;
-	temp->parent = node->parent;
-	if (!temp->parent)
-		tree->root = temp;
+	struct cgs_rbt_node* child = node->right;
+	node->right = child->left;
+	if (child->left)
+		child->left->parent = node;
+	child->parent = node->parent;
+	if (!child->parent)
+		tree->root = child;
 	else if (node == node->parent->left)
-		node->parent->left = temp;
+		node->parent->left = child;
 	else
-		node->parent->right = temp;
-	temp->left = node;
-	node->parent = temp;
+		node->parent->right = child;
+	child->left = node;
+	node->parent = child;
 }
 
+/**
+ * cgs_rbt_rotate_right
+ *
+ * Swap a node with it's left child. Only called under conditions where the
+ * "child" is guaranteed to exist.
+ */
 static void
 cgs_rbt_rotate_right(struct cgs_rbt* tree, struct cgs_rbt_node* node)
 {
-	struct cgs_rbt_node* temp = node->left;
-	node->left = temp->right;
-	if (temp && temp->right)
-		temp->right->parent = node;
-	temp->parent = node->parent;
-	if (!temp->parent)
-		tree->root = temp;
+	struct cgs_rbt_node* child = node->left;
+	node->left = child->right;
+	if (child->right)
+		child->right->parent = node;
+	child->parent = node->parent;
+	if (!child->parent)
+		tree->root = child;
 	else if (node == node->parent->left)
-		node->parent->left = temp;
+		node->parent->left = child;
 	else
-		node->parent->right = temp;
-	temp->right = node;
-	node->parent = temp;
+		node->parent->right = child;
+	child->right = node;
+	node->parent = child;
 }
 
+/**
+ * cgs_rbt_rebalance
+ *
+ * Check the tree structure after adding or deleting a node. Terminates when
+ * node's parent is not RED or is NULL (root).
+ *
+ * - If node's parent is a lefty
+ * 	- get aunty right
+ * 	- If aunt exists and is RED
+ * 		- node and aunt become BLACK
+ * 		- grandparent becomes RED
+ * 		- move node pointer to grandparent and iterate 
+ * 	- Else if node is a righty
+ * 		- move node pointer to parent
+ * 		- rotate left and iterate
+ * 	- Else node is a lefty
+ * 		- node's parent becomes BLACK
+ * 		- grandparent becomes RED
+ * 		- rotate right and break loop (parent is BLACK)
+ * 		
+ * - Else node's parent is a righty
+ *   	- get aunty left
+ *   	- If aunt exists and is RED
+ *   		- node and aunt become BLACK
+ *   		- grandparent becomes RED
+ *   		- move node pointer to grandparent and iterate
+ *   	- Else if node is a lefty
+ *   		- move node pointer to parent
+ *   		- rotate right and iterate
+ *   	- Else node is a righty
+ *   		- node's parent becomes BLACK
+ *   		- grandparent becomes RED
+ *   		- rotate left and break loop (parent is BLACK)
+ *
+ * Double parent dereferencing may result in NULL leaves which are assumed to
+ * be BLACK.
+ */
 static void
 cgs_rbt_rebalance(struct cgs_rbt* tree, struct cgs_rbt_node* node)
 {
 	// Fix-up tree-structure
 	while (node->parent && node->parent->color == CGS_RBT_RED) {
-		struct cgs_rbt_node* temp = NULL;
+		struct cgs_rbt_node* aunt = NULL;
 		if (node->parent == node->parent->parent->left) {
-			// node's parent is a lefty
-			temp = node->parent->parent->right;
-			if (temp && temp->color == CGS_RBT_RED) {
+			aunt = node->parent->parent->right;
+			if (aunt && aunt->color == CGS_RBT_RED) {
 				node->parent->color = CGS_RBT_BLACK;
-				temp->color = CGS_RBT_BLACK;
+				aunt->color = CGS_RBT_BLACK;
 				node->parent->parent->color = CGS_RBT_RED;
 				node = node->parent->parent;
 			} else if (node == node->parent->right) {
@@ -116,11 +164,10 @@ cgs_rbt_rebalance(struct cgs_rbt* tree, struct cgs_rbt_node* node)
 				cgs_rbt_rotate_right(tree, node->parent->parent);
 			}
 		} else {
-			// node's parent is a righty
-			temp = node->parent->parent->left;
-			if (temp && temp->color == CGS_RBT_RED) {
+			aunt = node->parent->parent->left;
+			if (aunt && aunt->color == CGS_RBT_RED) {
 				node->parent->color = CGS_RBT_BLACK;
-				temp->color = CGS_RBT_BLACK;
+				aunt->color = CGS_RBT_BLACK;
 				node->parent->parent->color = CGS_RBT_RED;
 				node = node->parent->parent;
 			} else if (node == node->parent->left) {
@@ -219,5 +266,20 @@ cgs_rbt_max(const struct cgs_rbt* tree)
 	while (node && node->right)
 		node = node->right;
 	return node ? cgs_variant_get(&node->data) : NULL;
+}
+
+const struct cgs_variant*
+cgs_rbt_search(const struct cgs_rbt* tree, const struct cgs_variant* data)
+{
+	const struct cgs_rbt_node* node = tree->root;
+	for (int rc; node; ) {
+		const void* a = cgs_variant_get(data);
+		const void* b = cgs_variant_get(&node->data);
+		rc = tree->cmp(a, b);
+		if (rc == 0)
+			return &node->data;
+		node = rc < 0 ? node->left : node->right;
+	}
+	return NULL;
 }
 

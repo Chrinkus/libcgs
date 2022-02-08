@@ -108,4 +108,18 @@ cgs_rbt_min(const struct cgs_rbt* tree);
 const void*
 cgs_rbt_max(const struct cgs_rbt* tree);
 
+/**
+ * cgs_rbt_search
+ *
+ * Search the tree for an entry. Uses the 3-way comparison function of the
+ * tree to find a matching variant.
+ *
+ * @param tree	Tree to search.
+ * @param data	Data to find in the tree.
+ *
+ * @return	A read-only pointer to the variant that matches the search
+ * 		data or NULL if not found.
+ */
+const struct cgs_variant*
+cgs_rbt_search(const struct cgs_rbt* tree, const struct cgs_variant* data);
 
