@@ -92,8 +92,8 @@ cgs_bst_insert(struct cgs_bst* tree, struct cgs_variant* data);
  * @return	A pointer to the variant that matches the search data or NULL
  * 		if not found.
  */
-struct cgs_variant*
-cgs_bst_search(struct cgs_bst* tree, const struct cgs_variant* data);
+const struct cgs_variant*
+cgs_bst_search(const struct cgs_bst* tree, const struct cgs_variant* data);
 
 /**
  * cgs_bst_min

@@ -53,7 +53,7 @@ int bst_int_search_test(void* data)
 	}
 
 	// re-usable pointers
-	struct cgs_variant* pv;
+	const struct cgs_variant* pv;
 	const int* pi;
 
 	for (int i = 0; i < glen; ++i) {

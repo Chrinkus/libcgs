@@ -5,9 +5,6 @@
 #include "cgs_variant.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-// Enums
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 // Structs
 struct cgs_bst {
 	struct cgs_bst_node* root;
@@ -17,18 +14,20 @@ struct cgs_bst {
 
 struct cgs_bst_node {
 	struct cgs_variant data;
+	struct cgs_bst_node* parent;
 	struct cgs_bst_node* left;
 	struct cgs_bst_node* right;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-// Node functions
+// Node functions - private
 static struct cgs_bst_node*
 cgs_bst_node_new(struct cgs_variant* data)
 {
 	struct cgs_bst_node* node = malloc(sizeof(struct cgs_bst_node));
 	if (node) {
 		memcpy(&node->data, data, sizeof(struct cgs_variant));
+		node->parent = NULL;
 		node->left = NULL;
 		node->right = NULL;
 	}
@@ -44,36 +43,6 @@ cgs_bst_node_free(struct cgs_bst_node* node)
 		cgs_variant_free_data(&node->data);
 	}
 	free(node);
-}
-
-static struct cgs_bst_node*
-cgs_bst_node_insert(struct cgs_bst_node* node, struct cgs_variant* data,
-		cgs_bst_cmp cmp)
-{
-	if (!node)
-		node = cgs_bst_node_new(data);
-	else if (cmp(cgs_variant_get(data), cgs_variant_get(&node->data)) < 0)
-		node->left = cgs_bst_node_insert(node->left, data, cmp);
-	else
-		node->right = cgs_bst_node_insert(node->right, data, cmp);
-
-	return node;
-}
-
-static struct cgs_variant*
-cgs_bst_node_search(struct cgs_bst_node* node, const struct cgs_variant* data,
-		cgs_bst_cmp cmp)
-{
-	for (int rc; node; ) {
-		rc = cmp(cgs_variant_get(data), cgs_variant_get(&node->data));
-		if (rc == 0)
-			return &node->data;
-		else if (rc < 0)
-			node = node->left;
-		else
-			node = node->right;
-	}
-	return NULL;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -104,16 +73,42 @@ size_t cgs_bst_size(const struct cgs_bst* tree)
 struct cgs_bst_node*
 cgs_bst_insert(struct cgs_bst* tree, struct cgs_variant* data)
 {
-	tree->root = cgs_bst_node_insert(tree->root, data, tree->cmp);
+	struct cgs_bst_node* node = cgs_bst_node_new(data);
+	struct cgs_bst_node* parent = NULL;
+
+	int cmp = 0;
+	for (struct cgs_bst_node* temp = tree->root; temp; ) {
+		parent = temp;
+		const void* a = cgs_variant_get(&node->data);
+		const void* b = cgs_variant_get(&temp->data);
+		temp = (cmp = tree->cmp(a, b)) < 0 ? temp->left : temp->right;
+	}
+	node->parent = parent;
+	if (!parent)
+		tree->root = node;
+	else if (cmp < 0)
+		parent->left = node;
+	else
+		parent->right = node;
+
 	++tree->size;
 
-	return tree->root;
+	return node;
 }
 
-struct cgs_variant*
-cgs_bst_search(struct cgs_bst* tree, const struct cgs_variant* data)
+const struct cgs_variant*
+cgs_bst_search(const struct cgs_bst* tree, const struct cgs_variant* data)
 {
-	return cgs_bst_node_search(tree->root, data, tree->cmp);
+	const struct cgs_bst_node* node = tree->root;
+	for (int rc; node; ) {
+		const void* a = cgs_variant_get(data);
+		const void* b = cgs_variant_get(&node->data);
+		rc = tree->cmp(a, b);
+		if (rc == 0)
+			return &node->data;
+		node = rc < 0 ? node->left : node->right;
+	}
+	return NULL;
 }
 
 const void*
@@ -121,9 +116,9 @@ cgs_bst_min(const struct cgs_bst* tree)
 {
 	const struct cgs_bst_node* node = tree->root;
 
-	while (node->left)
+	while (node && node->left)
 		node = node->left;
-	return cgs_variant_get(&node->data);
+	return node ? cgs_variant_get(&node->data) : NULL;
 }
 
 const void*
@@ -131,8 +126,8 @@ cgs_bst_max(const struct cgs_bst* tree)
 {
 	const struct cgs_bst_node* node = tree->root;
 
-	while (node->right)
+	while (node && node->right)
 		node = node->right;
-	return cgs_variant_get(&node->data);
+	return node ? cgs_variant_get(&node->data) : NULL;
 }
 
