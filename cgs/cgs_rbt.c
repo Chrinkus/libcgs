@@ -1,36 +1,43 @@
+/* cgs_rbt.c
+ *
+ * Copyright (C) 2022 Chris Schick <seeschickrun@gmail.com>
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ *
+ * cgs_rbt.c
+ *
+ * This file contains the source code of the libcgs implementation of a
+ * red-black tree.
+ *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 #include <stdlib.h>
 #include <string.h>
 
 #include "cgs_rbt.h"
+#include "cgs_rbt_private.h"
 #include "cgs_variant.h"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-// Enums
-
-enum cgs_rbt_colors { CGS_RBT_RED, CGS_RBT_BLACK };
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-// Structure definitions
-
-struct cgs_rbt {
-	struct cgs_rbt_node* root;
-	size_t size;
-	cgs_rbt_cmp cmp;
-};
-
-struct cgs_rbt_node {
-	struct cgs_variant data;
-	int color;
-	struct cgs_rbt_node* parent;
-	struct cgs_rbt_node* left;
-	struct cgs_rbt_node* right;
-};
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 // Node functions - private
 
-static struct cgs_rbt_node*
-cgs_rbt_node_new(struct cgs_variant* data)
+struct cgs_rbt_node*
+cgs_rbt_node_new(const struct cgs_variant* data)
 {
 	struct cgs_rbt_node* node = malloc(sizeof(struct cgs_rbt_node));
 	if (node) {
@@ -43,15 +50,21 @@ cgs_rbt_node_new(struct cgs_variant* data)
 	return node;
 }
 
-static void
+void
 cgs_rbt_node_free(struct cgs_rbt_node* node)
 {
 	if (node) {
 		cgs_rbt_node_free(node->left);
 		cgs_rbt_node_free(node->right);
 		cgs_variant_free_data(&node->data);
-		free(node);
+		if (node->parent) {
+			if (node == node->parent->left)
+				node->parent->left = NULL;
+			else
+				node->parent->right = NULL;
+		}
 	}
+	free(node);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -281,5 +294,40 @@ cgs_rbt_search(const struct cgs_rbt* tree, const struct cgs_variant* data)
 		node = rc < 0 ? node->left : node->right;
 	}
 	return NULL;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+// Tree functions - diagnostic
+
+const struct cgs_rbt_node*
+cgs_rbt_root(const struct cgs_rbt* tree)
+{
+	return tree->root;
+}
+
+int
+cgs_rbt_node_is_red(const struct cgs_rbt_node* node)
+{
+	return node ? node->color == CGS_RBT_RED : 1;
+}
+
+int
+cgs_rbt_node_is_black(const struct cgs_rbt_node* node)
+{
+	return node ? node->color == CGS_RBT_BLACK : 1;
+}
+
+int
+cgs_rbt_node_black_height(const struct cgs_rbt_node* node)
+{
+	if (!node)
+		return 1;	// Leaf nodes are considered black
+
+	int left = cgs_rbt_node_black_height(node->left);
+	int right = cgs_rbt_node_black_height(node->right);
+	if (left != right || left == -1)
+		return -1;
+
+	return left + cgs_rbt_node_is_black(node);
 }
 

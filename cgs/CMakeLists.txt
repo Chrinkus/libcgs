@@ -12,6 +12,7 @@ set(headers
 	"cgs_array.h"
 	"cgs_bst.h"
 	"cgs_rbt.h"
+	"cgs_rbt_private.h"
 	"cgs_string_utils.h"
 	"cgs_test.h"
 	"cgs_variant.h"
