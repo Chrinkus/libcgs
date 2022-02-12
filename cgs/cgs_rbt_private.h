@@ -139,3 +139,15 @@ cgs_rbt_node_is_black(const struct cgs_rbt_node* node);
 int
 cgs_rbt_node_black_height(const struct cgs_rbt_node* node);
 
+/**
+ * cgs_rbt_node_red_children_test
+ *
+ * A recursive test function to check whether any red nodes have red children.
+ *
+ * @param node	The node to test.
+ *
+ * @return	An integer boolean.
+ */
+int
+cgs_rbt_node_red_children_test(const struct cgs_rbt_node* node);
+

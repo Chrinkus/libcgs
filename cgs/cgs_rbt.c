@@ -331,3 +331,20 @@ cgs_rbt_node_black_height(const struct cgs_rbt_node* node)
 	return left + cgs_rbt_node_is_black(node);
 }
 
+int
+cgs_rbt_node_red_children_test(const struct cgs_rbt_node* node)
+{
+	if (!node)
+		return 1;
+
+	if (node->color == CGS_RBT_RED) {
+		if (node->left && node->left->color == CGS_RBT_RED)
+			return 0;
+		if (node->right && node->right->color == CGS_RBT_RED)
+			return 0;
+	}
+
+	return cgs_rbt_node_red_children_test(node->left)
+		&& cgs_rbt_node_red_children_test(node->right);
+}
+
