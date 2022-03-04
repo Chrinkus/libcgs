@@ -16,3 +16,10 @@ add_subdirectory(test)
 
 include(GNUInstallDirs)
 
+# Generates cmake config file for discovery
+install(EXPORT ${LIB_NAME}
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${LIB_NAME}
+	NAMESPACE ${LIB_NAME}::
+	FILE ${LIB_NAME}-config.cmake
+)
+
