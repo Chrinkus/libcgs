@@ -6,8 +6,6 @@ set(sources
 	"cgs_variant.c"
 )
 
-add_library(${LIB_NAME} "${sources}")
-
 set(headers
 	"cgs.h"
 	"cgs_array.h"
@@ -19,6 +17,8 @@ set(headers
 	"cgs_test.h"
 	"cgs_variant.h"
 )
+
+add_library(${LIB_NAME} "${sources}")
 
 set_target_properties(${LIB_NAME} PROPERTIES
 	VERSION 	${PROJECT_VERSION}

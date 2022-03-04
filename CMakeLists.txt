@@ -7,14 +7,14 @@ set(CMAKE_C_STANDARD_REQUIRED YES)
 
 add_compile_options(-Wall -Wextra)
 
+include(GNUInstallDirs)
+
 set(LIB_NAME "cgs")
 
 add_subdirectory(cgs)
 
 enable_testing()
 add_subdirectory(test)
-
-include(GNUInstallDirs)
 
 # Generates cmake config file for discovery
 install(EXPORT ${LIB_NAME}
