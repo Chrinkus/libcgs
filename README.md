@@ -50,8 +50,8 @@ This set of commands will configure the project for a release build and use Ninj
 ```
 $ mkdir build-release
 $ cd build-release
-$ cmake -G Ninja -DBUILD_SHARED_LIBS=YES ..
-$ cmake --build . --config Release
+$ cmake -G Ninja -DBUILD_SHARED_LIBS=YES -DCMAKE_BUILD_TYPE=Release ..
+$ cmake --build .
 $ sudo cmake --install .
 ```
 
@@ -62,8 +62,8 @@ Tests are not built by default. To build a debug-enabled version of the library 
 ```
 $ mkdir build-debug
 $ cd build-debug
-$ cmake -G Ninja -DBUILD_SHARE_LIBS=YES
-$ cmake --build . --config Debug --target tests
+$ cmake -G Ninja -DBUILD_SHARE_LIBS=YES -DCMAKE_BUILD_TYPE=Debug ..
+$ cmake --build . --target tests
 $ ctest
 ```
 
