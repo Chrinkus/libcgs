@@ -2,6 +2,7 @@ set(sources
 	"cgs_bst.c"
 	"cgs_compare.c"
 	"cgs_rbt.c"
+	"cgs_string.c"
 	"cgs_string_utils.c"
 	"cgs_variant.c"
 )
@@ -13,6 +14,7 @@ set(headers
 	"cgs_compare.h"
 	"cgs_rbt.h"
 	"cgs_rbt_private.h"
+	"cgs_string.h"
 	"cgs_string_utils.h"
 	"cgs_test.h"
 	"cgs_variant.h"
