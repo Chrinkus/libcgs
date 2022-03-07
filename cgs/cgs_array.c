@@ -30,6 +30,9 @@
  * This file contains the source code of the libcgs implementation of a
  * generic dynamic array.
  *
+ * After experimenting with an all-macro array implementation I decided to
+ * go with a char-counting array.
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 #include "cgs_array.h"
@@ -50,13 +53,13 @@ enum cgs_array_constants {
 };
 
 struct cgs_array*
-cgs_array_new_from_size(size_t element_size)
+cgs_array_new_from_size(size_t size)
 {
 	struct cgs_array* a = malloc(sizeof(struct cgs_array));
 	if (!a)
 		return NULL;
 
-	a->element_size = element_size;
+	a->element_size = size;
 	a->capacity = CGS_ARRAY_INITIAL_CAPACITY;
 	a->memory = malloc(a->element_size * a->capacity);
 	if (!a->memory) {
@@ -68,6 +71,27 @@ cgs_array_new_from_size(size_t element_size)
 	return a;
 }
 
+struct cgs_array*
+cgs_array_new_from_array(const void* src, size_t len, size_t size)
+{
+	struct cgs_array* a = malloc(sizeof(struct cgs_array));
+	if (!a)
+		return NULL;
+
+	a->element_size = size;
+	a->capacity = len;
+	a->memory = malloc(a->element_size * a->capacity);
+	if (!a->memory) {
+		free(a);
+		return NULL;
+	}
+
+	a->length = len;
+	memcpy(a->memory, src, a->length * a->element_size);
+
+	return a;
+}
+
 void
 cgs_array_free(struct cgs_array* a)
 {
@@ -75,6 +99,17 @@ cgs_array_free(struct cgs_array* a)
 		free(a->memory);
 		free(a);
 	}
+}
+
+void*
+cgs_array_xfer(struct cgs_array* a, size_t* len)
+{
+	void* p = a->memory;
+	if (len)
+		*len = a->length;
+	free(a);
+
+	return p;
 }
 
 size_t
@@ -126,5 +161,14 @@ void
 cgs_array_sort(struct cgs_array* a, cgs_cmp_3way cmp)
 {
 	qsort(a->memory, a->length, a->element_size, cmp);
+}
+
+void*
+cgs_array_find(struct cgs_array* a, const void* val, cgs_cmp_3way cmp)
+{
+	for (size_t i = 0; i < a->length; ++i)
+		if (cmp(cgs_array_get(a, i), val) == 0)
+			return cgs_array_get_mutable(a, i);
+	return NULL;
 }
 

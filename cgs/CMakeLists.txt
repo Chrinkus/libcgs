@@ -2,7 +2,6 @@ set(sources
 	"cgs_array.c"
 	"cgs_bst.c"
 	"cgs_compare.c"
-	"cgs_generic_array.c"
 	"cgs_rbt.c"
 	"cgs_string.c"
 	"cgs_string_utils.c"
