@@ -5,7 +5,7 @@ A C library of standard utilities.
 |Type|Description|
 |----|-----------|
 |cgs\_variant|A type-safe union|
-|cgs\_array|A dynamic array|
+|cgs\_array|A generic, dynamic array|
 |cgs\_rbt|A red-black tree|
 |cgs\_string\_utils|Common utilities for `char*`|
 

@@ -25,111 +25,60 @@
 #pragma once
 
 #include <stddef.h>
+#include "cgs_compare.h"
 
 /**
- * Dynamic Array
+ * struct cgs_array
  *
- * A dynamic vector implementation using macros. Yeah.
+ * A generic, dynamic array
  */
-
-enum cgs_array_scalars {
-	CGS_ARRAY_INITIAL_MEMORY = 8,
-	CGS_ARRAY_GROWTH_RATE = 2,
-};
+struct cgs_array;
 
 /**
- * CGS_ARRAY_DEFINE_STRUCT
+ * cgs_array_new
  *
- * Defines an array struct of type TYPE called NAME. This ensures the array
- * type will have the expected members.
+ * A convenience macro that calls 'sizeof' on a given type to call the
+ * 'cgs_array_new_from size' function below.
+ *
+ * @param t	Type of array.
  */
-#define CGS_ARRAY_DEFINE_STRUCT(name, type)	\
-	 struct name {				\
-		size_t len;			\
-		size_t mem;			\
-		type*  arr;			\
-	} 
+#define cgs_array_new(t) cgs_array_new_from_size(sizeof(t))
 
 /**
- * cgs_array_init
+ * cgs_array_new_from_size
  *
- * Initializes the array with a chunk of available memory.
+ * Allocates a new array for elements the size of the given type's size.
+ *
+ * @param element_size	The size in bytes of the array type.
+ *
+ * @return		A new empty array.
  */
-#define cgs_array_init(a)						\
-	do {								\
-		(a)->len = 0;						\
-		(a)->mem = CGS_ARRAY_INITIAL_MEMORY;			\
-		(a)->arr = malloc(sizeof(*(a)->arr) * (a)->mem);	\
-	} while (0)
+struct cgs_array*
+cgs_array_new_from_size(size_t element_size);
 
 /**
  * cgs_array_free
  *
- * Frees the memory that the array occupies.
- */
-#define cgs_array_free(a)		\
-	do {				\
-		(a)->len = 0;		\
-		(a)->mem = 0;		\
-		free((a)->arr);		\
-	} while (0)
-
-/**
- * cgs_array_xfer
+ * Deallocates an array.
  *
- * Passes ownership of the array memory. Sets arr to NULL but preserves len
- * for extraction.
+ * @param a	The array to deallocate.
  */
-#define cgs_array_xfer(a, p)		\
-	do {				\
-		(p) = (a)->arr;		\
-		(a)->arr = NULL;	\
-		(a)->mem = 0;		\
-	} while (0)
+void
+cgs_array_free(struct cgs_array* a);
 
-/**
- * cgs_array_place
- *
- * Sets the last value of the array. Assumes there is enough room. Called by
- * other macros, do not use.
- */
-#define cgs_array_place(a, val) (a)->arr[(a)->len++] = (val)
+size_t
+cgs_array_length(const struct cgs_array* a);
 
-/**
- * cgs_array_grow
- *
- * Increases the size of the array. Called by other macros, do not use.
- */
-#define cgs_array_grow(a)						\
-	do {								\
-		size_t inc = (a)->mem * CGS_ARRAY_GROWTH_RATE;		\
-		(a)->arr = realloc((a)->arr, sizeof(*(a)->arr) * inc);	\
-		(a)->mem = inc;						\
-	} while (0)
 
-/**
- * cgs_array_push
- *
- * Add an element to the end of the array. Resize if necessary.
- */
-#define cgs_array_push(a, val)			\
-	do {					\
-		if ((a)->len == (a)->mem)	\
-			cgs_array_grow((a));	\
-		cgs_array_place((a), (val));	\
-	} while (0)
+const void*
+cgs_array_get(const struct cgs_array* a, size_t index);
 
-/**
- * cgs_array_get
- *
- * Get the value of the element at the requested index.
- */
-#define cgs_array_get(a, index) (a)->arr[(index)]
+void*
+cgs_array_get_mutable(struct cgs_array* a, size_t index);
 
-/**
- * cgs_array_getp
- *
- * Get a pointer to the element at the requested index.
- */
-#define cgs_array_getp(a, index) (&(a)->arr[(index)])
+void*
+cgs_array_push(struct cgs_array* a, const void* src);
+
+void
+cgs_array_sort(struct cgs_array* a, cgs_cmp_3way cmp);
 
