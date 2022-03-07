@@ -1,21 +1,17 @@
 #include "cgs_bst.h"
 #include "cgs_variant.h"
+#include "cgs_compare.h"
 
 #include "cgs_test.h"
 
 const int garr[] = { 10, 14, 2, -13, 37, -6, 100, 0, -1, 8, -67, 72 };
 const int glen = ARR_SIZE(garr);
 
-int int_cmp(const void* a, const void* b)
-{
-	return *(int*)a - *(int*)b;
-}
-
 int bst_int_new_test(void* data)
 {
 	(void)data;
 
-	struct cgs_bst* tree = cgs_bst_new(int_cmp);
+	struct cgs_bst* tree = cgs_bst_new(cgs_int_cmp);
 	assert(tree != NULL);
 	assert(cgs_bst_size(tree) == 0);
 
@@ -28,7 +24,7 @@ int bst_int_insert_test(void* data)
 {
 	(void)data;
 
-	struct cgs_bst* tree = cgs_bst_new(int_cmp);
+	struct cgs_bst* tree = cgs_bst_new(cgs_int_cmp);
 	struct cgs_variant var = { 0 };
 
 	cgs_variant_set_int(&var, 5);
@@ -45,7 +41,7 @@ int bst_int_search_test(void* data)
 {
 	(void)data;
 
-	struct cgs_bst* tree = cgs_bst_new(int_cmp);
+	struct cgs_bst* tree = cgs_bst_new(cgs_int_cmp);
 	struct cgs_variant var = { 0 };
 	for (int i = 0; i < glen; ++i) {
 		cgs_variant_set_int(&var, garr[i]);
@@ -94,7 +90,7 @@ int bst_int_minmax_test(void* data)
 {
 	(void)data;
 
-	struct cgs_bst* tree = cgs_bst_new(int_cmp);
+	struct cgs_bst* tree = cgs_bst_new(cgs_int_cmp);
 	struct cgs_variant var = { 0 };
 
 	int i = 0;

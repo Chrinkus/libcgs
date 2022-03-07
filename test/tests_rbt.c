@@ -1,18 +1,14 @@
 #include "cgs_rbt.h"
 #include "cgs_test.h"
+#include "cgs_compare.h"
 
 #include "cgs_variant.h"
-
-int int_cmp(const void* a, const void* b)
-{
-	return *(int*)a - *(int*)b;
-}
 
 int rbt_new_test(void* data)
 {
 	(void)data;
 
-	struct cgs_rbt* tree = cgs_rbt_new(int_cmp);
+	struct cgs_rbt* tree = cgs_rbt_new(cgs_int_cmp);
 
 	assert(tree != NULL);
 	assert(cgs_rbt_size(tree) == 0);
@@ -26,7 +22,7 @@ int rbt_insert_test(void* data)
 {
 	(void)data;
 
-	struct cgs_rbt* tree = cgs_rbt_new(int_cmp);
+	struct cgs_rbt* tree = cgs_rbt_new(cgs_int_cmp);
 	assert(cgs_rbt_size(tree) == 0);
 
 	struct cgs_variant v = { 0 };
@@ -48,7 +44,7 @@ int rbt_minmax_test(void* data)
 {
 	(void)data;
 
-	struct cgs_rbt* tree = cgs_rbt_new(int_cmp);
+	struct cgs_rbt* tree = cgs_rbt_new(cgs_int_cmp);
 
 	struct cgs_variant v = { 0 };
 	cgs_variant_set_int(&v, 77);
@@ -78,7 +74,7 @@ int rbt_search_test(void* data)
 {
 	(void)data;
 
-	struct cgs_rbt* tree = cgs_rbt_new(int_cmp);
+	struct cgs_rbt* tree = cgs_rbt_new(cgs_int_cmp);
 	struct cgs_variant v1 = { 0 };
 
 	int arr[] = { 2, 7, -3, 19, -1, 0, -12, 6, 100, 15 };

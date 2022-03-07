@@ -8,6 +8,7 @@ add_custom_target(tests)
 set(test_sources
 	"tests_array.c"
 	"tests_bst.c"
+	"tests_compare.c"
 	"tests_rbt.c"
 	"tests_rbt_private.c"
 	"tests_variant.c"

@@ -39,3 +39,8 @@ int cgs_str_cmp(const void* a, const void* b)
 	return strcmp(s1, s2);
 }
 
+int cgs_char_cmp(const void* a, const void* b)
+{
+	return *(char*)a - *(char*)b;
+}
+

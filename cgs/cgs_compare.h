@@ -36,6 +36,7 @@
  * |  a == b  |0             |
  *
  */
+typedef int (*cgs_3way_cmp)(const void*, const void*);
 
 /**
  * cgs_int_cmp
@@ -50,7 +51,7 @@
 int cgs_int_cmp(const void* a, const void* b);
 
 /**
- * cgs_int_cmp
+ * cgs_str_cmp
  *
  * Three-way comparison function for strings (char*, char[]).
  *
@@ -61,3 +62,14 @@ int cgs_int_cmp(const void* a, const void* b);
  */
 int cgs_str_cmp(const void* a, const void* b);
 
+/**
+ * cgs_char_cmp
+ *
+ * Three-way comparison function for chars.
+ *
+ * @param a	A pointer to the target char.
+ * @param b	A pointer to the compare char.
+ *
+ * @return	An integer indicating the result of the comparison.
+ */
+int cgs_char_cmp(const void* a, const void* b);

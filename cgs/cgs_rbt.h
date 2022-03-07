@@ -50,12 +50,14 @@
 
 #include <stddef.h>
 
+#include "cgs_variant.h"
+#include "cgs_compare.h"
+
 /*
  * Struct forward declarations
  */
 struct cgs_rbt;
 struct cgs_rbt_node;
-struct cgs_variant;
 
 /**
  * cgs_rbt_cmp

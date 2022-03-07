@@ -26,6 +26,9 @@
 
 #include <stddef.h>
 
+#include "cgs_variant.h"
+#include "cgs_compare.h"
+
 /**
  * Binary Search Tree
  *
@@ -49,7 +52,6 @@
  */
 struct cgs_bst;
 struct cgs_bst_node;
-struct cgs_variant;
 
 /**
  * cgs_bst_cmp
