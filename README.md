@@ -4,10 +4,12 @@ A C library of standard utilities.
 
 |Type|Description|
 |----|-----------|
-|cgs\_variant|A type-safe union|
-|cgs\_array|A generic, dynamic array|
+|cgs\_array|A generic memory managed array|
 |cgs\_rbt|A red-black tree|
-|cgs\_string\_utils|Common utilities for `char*`|
+|cgs\_string|A memory managed string for unknown reads|
+|cgs\_variant|A type-safe union|
+|cgs\_io|Memory managed stream reading|
+|cgs\_string\_utils|Common utilities for regular `char*`'s|
 
 ## Download
 
