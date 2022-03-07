@@ -126,3 +126,13 @@ cgs_string_clear(struct cgs_string* s);
  */
 void
 cgs_string_erase(struct cgs_string* s);
+
+/**
+ * cgs_string_sort
+ *
+ * Sorts the characters of the string in-place.
+ *
+ * @param s	The string to sort.
+ */
+void
+cgs_string_sort(struct cgs_string* s);

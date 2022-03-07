@@ -102,6 +102,21 @@ int string_erase_test(void* data)
 	return TEST_SUCCESS;
 }
 
+int string_sort_test(void* data)
+{
+	(void)data;
+
+	struct cgs_string* s = cgs_string_new_from_string("abcdabcdabcd");
+
+	cgs_string_sort(s);
+
+	assert(strcmp(cgs_string_read(s), "aaabbbcccddd") == 0);
+
+	cgs_string_free(s);
+
+	return TEST_SUCCESS;
+}
+
 int main(void)
 {
 	struct test tests[] = {
@@ -111,6 +126,7 @@ int main(void)
 		{ "string_erase", string_erase_test, NULL },
 		{ "string_new_from_string", string_new_from_string_test,
 			"Super test string" },
+		{ "string_sort", string_sort_test, NULL },
 	};
 
 	return cgs_run_tests(tests);

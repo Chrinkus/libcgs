@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 #include "cgs_string.h"
+#include "cgs_compare.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -134,5 +135,11 @@ cgs_string_erase(struct cgs_string* s)
 	for (char* p = s->memory; p < s->memory + s->capacity; ++p)
 		*p = '\0';
 	s->length = 0;
+}
+
+void
+cgs_string_sort(struct cgs_string* s)
+{
+	qsort(s->memory, s->length, sizeof(char), cgs_char_cmp);
 }
 
