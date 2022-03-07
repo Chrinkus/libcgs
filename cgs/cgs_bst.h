@@ -54,13 +54,6 @@ struct cgs_bst;
 struct cgs_bst_node;
 
 /**
- * cgs_bst_cmp
- *
- * A three-way comparison function. Shares the same signature as qsort compare.
- */
-typedef int (*cgs_bst_cmp)(const void*, const void*);
-
-/**
  * cgs_bst_new
  *
  * Allocate a new binary search tree and return it. Size will be 0, the root
@@ -70,7 +63,7 @@ typedef int (*cgs_bst_cmp)(const void*, const void*);
  *
  * @return	An empty binary search tree.
  */
-struct cgs_bst* cgs_bst_new(cgs_bst_cmp cmp);
+struct cgs_bst* cgs_bst_new(cgs_cmp_3way cmp);
 
 /**
  * cgs_bst_free

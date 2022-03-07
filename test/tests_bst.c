@@ -1,6 +1,4 @@
 #include "cgs_bst.h"
-#include "cgs_variant.h"
-#include "cgs_compare.h"
 
 #include "cgs_test.h"
 

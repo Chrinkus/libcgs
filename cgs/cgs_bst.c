@@ -26,14 +26,13 @@
 #include <string.h>
 
 #include "cgs_bst.h"
-#include "cgs_variant.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 // Structs
 struct cgs_bst {
 	struct cgs_bst_node* root;
 	size_t size;
-	cgs_bst_cmp cmp;
+	cgs_cmp_3way cmp;
 };
 
 struct cgs_bst_node {
@@ -71,7 +70,7 @@ cgs_bst_node_free(struct cgs_bst_node* node)
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 // Tree functions
-struct cgs_bst* cgs_bst_new(cgs_bst_cmp cmp)
+struct cgs_bst* cgs_bst_new(cgs_cmp_3way cmp)
 {
 	struct cgs_bst* tree = malloc(sizeof(struct cgs_bst));
 	if (tree) {

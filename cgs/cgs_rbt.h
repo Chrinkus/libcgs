@@ -22,6 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  *
  * cgs_rbt.h
@@ -59,13 +60,6 @@
 struct cgs_rbt;
 struct cgs_rbt_node;
 
-/**
- * cgs_rbt_cmp
- *
- * A three-way comparison function. Shares the same signature as qsort compare.
- */
-typedef int (*cgs_rbt_cmp)(const void*, const void*);
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Red-Black Tree Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
@@ -81,7 +75,7 @@ typedef int (*cgs_rbt_cmp)(const void*, const void*);
  * @return	An empty red-black tree.
  */
 struct cgs_rbt*
-cgs_rbt_new(cgs_rbt_cmp cmp);
+cgs_rbt_new(cgs_cmp_3way cmp);
 
 /**
  * cgs_rbt_free

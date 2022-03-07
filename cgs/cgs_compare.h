@@ -36,7 +36,7 @@
  * |  a == b  |0             |
  *
  */
-typedef int (*cgs_3way_cmp)(const void*, const void*);
+typedef int (*cgs_cmp_3way)(const void*, const void*);
 
 /**
  * cgs_int_cmp
@@ -73,3 +73,4 @@ int cgs_str_cmp(const void* a, const void* b);
  * @return	An integer indicating the result of the comparison.
  */
 int cgs_char_cmp(const void* a, const void* b);
+

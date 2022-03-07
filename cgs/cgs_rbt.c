@@ -38,6 +38,7 @@
 #include "cgs_rbt.h"
 #include "cgs_rbt_private.h"
 #include "cgs_variant.h"
+#include "cgs_compare.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
 // Node functions - private
@@ -206,7 +207,7 @@ cgs_rbt_rebalance(struct cgs_rbt* tree, struct cgs_rbt_node* node)
 // Tree functions - public
 
 struct cgs_rbt*
-cgs_rbt_new(cgs_rbt_cmp cmp)
+cgs_rbt_new(cgs_cmp_3way cmp)
 {
 	struct cgs_rbt* tree = malloc(sizeof(struct cgs_rbt));
 	if (tree) {
