@@ -9,6 +9,7 @@ set(test_sources
 	"tests_array.c"
 	"tests_bst.c"
 	"tests_compare.c"
+	"tests_io.c"
 	"tests_rbt.c"
 	"tests_rbt_private.c"
 	"tests_variant.c"
@@ -36,3 +37,6 @@ foreach(file IN LISTS test_sources)
 	add_dependencies(tests "${command_name}")
 endforeach()
 
+# Move data files to test binary
+file(COPY "${PROJECT_SOURCE_DIR}/data/io_test_data.txt"
+	DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
