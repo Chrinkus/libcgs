@@ -159,13 +159,13 @@ cgs_array_get_mutable(struct cgs_array* a, size_t index)
 const void*
 cgs_array_start(const struct cgs_array* a)
 {
-	return &a->memory[0];
+	return a->memory;
 }
 
 const void*
 cgs_array_end(const struct cgs_array* a)
 {
-	return &a->memory[0] + a->length;
+	return a->memory + a->length * a->element_size;
 }
 
 void*

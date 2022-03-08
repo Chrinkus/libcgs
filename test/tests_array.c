@@ -118,6 +118,12 @@ int array_iter_test(void* data)
 	const int* pend = cgs_array_end(ai);
 	assert(pend != NULL);
 
+	int sum = 0;
+	for (const int* p = pstart; p != pend; ++p)
+		sum += *p;
+
+	assert(sum == 55);
+
 	cgs_array_free(ai);
 
 	return TEST_SUCCESS;
@@ -152,17 +158,26 @@ int array_strings_test(void* data)
 		"Dugald",
 	};
 
+	// New
 	struct cgs_array* as = cgs_array_new(char*);
+	// Push
 	for (int i = 0; i < 5; ++i) {
 		char* p = cgs_strdup(strs[i]);
 		cgs_array_push(as, &p);
 	}
-
 	assert(cgs_array_length(as) == 5);
 
-	const char* p = *(const char**)cgs_array_get(as, 0);
-	assert(strcmp(p, strs[0]) == 0);
+	// Get :(
+	const char* const * p = cgs_array_get(as, 0);
+	assert(strcmp(*p, strs[0]) == 0);
 
+	// Iters :(((
+	for (const char* const * p = cgs_array_start(as),
+			* const * q = cgs_array_end(as),
+			** s = strs; p != q; ++p, ++s)
+		assert(strcmp(*p, *s) == 0);
+
+	// Free
 	cgs_array_free_with_data(as);
 
 	return TEST_SUCCESS;
