@@ -25,20 +25,6 @@
 #pragma once
 
 /**
- * Comparison Functions
- *
- * These comparison functions act as 3-way, qsort-compatible comparisons.
- *
- * |Comparison|Return Value  |
- * |----------|--------------|
- * |  a < b   |Less than 0   |
- * |  a > b   |Greater than 0|
- * |  a == b  |0             |
- *
- */
-typedef int (*cgs_cmp_3way)(const void*, const void*);
-
-/**
  * cgs_int_cmp
  *
  * Three-way comparison function for integers.

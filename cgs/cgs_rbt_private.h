@@ -37,7 +37,7 @@
 
 #include "cgs_rbt.h"
 #include "cgs_variant.h"
-#include "cgs_compare.h"
+#include "cgs_defs.h"
 
 /**
  * enum cgs_rbt_color
@@ -67,7 +67,7 @@ struct cgs_rbt_node {
 struct cgs_rbt {
 	struct cgs_rbt_node* root;
 	size_t size;
-	cgs_cmp_3way cmp;
+	CgsCmp3Way cmp;
 };
 
 /**

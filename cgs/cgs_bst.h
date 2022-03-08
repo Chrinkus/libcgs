@@ -27,7 +27,7 @@
 #include <stddef.h>
 
 #include "cgs_variant.h"
-#include "cgs_compare.h"
+#include "cgs_defs.h"
 
 /**
  * Binary Search Tree
@@ -63,7 +63,7 @@ struct cgs_bst_node;
  *
  * @return	An empty binary search tree.
  */
-struct cgs_bst* cgs_bst_new(cgs_cmp_3way cmp);
+struct cgs_bst* cgs_bst_new(CgsCmp3Way cmp);
 
 /**
  * cgs_bst_free

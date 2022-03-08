@@ -25,7 +25,7 @@
 #pragma once
 
 #include <stddef.h>
-#include "cgs_compare.h"
+#include "cgs_defs.h"
 
 /**
  * struct cgs_array
@@ -144,7 +144,7 @@ void*
 cgs_array_get_mutable(struct cgs_array* a, size_t index);
 
 /**
- * cgs_array_start
+ * cgs_array_begin
  *
  * Get a read-only pointer to the first element in the array.
  *
@@ -153,7 +153,7 @@ cgs_array_get_mutable(struct cgs_array* a, size_t index);
  * @return	A read-only pointer to the first element.
  */
 const void*
-cgs_array_start(const struct cgs_array* a);
+cgs_array_begin(const struct cgs_array* a);
 
 /**
  * cgs_array_end
@@ -190,7 +190,7 @@ cgs_array_push(struct cgs_array* a, const void* src);
  * @param cmp	A three-way compare function for the elements of the array.
  */
 void
-cgs_array_sort(struct cgs_array* a, cgs_cmp_3way cmp);
+cgs_array_sort(struct cgs_array* a, CgsCmp3Way cmp);
 
 /**
  * cgs_array_find
@@ -204,5 +204,5 @@ cgs_array_sort(struct cgs_array* a, cgs_cmp_3way cmp);
  * @return	A pointer to the element if found or NULL if not found.
  */
 void*
-cgs_array_find(struct cgs_array* a, const void* val, cgs_cmp_3way cmp);
+cgs_array_find(struct cgs_array* a, const void* val, CgsCmp3Way cmp);
 

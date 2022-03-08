@@ -1,4 +1,5 @@
 #include "cgs_rbt.h"
+#include "cgs_compare.h"
 #include "cgs_test.h"
 
 int rbt_new_test(void* data)

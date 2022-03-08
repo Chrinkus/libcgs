@@ -157,7 +157,7 @@ cgs_array_get_mutable(struct cgs_array* a, size_t index)
 }
 
 const void*
-cgs_array_start(const struct cgs_array* a)
+cgs_array_begin(const struct cgs_array* a)
 {
 	return a->memory;
 }
@@ -181,13 +181,13 @@ cgs_array_push(struct cgs_array* a, const void* src)
 }
 
 void
-cgs_array_sort(struct cgs_array* a, cgs_cmp_3way cmp)
+cgs_array_sort(struct cgs_array* a, CgsCmp3Way cmp)
 {
 	qsort(a->memory, a->length, a->element_size, cmp);
 }
 
 void*
-cgs_array_find(struct cgs_array* a, const void* val, cgs_cmp_3way cmp)
+cgs_array_find(struct cgs_array* a, const void* val, CgsCmp3Way cmp)
 {
 	for (size_t i = 0; i < a->length; ++i)
 		if (cmp(cgs_array_get(a, i), val) == 0)

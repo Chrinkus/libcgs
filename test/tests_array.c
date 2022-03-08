@@ -1,6 +1,7 @@
 #include "cgs_array.h"
 #include "cgs_test.h"
 
+#include "cgs_compare.h"
 #include "cgs_string_utils.h"
 
 int test_int_10[10] = { 37, 2, 10, -13, -22, 5, 18, -1, 0, 30 };
@@ -112,15 +113,15 @@ int array_iter_test(void* data)
 
 	struct cgs_array* ai = cgs_array_new_from_array(ints, 10, sizeof(int));
 
-	const int* pstart = cgs_array_start(ai);
-	assert(pstart != NULL);
+	const int* b = cgs_array_begin(ai);
+	assert(b != NULL);
 
-	const int* pend = cgs_array_end(ai);
-	assert(pend != NULL);
+	const int* e = cgs_array_end(ai);
+	assert(e != NULL);
 
 	int sum = 0;
-	for (const int* p = pstart; p != pend; ++p)
-		sum += *p;
+	for ( ; b != e; ++b)
+		sum += *b;
 
 	assert(sum == 55);
 
@@ -150,7 +151,7 @@ int array_strings_test(void* data)
 {
 	(void)data;
 
-	const char* strs[5] = {
+	const char* const strs[5] = {
 		"Zora",
 		"Anola",
 		"Hazelridge",
@@ -168,14 +169,14 @@ int array_strings_test(void* data)
 	assert(cgs_array_length(as) == 5);
 
 	// Get :(
-	const char* const * p = cgs_array_get(as, 0);
+	const char*const* p = cgs_array_get(as, 0);
 	assert(strcmp(*p, strs[0]) == 0);
 
-	// Iters :(((
-	for (const char* const * p = cgs_array_start(as),
-			* const * q = cgs_array_end(as),
-			** s = strs; p != q; ++p, ++s)
-		assert(strcmp(*p, *s) == 0);
+	// Iterators :)
+	CgsStrIter b = cgs_array_begin(as);
+	CgsStrIter e = cgs_array_end(as);
+	for (CgsStrIter s = strs; b != e; ++b, ++s)
+		assert(strcmp(*b, *s) == 0);
 
 	// Free
 	cgs_array_free_with_data(as);

@@ -207,7 +207,7 @@ cgs_rbt_rebalance(struct cgs_rbt* tree, struct cgs_rbt_node* node)
 // Tree functions - public
 
 struct cgs_rbt*
-cgs_rbt_new(cgs_cmp_3way cmp)
+cgs_rbt_new(CgsCmp3Way cmp)
 {
 	struct cgs_rbt* tree = malloc(sizeof(struct cgs_rbt));
 	if (tree) {

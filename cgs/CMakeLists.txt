@@ -14,6 +14,7 @@ set(headers
 	"cgs_array.h"
 	"cgs_bst.h"
 	"cgs_compare.h"
+	"cgs_defs.h"
 	"cgs_io.h"
 	"cgs_rbt.h"
 	"cgs_rbt_private.h"

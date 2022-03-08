@@ -1,4 +1,4 @@
-/* cgs.h
+/* cgs_defs.h
  *
  * MIT License
  * 
@@ -24,13 +24,37 @@
  */
 #pragma once
 
-#include <cgs/cgs_array.h>
-#include <cgs/cgs_bst.h>
-#include <cgs/cgs_compare.h>
-#include <cgs/cgs_defs.h>
-#include <cgs/cgs_io.h>
-#include <cgs/cgs_rbt.h>
-#include <cgs/cgs_variant.h>
-#include <cgs/cgs_string.h>
-#include <cgs/cgs_string_utils.h>
+/**
+ * CgsStrIter
+ *
+ * This typedef simplifies a difficult to read type for pointers into const
+ * arrays of const char*'s. This definition follows the principle of
+ * const-by-default and does not indicate in its name that it is read-only.
+ */
+typedef const char* const* CgsStrIter;
+
+/**
+ * CgsStrIterMut
+ *
+ * This typedef is the mutable version of the const iterator. It's natural
+ * type is actually not ugly to type or difficult to read so I recommend just
+ * using 'char**' for this purpose.
+ *
+ * Defined here for symmetry of the interface.
+ */
+typedef char** CgsStrIterMut;
+
+/**
+ * CgsCmp3Way
+ *
+ * This comparison function matches the three-way, qsort compare signature.
+ *
+ * |Comparison|Return Value  |
+ * |----------|--------------|
+ * |  a < b   |Less than 0   |
+ * |  a > b   |Greater than 0|
+ * |  a == b  |0             |
+ *
+ */
+typedef int (*CgsCmp3Way)(const void*, const void*);
 
