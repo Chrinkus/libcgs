@@ -1,6 +1,8 @@
 #include "cgs_array.h"
 #include "cgs_test.h"
 
+#include "cgs_string_utils.h"
+
 int test_int_10[10] = { 37, 2, 10, -13, -22, 5, 18, -1, 0, 30 };
 
 int array_new_test(void* data)
@@ -120,6 +122,34 @@ int array_new_from_array_test(void* data)
 	return TEST_SUCCESS;
 }
 
+int array_strings_test(void* data)
+{
+	(void)data;
+
+	const char* strs[5] = {
+		"Zora",
+		"Anola",
+		"Hazelridge",
+		"Oakbank",
+		"Dugald",
+	};
+
+	struct cgs_array* as = cgs_array_new(char*);
+	for (int i = 0; i < 5; ++i) {
+		char* p = cgs_strdup(strs[i]);
+		cgs_array_push(as, &p);
+	}
+
+	assert(cgs_array_length(as) == 5);
+
+	const char* p = *(const char**)cgs_array_get(as, 0);
+	assert(strcmp(p, strs[0]) == 0);
+
+	cgs_array_free_with_data(as);
+
+	return TEST_SUCCESS;
+}
+
 int main(void)
 {
 	struct test tests[] = {
@@ -130,6 +160,7 @@ int main(void)
 		{ "array_xfer", array_xfer_test, test_int_10 },
 		{ "array_new_from_array", array_new_from_array_test,
 			test_int_10 },
+		{ "array_strings", array_strings_test, NULL },
 	};
 
 	return cgs_run_tests(tests);
