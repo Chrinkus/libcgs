@@ -4,6 +4,7 @@
 #include "cgs_string_utils.h"
 
 int test_int_10[10] = { 37, 2, 10, -13, -22, 5, 18, -1, 0, 30 };
+int test_int_iota[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
 int array_new_test(void* data)
 {
@@ -105,6 +106,23 @@ int array_xfer_test(void* data)
 	return TEST_SUCCESS;
 }
 
+int array_iter_test(void* data)
+{
+	const int* ints = (const int*)data;
+
+	struct cgs_array* ai = cgs_array_new_from_array(ints, 10, sizeof(int));
+
+	const int* pstart = cgs_array_start(ai);
+	assert(pstart != NULL);
+
+	const int* pend = cgs_array_end(ai);
+	assert(pend != NULL);
+
+	cgs_array_free(ai);
+
+	return TEST_SUCCESS;
+}
+
 int array_new_from_array_test(void* data)
 {
 	const int* ints = (const int*)data;
@@ -161,6 +179,7 @@ int main(void)
 		{ "array_new_from_array", array_new_from_array_test,
 			test_int_10 },
 		{ "array_strings", array_strings_test, NULL },
+		{ "array_iter", array_iter_test, test_int_iota },
 	};
 
 	return cgs_run_tests(tests);

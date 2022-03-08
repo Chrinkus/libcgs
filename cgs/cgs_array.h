@@ -144,6 +144,30 @@ void*
 cgs_array_get_mutable(struct cgs_array* a, size_t index);
 
 /**
+ * cgs_array_start
+ *
+ * Get a read-only pointer to the first element in the array.
+ *
+ * @param a	The array.
+ *
+ * @return	A read-only pointer to the first element.
+ */
+const void*
+cgs_array_start(const struct cgs_array* a);
+
+/**
+ * cgs_array_end
+ *
+ * Get a read-only pointer to the element past the last element of the array.
+ *
+ * @param a	The array.
+ *
+ * @return	A read-only pointer to the element past the last element.
+ */
+const void*
+cgs_array_end(const struct cgs_array* a);
+
+/**
  * cgs_array_push
  *
  * Add an element to the end of the array. May invalidate existing pointers
