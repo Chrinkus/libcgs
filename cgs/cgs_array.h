@@ -81,14 +81,14 @@ void
 cgs_array_free(struct cgs_array* a);
 
 /**
- * cgs_array_free_with_data
+ * cgs_array_free_all
  *
  * Deallocates the elements of an array then the array itself.
  *
  * @param a	The array of allocated elements to free.
  */
 void
-cgs_array_free_with_data(struct cgs_array* a);
+cgs_array_free_all(struct cgs_array* a);
 
 /**
  * cgs_array_xfer

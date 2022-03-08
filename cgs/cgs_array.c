@@ -102,7 +102,7 @@ cgs_array_free(struct cgs_array* a)
 }
 
 void
-cgs_array_free_with_data(struct cgs_array* a)
+cgs_array_free_all(struct cgs_array* a)
 {
 	if (a && a->memory) {
 		for (size_t i = 0; i < cgs_array_length(a); ++i)

@@ -179,7 +179,7 @@ int array_strings_test(void* data)
 		assert(strcmp(*b, *s) == 0);
 
 	// Free
-	cgs_array_free_with_data(as);
+	cgs_array_free_all(as);
 
 	return TEST_SUCCESS;
 }
