@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 #include "cgs_io.h"
+#include "cgs_string_utils.h"
 
 int
 cgs_io_getline(FILE* file, struct cgs_string* buff)
@@ -33,5 +34,20 @@ cgs_io_getline(FILE* file, struct cgs_string* buff)
 		cgs_string_push(buff, c);
 
 	return count;
+}
+
+struct cgs_array*
+cgs_io_readlines(FILE* file)
+{
+	struct cgs_array* lines = cgs_array_new(char*);
+	struct cgs_string* buffer = cgs_string_new();
+
+	for ( ; cgs_io_getline(file, buffer) > 0; cgs_string_clear(buffer)) {
+		char* line = cgs_strdup(cgs_string_read(buffer));
+		cgs_array_push(lines, &line);
+	}
+	cgs_string_free(buffer);
+
+	return lines;
 }
 

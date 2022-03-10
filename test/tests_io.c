@@ -47,10 +47,35 @@ int io_getline_test(void* data)
 	return TEST_SUCCESS;
 }
 
+int io_readlines_test(void* data)
+{
+	const char* path = (const char*)data;
+	FILE* file = fopen(path, "r");
+
+	struct cgs_array* lines = cgs_io_readlines(file);
+	assert(cgs_array_length(lines) == 4);
+
+	CgsStrIter b = cgs_array_begin(lines);
+	CgsStrIter e = cgs_array_end(lines);
+	assert(b != e);
+
+	assert(strcmp(*b++, "Birthday") == 0);
+	assert(strcmp(*b++, "Christmas") == 0);
+	assert(strcmp(*b++, "Tuesday") == 0);
+	assert(strcmp(*b++, "Books for reading") == 0);
+	assert(b == e);
+
+	cgs_array_free_all(lines);
+	fclose(file);
+
+	return TEST_SUCCESS;
+}
+
 int main(void)
 {
 	struct test tests[] = {
 		{ "io_getline", io_getline_test, "io_test_data.txt" },
+		{ "io_readlines", io_readlines_test, "io_test_data.txt" },
 	};
 
 	return cgs_run_tests(tests);

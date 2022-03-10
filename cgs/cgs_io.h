@@ -25,7 +25,12 @@
 #pragma once
 
 #include <stdio.h>
+/* The cgs_string and cgs_array headers are included rather than just forward
+ * declaring the structs since usage of the io functions demands their
+ * inclusion.
+ */
 #include "cgs_string.h"
+#include "cgs_array.h"
 
 /**
  * cgs_io_getline
@@ -40,4 +45,16 @@
  */
 int
 cgs_io_getline(FILE* file, struct cgs_string* buff);
+
+/**
+ * cgs_io_readlines
+ *
+ * Read all lines from a file and store them in a cgs_array sized for char*'s.
+ * 
+ * @param file	The file or stream to read from.
+ *
+ * @return	A cgs_array of char*'s.
+ */
+struct cgs_array*
+cgs_io_readlines(FILE* file);
 
