@@ -85,6 +85,15 @@ cgs_string_free(struct cgs_string* s)
 	}
 }
 
+char*
+cgs_string_xfer(struct cgs_string* s)
+{
+	char* p = s->memory;
+	s->memory = NULL;
+	free(s);
+	return p;
+}
+
 const char*
 cgs_string_read(const struct cgs_string* s)
 {

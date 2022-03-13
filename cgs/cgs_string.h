@@ -62,6 +62,18 @@ void
 cgs_string_free(struct cgs_string* s);
 
 /**
+ * cgs_string_xfer
+ *
+ * Release ownership of the inner string buffer.
+ *
+ * @param s	The string struct to release ownership from.
+ *
+ * @return	A pointer to the transferred memory.
+ */
+char*
+cgs_string_xfer(struct cgs_string* s);
+
+/**
  * cgs_string_read
  *
  * Get read-access to the string.

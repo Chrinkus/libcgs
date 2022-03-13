@@ -37,6 +37,22 @@ int string_new_from_string_test(void* data)
 	return TEST_SUCCESS;
 }
 
+int string_xfer_test(void* data)
+{
+	const char* test = (const char*)data;
+
+	struct cgs_string* s = cgs_string_new_from_string(test);
+
+	char* p = cgs_string_xfer(s);
+
+	assert(strcmp(p, test) == 0);
+	assert(p != test);
+
+	free(p);
+
+	return TEST_SUCCESS;
+}
+
 int string_push_test(void* data)
 {
 	(void)data;
@@ -121,6 +137,7 @@ int main(void)
 {
 	struct test tests[] = {
 		{ "string_new", string_new_test, NULL },
+		{ "string_xfer", string_xfer_test, "Transfer me!" },
 		{ "string_push", string_push_test, NULL },
 		{ "string_clear", string_clear_test, NULL },
 		{ "string_erase", string_erase_test, NULL },

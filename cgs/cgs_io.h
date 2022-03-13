@@ -47,6 +47,18 @@ int
 cgs_io_getline(FILE* file, struct cgs_string* buff);
 
 /**
+ * cgs_io_readline
+ *
+ * Read a line from a file and return a pointer to it.
+ *
+ * @param file	The file or stream to read from.
+ *
+ * @return	An allocated null-terminated string.
+ */
+char*
+cgs_io_readline(FILE* file);
+
+/**
  * cgs_io_readlines
  *
  * Read all lines from a file and store them in a cgs_array sized for char*'s.

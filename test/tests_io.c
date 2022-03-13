@@ -47,6 +47,33 @@ int io_getline_test(void* data)
 	return TEST_SUCCESS;
 }
 
+int io_readline_test(void* data)
+{
+	const char* path = (const char*)data;
+	FILE* file = fopen(path, "r");
+
+	char* line = cgs_io_readline(file);
+	assert(strcmp(line, "Birthday") == 0);
+	free(line);
+
+	line = cgs_io_readline(file);
+	assert(strcmp(line, "Christmas") == 0);
+	free(line);
+	line = cgs_io_readline(file);
+	assert(strcmp(line, "Tuesday") == 0);
+	free(line);
+	line = cgs_io_readline(file);
+	assert(strcmp(line, "Books for reading") == 0);
+	free(line);
+
+	line = cgs_io_readline(file);
+	assert(line == NULL);
+
+	fclose(file);
+
+	return TEST_SUCCESS;
+}
+
 int io_readlines_test(void* data)
 {
 	const char* path = (const char*)data;
@@ -75,6 +102,7 @@ int main(void)
 {
 	struct test tests[] = {
 		{ "io_getline", io_getline_test, "io_test_data.txt" },
+		{ "io_readline", io_readline_test, "io_test_data.txt" },
 		{ "io_readlines", io_readlines_test, "io_test_data.txt" },
 	};
 

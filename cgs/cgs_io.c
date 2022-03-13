@@ -36,6 +36,20 @@ cgs_io_getline(FILE* file, struct cgs_string* buff)
 	return count;
 }
 
+char*
+cgs_io_readline(FILE* file)
+{
+	char* p = NULL;
+
+	struct cgs_string* buffer = cgs_string_new();
+	if (cgs_io_getline(file, buffer))
+		p = cgs_string_xfer(buffer);
+	else
+		cgs_string_free(buffer);
+
+	return p;
+}
+
 struct cgs_array*
 cgs_io_readlines(FILE* file)
 {
