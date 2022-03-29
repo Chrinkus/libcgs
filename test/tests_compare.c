@@ -55,12 +55,32 @@ int compare_str_test(void* data)
 	return TEST_SUCCESS;
 }
 
+int min_max_test(void* data)
+{
+	(void)data;
+
+	assert(cgs_min(3, 8) == 3);
+	assert(cgs_min(5, -1) == -1);
+	assert(cgs_min(10, 10) == 10);
+	assert(cgs_min('a', 'h') == 'a');
+	assert(cgs_min('Z', 'Q') == 'Q');
+
+	assert(cgs_max(3, 8) == 8);
+	assert(cgs_max(5, -1) == 5);
+	assert(cgs_max(10, 10) == 10);
+	assert(cgs_max('a', 'h') == 'h');
+	assert(cgs_max('Z', 'Q') == 'Z');
+
+	return TEST_SUCCESS;
+}
+
 int main(void)
 {
 	struct test tests[] = {
 		{ "compare_int", compare_int_test, NULL },
 		{ "compare_char", compare_char_test, NULL },
 		{ "compare_str", compare_str_test, NULL },
+		{ "min_max", min_max_test, NULL },
 	};
 
 	return cgs_run_tests(tests);
