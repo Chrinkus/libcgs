@@ -1,112 +1,155 @@
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <cmocka.h>
+#include <stdlib.h>
+
 #include "cgs_array.h"
-#include "cgs_test.h"
 
 #include "cgs_compare.h"
 #include "cgs_string_utils.h"
 
-int test_int_10[10] = { 37, 2, 10, -13, -22, 5, 18, -1, 0, 30 };
 int test_int_iota[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
-int array_new_test(void* data)
+enum { RANDOM_SIZE = 10 };
+
+static int setup_random(void** state)
 {
-	(void)data;
+	int* ai = malloc(sizeof(int) * RANDOM_SIZE);
+	if (!ai)
+		return -1;
+	ai[0] = 37;
+	ai[1] = 2;
+	ai[2] = 10;
+	ai[3] = -13;
+	ai[4] = -22;
+	ai[5] = 5;
+	ai[6] = 18;
+	ai[7] = -1;
+	ai[8] = 0;
+	ai[9] = 30;
+
+	*state = ai;
+
+	return 0;
+}
+
+static int teardown_random(void** state)
+{
+	free(*state);
+	return 0;
+}
+
+static void array_new_test(void** state)
+{
+	(void)state;
 
 	struct cgs_array* ai = cgs_array_new(int);
 
-	assert(ai != NULL);
-	assert(cgs_array_length(ai) == 0);
+	assert_non_null(ai);
+	assert_int_equal(cgs_array_length(ai), 0);
 
 	cgs_array_free(ai);
 
 	struct cgs_array* ad = cgs_array_new(double);
-	assert(ad != NULL);
-	assert(cgs_array_length(ad) == 0);
+	assert_non_null(ad);
+	assert_int_equal(cgs_array_length(ad), 0);
 
 	cgs_array_free(ad);
 
 	struct cgs_array* as = cgs_array_new(char*);
-	assert(as != NULL);
-	assert(cgs_array_length(as) == 0);
+	assert_non_null(as);
+	assert_int_equal(cgs_array_length(as), 0);
 
 	cgs_array_free(as);
-
-	return TEST_SUCCESS;
 }
 
-int array_push_test(void* data)
+static void array_push_test(void** state)
 {
-	const int* ints = (const int*)data;
+	const int* ints = *(const int**)state;
 
 	struct cgs_array* ai = cgs_array_new(int);
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < RANDOM_SIZE; ++i)
 		cgs_array_push(ai, &ints[i]);
 
-	assert(cgs_array_length(ai) == 10);
+	assert_int_equal(cgs_array_length(ai), RANDOM_SIZE);
 
 	cgs_array_free(ai);
-
-	return TEST_SUCCESS;
 }
 
-int array_sort_test(void* data)
+static void array_sort_test(void** state)
 {
-	const int* ints = (const int*)data;
+	const int* ints = *(const int**)state;
 
-	struct cgs_array* ai = cgs_array_new_from_array(ints, 10, sizeof(int));
+	struct cgs_array* ai = cgs_array_new_from_array(ints, RANDOM_SIZE,
+			sizeof(int));
 
 	cgs_array_sort(ai, cgs_int_cmp);
 
 	int min = *(int*)cgs_array_get(ai, 0);
 	int max = *(int*)cgs_array_get(ai, 9);
-	assert(min == -22);
-	assert(max == 37);
+	assert_int_equal(min, -22);
+	assert_int_equal(max, 37);
 
 	cgs_array_free(ai);
-
-	return TEST_SUCCESS;
 }
 
-int array_find_test(void* data)
+static void array_find_test(void** state)
 {
-	const int* ints = (const int*)data;
+	const int* ints = *(const int**)state;
 
-	struct cgs_array* ai = cgs_array_new_from_array(ints, 10, sizeof(int));
+	struct cgs_array* ai = cgs_array_new_from_array(ints, RANDOM_SIZE,
+			sizeof(int));
 
 	int x = 99;
 	int* found = cgs_array_find(ai, &x, cgs_int_cmp);
-	assert(found == NULL);
+	assert_null(found);
 	x = -13;
 	found = cgs_array_find(ai, &x, cgs_int_cmp);
-	assert(found != NULL);
-	assert(found != &x);
-	assert(*found == -13);
+	assert_non_null(found);
+	assert_ptr_not_equal(found, &x);
+	assert_int_equal(*found, -13);
 
 	cgs_array_free(ai);
-
-	return TEST_SUCCESS;
 }
 
-int array_xfer_test(void* data)
+static void array_xfer_test(void** state)
 {
-	const int* ints = (const int*)data;
+	const int* ints = *(const int**)state;
 
-	struct cgs_array* ai = cgs_array_new_from_array(ints, 10, sizeof(int));
+	struct cgs_array* ai = cgs_array_new_from_array(ints, RANDOM_SIZE,
+			sizeof(int));
 
 	size_t len = 0;
 	int* out = cgs_array_xfer(ai, &len);
 
-	assert(len == 10);
-	assert(out != NULL);
-	assert(out != ints);
+	assert_int_equal(len, 10);
+	assert_non_null(out);
+	assert_ptr_not_equal(out, ints);
 
 	for (size_t i = 0; i < len; ++i)
-		assert(out[i] == ints[i]);
+		assert_int_equal(out[i], ints[i]);
 
 	free(out);
-
-	return TEST_SUCCESS;
 }
 
+static void array_new_from_array_test(void** state)
+{
+	const int* ints = *(const int**)state;
+
+	struct cgs_array* ai = cgs_array_new_from_array(ints, RANDOM_SIZE,
+			sizeof(int));
+
+	assert_non_null(ai);
+	assert_int_equal(cgs_array_length(ai), RANDOM_SIZE);
+
+	for (size_t i = 0; i < cgs_array_length(ai); ++i)
+		assert_int_equal(*(int*)cgs_array_get(ai, i), ints[i]);
+
+	cgs_array_free(ai);
+}
+
+/*
 int array_iter_test(void* data)
 {
 	const int* ints = (const int*)data;
@@ -124,23 +167,6 @@ int array_iter_test(void* data)
 		sum += *b;
 
 	assert(sum == 55);
-
-	cgs_array_free(ai);
-
-	return TEST_SUCCESS;
-}
-
-int array_new_from_array_test(void* data)
-{
-	const int* ints = (const int*)data;
-
-	struct cgs_array* ai = cgs_array_new_from_array(ints, 10, sizeof(int));
-
-	assert(ai != NULL);
-	assert(cgs_array_length(ai) == 10);
-
-	for (size_t i = 0; i < cgs_array_length(ai); ++i)
-		assert(*(int*)cgs_array_get(ai, i) == ints[i]);
 
 	cgs_array_free(ai);
 
@@ -187,7 +213,7 @@ int array_strings_test(void* data)
 int main(void)
 {
 	struct test tests[] = {
-		{ "array_new", array_new_test, NULL },
+		//{ "array_new", array_new_test, NULL },
 		{ "array_push", array_push_test, test_int_10 },
 		{ "array_sort", array_sort_test, test_int_10 },
 		{ "array_find", array_find_test, test_int_10 },
@@ -199,5 +225,20 @@ int main(void)
 	};
 
 	return cgs_run_tests(tests);
+}
+*/
+
+int main(void)
+{
+	const struct CMUnitTest tests[] = {
+		cmocka_unit_test(array_new_test),
+		cmocka_unit_test(array_push_test),
+		cmocka_unit_test(array_sort_test),
+		cmocka_unit_test(array_find_test),
+		cmocka_unit_test(array_xfer_test),
+		cmocka_unit_test(array_new_from_array_test),
+	};
+
+	return cmocka_run_group_tests(tests, setup_random, teardown_random);
 }
 

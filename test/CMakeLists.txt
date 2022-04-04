@@ -1,3 +1,6 @@
+# Bring in CMocka
+find_package(cmocka)
+
 # Main project
 include_directories("${PROJECT_SOURCE_DIR}/cgs")
 
@@ -32,7 +35,7 @@ foreach(file IN LISTS test_sources)
 	set(command_name "${func}_test")
 
 	add_executable("${command_name}" EXCLUDE_FROM_ALL "${file}")
-	target_link_libraries("${command_name}" PRIVATE "${LIB_NAME}")
+	target_link_libraries("${command_name}" PRIVATE "${LIB_NAME}" cmocka)
 	add_test(NAME "${func}" COMMAND "${command_name}")
 	add_dependencies(tests "${command_name}")
 endforeach()
