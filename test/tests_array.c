@@ -1,21 +1,21 @@
-#include <stdarg.h>
-#include <stddef.h>
-#include <setjmp.h>
-#include <cmocka.h>
-#include <stdlib.h>
+#include "test_headers.h"
+
+#include <stdlib.h>	// malloc, free
 
 #include "cgs_array.h"
 
 #include "cgs_compare.h"
 #include "cgs_string_utils.h"
 
-int test_int_iota[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Setups and teardowns
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-enum { RANDOM_SIZE = 10 };
+enum { NUM_RANDOMS = 10, NUM_IOTAS = 10, NUM_TOWNS = 5 };
 
 static int setup_random(void** state)
 {
-	int* ai = malloc(sizeof(int) * RANDOM_SIZE);
+	int* ai = malloc(sizeof(int) * NUM_RANDOMS);
 	if (!ai)
 		return -1;
 	ai[0] = 37;
@@ -34,11 +34,46 @@ static int setup_random(void** state)
 	return 0;
 }
 
-static int teardown_random(void** state)
+static int setup_iota(void** state)
+{
+	int* ai = malloc(sizeof(int) * NUM_IOTAS);
+	if (!ai)
+		return -1;
+
+	for (int i = 0, n = 1; i < NUM_IOTAS; ++i, ++n)
+		ai[i] = n;
+
+	*state = ai;
+
+	return 0;
+}
+
+static int setup_towns(void** state)
+{
+	const char** as = malloc(sizeof(char*) * NUM_TOWNS);
+	if (!as)
+		return -1;
+
+	as[0] = "Cooks Creek";
+	as[1] = "Anola";
+	as[2] = "Hazelridge";
+	as[3] = "Oakbank";
+	as[4] = "Dugald";
+
+	*state = as;
+
+	return 0;
+}
+
+static int teardown_ptr(void** state)
 {
 	free(*state);
 	return 0;
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Tests
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 static void array_new_test(void** state)
 {
@@ -69,10 +104,10 @@ static void array_push_test(void** state)
 	const int* ints = *(const int**)state;
 
 	struct cgs_array* ai = cgs_array_new(int);
-	for (int i = 0; i < RANDOM_SIZE; ++i)
+	for (int i = 0; i < NUM_RANDOMS; ++i)
 		cgs_array_push(ai, &ints[i]);
 
-	assert_int_equal(cgs_array_length(ai), RANDOM_SIZE);
+	assert_int_equal(cgs_array_length(ai), NUM_RANDOMS);
 
 	cgs_array_free(ai);
 }
@@ -81,7 +116,7 @@ static void array_sort_test(void** state)
 {
 	const int* ints = *(const int**)state;
 
-	struct cgs_array* ai = cgs_array_new_from_array(ints, RANDOM_SIZE,
+	struct cgs_array* ai = cgs_array_new_from_array(ints, NUM_RANDOMS,
 			sizeof(int));
 
 	cgs_array_sort(ai, cgs_int_cmp);
@@ -98,7 +133,7 @@ static void array_find_test(void** state)
 {
 	const int* ints = *(const int**)state;
 
-	struct cgs_array* ai = cgs_array_new_from_array(ints, RANDOM_SIZE,
+	struct cgs_array* ai = cgs_array_new_from_array(ints, NUM_RANDOMS,
 			sizeof(int));
 
 	int x = 99;
@@ -117,7 +152,7 @@ static void array_xfer_test(void** state)
 {
 	const int* ints = *(const int**)state;
 
-	struct cgs_array* ai = cgs_array_new_from_array(ints, RANDOM_SIZE,
+	struct cgs_array* ai = cgs_array_new_from_array(ints, NUM_RANDOMS,
 			sizeof(int));
 
 	size_t len = 0;
@@ -137,11 +172,11 @@ static void array_new_from_array_test(void** state)
 {
 	const int* ints = *(const int**)state;
 
-	struct cgs_array* ai = cgs_array_new_from_array(ints, RANDOM_SIZE,
+	struct cgs_array* ai = cgs_array_new_from_array(ints, NUM_RANDOMS,
 			sizeof(int));
 
 	assert_non_null(ai);
-	assert_int_equal(cgs_array_length(ai), RANDOM_SIZE);
+	assert_int_equal(cgs_array_length(ai), NUM_RANDOMS);
 
 	for (size_t i = 0; i < cgs_array_length(ai); ++i)
 		assert_int_equal(*(int*)cgs_array_get(ai, i), ints[i]);
@@ -149,84 +184,58 @@ static void array_new_from_array_test(void** state)
 	cgs_array_free(ai);
 }
 
-/*
-int array_iter_test(void* data)
+static void array_iter_test(void** state)
 {
-	const int* ints = (const int*)data;
+	const int* ints = *(const int**)state;
 
-	struct cgs_array* ai = cgs_array_new_from_array(ints, 10, sizeof(int));
+	struct cgs_array* ai = cgs_array_new_from_array(ints, NUM_IOTAS,
+			sizeof(int));
 
 	const int* b = cgs_array_begin(ai);
-	assert(b != NULL);
+	assert_non_null(b);
 
 	const int* e = cgs_array_end(ai);
-	assert(e != NULL);
+	assert_non_null(e);
 
 	int sum = 0;
-	for ( ; b != e; ++b)
-		sum += *b;
+	while (b != e)
+		sum += *b++;
 
-	assert(sum == 55);
+	assert_int_equal(sum, 55);
 
 	cgs_array_free(ai);
-
-	return TEST_SUCCESS;
 }
 
-int array_strings_test(void* data)
+static void array_strings_test(void** state)
 {
-	(void)data;
-
-	const char* const strs[5] = {
-		"Zora",
-		"Anola",
-		"Hazelridge",
-		"Oakbank",
-		"Dugald",
-	};
+	const char** strs = *(const char***)state;
 
 	// New
 	struct cgs_array* as = cgs_array_new(char*);
 	// Push
-	for (int i = 0; i < 5; ++i) {
+	for (int i = 0; i < NUM_TOWNS; ++i) {
 		char* p = cgs_strdup(strs[i]);
 		cgs_array_push(as, &p);
 	}
-	assert(cgs_array_length(as) == 5);
+
+	assert_int_equal(cgs_array_length(as), NUM_TOWNS);
 
 	// Get :(
 	const char*const* p = cgs_array_get(as, 0);
-	assert(strcmp(*p, strs[0]) == 0);
+	assert_string_equal(*p, strs[0]);
 
 	// Iterators :)
 	CgsStrIter b = cgs_array_begin(as);
 	CgsStrIter e = cgs_array_end(as);
 	for (CgsStrIter s = strs; b != e; ++b, ++s)
-		assert(strcmp(*b, *s) == 0);
+		assert_string_equal(*b, *s);
 
-	// Free
 	cgs_array_free_all(as);
-
-	return TEST_SUCCESS;
 }
 
-int main(void)
-{
-	struct test tests[] = {
-		//{ "array_new", array_new_test, NULL },
-		{ "array_push", array_push_test, test_int_10 },
-		{ "array_sort", array_sort_test, test_int_10 },
-		{ "array_find", array_find_test, test_int_10 },
-		{ "array_xfer", array_xfer_test, test_int_10 },
-		{ "array_new_from_array", array_new_from_array_test,
-			test_int_10 },
-		{ "array_strings", array_strings_test, NULL },
-		{ "array_iter", array_iter_test, test_int_iota },
-	};
-
-	return cgs_run_tests(tests);
-}
-*/
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Main
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 int main(void)
 {
@@ -237,8 +246,12 @@ int main(void)
 		cmocka_unit_test(array_find_test),
 		cmocka_unit_test(array_xfer_test),
 		cmocka_unit_test(array_new_from_array_test),
+		cmocka_unit_test_setup_teardown(array_iter_test, setup_iota,
+				teardown_ptr),
+		cmocka_unit_test_setup_teardown(array_strings_test,
+				setup_towns, teardown_ptr),
 	};
 
-	return cmocka_run_group_tests(tests, setup_random, teardown_random);
+	return cmocka_run_group_tests(tests, setup_random, teardown_ptr);
 }
 
