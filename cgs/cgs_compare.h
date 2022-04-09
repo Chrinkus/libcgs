@@ -25,32 +25,6 @@
 #pragma once
 
 /**
- * cgs_min
- *
- * Evaluates the minimum of two numeric values. Checks each parameter
- * multiple times, beware of side-effects!
- *
- * @param a	Numeric value.
- * @param b	Numeric value.
- *
- * @return	The lesser of the two values.
- */
-#define cgs_min(a, b) ((a) < (b) ? (a) : (b))
-
-/**
- * cgs_max
- *
- * Evaluates the maximum of two numeric values. Checks each parameter
- * multiple times, beware of side-effects!
- *
- * @param a	Numeric value.
- * @param b	Numeric value.
- *
- * @return	The greater of the two values.
- */
-#define cgs_max(a, b) ((a) > (b) ? (a) : (b))
-
-/**
  * cgs_int_cmp
  *
  * Three-way comparison function for integers.

@@ -12,6 +12,7 @@ set(test_sources
 	"tests_array.c"
 	"tests_bst.c"
 	"tests_compare.c"
+	"tests_defs.c"
 	"tests_io.c"
 	"tests_rbt.c"
 	"tests_rbt_private.c"

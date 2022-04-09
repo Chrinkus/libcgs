@@ -94,9 +94,10 @@ size_t cgs_bst_size(const struct cgs_bst* tree);
  * @param tree	Tree to insert node into.
  * @param val	Value to insert into tree.
  *
- * @return	Pointer to inserted node if successful, NULL on failure.
+ * @return	A read-only pointer to inserted node if successful, NULL
+ * 		on failure.
  */
-struct cgs_bst_node*
+const struct cgs_bst_node*
 cgs_bst_insert(struct cgs_bst* tree, struct cgs_variant* data);
 
 /**

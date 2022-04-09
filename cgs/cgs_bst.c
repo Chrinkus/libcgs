@@ -93,7 +93,7 @@ size_t cgs_bst_size(const struct cgs_bst* tree)
 	return tree->size;
 }
 
-struct cgs_bst_node*
+const struct cgs_bst_node*
 cgs_bst_insert(struct cgs_bst* tree, struct cgs_variant* data)
 {
 	struct cgs_bst_node* node = cgs_bst_node_new(data);

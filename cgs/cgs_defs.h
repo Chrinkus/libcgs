@@ -24,6 +24,52 @@
  */
 #pragma once
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Function-like Macros
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+/**
+ * CGS_MIN
+ *
+ * Evaluates the minimum of two numeric values. Checks each parameter
+ * multiple times, beware of side-effects!
+ *
+ * @param a	Numeric value.
+ * @param b	Numeric value.
+ *
+ * @result	The lesser of the two values.
+ */
+#define CGS_MIN(a, b) ((a) < (b) ? (a) : (b))
+
+/**
+ * CGS_MAX
+ *
+ * Evaluates the maximum of two numeric values. Checks each parameter
+ * multiple times, beware of side-effects!
+ *
+ * @param a	Numeric value.
+ * @param b	Numeric value.
+ *
+ * @result	The greater of the two values.
+ */
+#define CGS_MAX(a, b) ((a) > (b) ? (a) : (b))
+
+/**
+ * CGS_ARRAY_LENGTH
+ *
+ * Evalutates the length of a static array. **NO POINTERS**
+ *
+ * @param a	The array.
+ *
+ * @result	A positive value representing the length of the array.
+ */
+#define CGS_ARRAY_LENGTH(a) (sizeof(a) / sizeof((a)[0]))
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Typedefs
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 /**
  * CgsStrIter
  *

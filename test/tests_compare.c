@@ -55,6 +55,7 @@ int compare_str_test(void* data)
 	return TEST_SUCCESS;
 }
 
+/*
 int min_max_test(void* data)
 {
 	(void)data;
@@ -73,6 +74,7 @@ int min_max_test(void* data)
 
 	return TEST_SUCCESS;
 }
+*/
 
 int main(void)
 {
@@ -80,7 +82,7 @@ int main(void)
 		{ "compare_int", compare_int_test, NULL },
 		{ "compare_char", compare_char_test, NULL },
 		{ "compare_str", compare_str_test, NULL },
-		{ "min_max", min_max_test, NULL },
+		//{ "min_max", min_max_test, NULL },
 	};
 
 	return cgs_run_tests(tests);
