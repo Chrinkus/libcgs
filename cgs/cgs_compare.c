@@ -28,7 +28,15 @@
 
 int cgs_int_cmp(const void* a, const void* b)
 {
-	return *(int*)a - *(int*)b;
+	int v1 = *(const int*)a;
+	int v2 = *(const int*)b;
+
+	if (v1 < v2)
+		return -1;
+	else if (v1 > v2)
+		return 1;
+	else
+		return 0;
 }
 
 int cgs_str_cmp(const void* a, const void* b)
