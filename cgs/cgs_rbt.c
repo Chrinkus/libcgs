@@ -316,13 +316,13 @@ cgs_rbt_root(const struct cgs_rbt* tree)
 int
 cgs_rbt_node_is_red(const struct cgs_rbt_node* node)
 {
-	return node ? node->color == CGS_RBT_RED : 1;
+	return node ? node->color == CGS_RBT_RED : CGS_FALSE;
 }
 
 int
 cgs_rbt_node_is_black(const struct cgs_rbt_node* node)
 {
-	return node ? node->color == CGS_RBT_BLACK : 1;
+	return node ? node->color == CGS_RBT_BLACK : CGS_TRUE;
 }
 
 int
@@ -342,17 +342,16 @@ cgs_rbt_node_black_height(const struct cgs_rbt_node* node)
 int
 cgs_rbt_node_red_children_test(const struct cgs_rbt_node* node)
 {
-	if (!node)
-		return 1;
+	if (!node)		// leaf node is black and has no children
+		return CGS_TRUE;
 
 	if (node->color == CGS_RBT_RED) {
 		if (node->left && node->left->color == CGS_RBT_RED)
-			return 0;
+			return CGS_FALSE;
 		if (node->right && node->right->color == CGS_RBT_RED)
-			return 0;
+			return CGS_FALSE;
 	}
 
-	return cgs_rbt_node_red_children_test(node->left)
-		&& cgs_rbt_node_red_children_test(node->right);
+	return CGS_TRUE;	// node is black or red with black children
 }
 
