@@ -288,16 +288,17 @@ cgs_rbt_max(const struct cgs_rbt* tree)
 	return node ? cgs_variant_get(&node->data) : NULL;
 }
 
-const struct cgs_variant*
+const void*
 cgs_rbt_search(const struct cgs_rbt* tree, const struct cgs_variant* data)
 {
 	const struct cgs_rbt_node* node = tree->root;
+	const void* a = cgs_variant_get(data);
+
 	for (int rc; node; ) {
-		const void* a = cgs_variant_get(data);
 		const void* b = cgs_variant_get(&node->data);
 		rc = tree->cmp(a, b);
 		if (rc == 0)
-			return &node->data;
+			return b;
 		node = rc < 0 ? node->left : node->right;
 	}
 	return NULL;

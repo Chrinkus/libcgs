@@ -87,24 +87,24 @@ static void rbt_search_test(void** state)
 	
 	// search for a value that is in the tree
 	cgs_variant_set_int(&v1, 2);
-	const struct cgs_variant* v2 = cgs_rbt_search(tree, &v1);
-	assert_non_null(v2);
-	assert_int_equal(*(const int*)cgs_variant_get(v2), 2);
+	const int* p = cgs_rbt_search(tree, &v1);
+	assert_non_null(p);
+	assert_int_equal(*p, 2);
 
 	// search for a value that is not in the tree
 	cgs_variant_set_int(&v1, 42);
-	v2 = cgs_rbt_search(tree, &v1);
-	assert_null(v2);
+	p = cgs_rbt_search(tree, &v1);
+	assert_null(p);
 
 	cgs_variant_set_int(&v1, -12);
-	v2 = cgs_rbt_search(tree, &v1);
-	assert_non_null(v2);
-	assert_int_equal(*(const int*)cgs_variant_get(v2), -12);
+	p = cgs_rbt_search(tree, &v1);
+	assert_non_null(p);
+	assert_int_equal(*p, -12);
 
 	cgs_variant_set_int(&v1, 100);
-	v2 = cgs_rbt_search(tree, &v1);
-	assert_non_null(v2);
-	assert_int_equal(*(const int*)cgs_variant_get(v2), 100);
+	p = cgs_rbt_search(tree, &v1);
+	assert_non_null(p);
+	assert_int_equal(*p, 100);
 
 	cgs_rbt_free(tree);
 }

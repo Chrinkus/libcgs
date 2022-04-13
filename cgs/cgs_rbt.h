@@ -120,7 +120,7 @@ cgs_rbt_insert(struct cgs_rbt* tree, struct cgs_variant* data);
  *
  * @param tree	Tree to find minimum value of.
  *
- * @return	Minimum value in the tree.
+ * @return	A read-only pointer to the minimum value in the tree.
  */
 const void*
 cgs_rbt_min(const struct cgs_rbt* tree);
@@ -132,7 +132,7 @@ cgs_rbt_min(const struct cgs_rbt* tree);
  *
  * @param tree	Tree to find maximum value of.
  *
- * @return	Maximum value in the tree.
+ * @return	A read-only pointer to the maximum value in the tree.
  */
 const void*
 cgs_rbt_max(const struct cgs_rbt* tree);
@@ -146,9 +146,9 @@ cgs_rbt_max(const struct cgs_rbt* tree);
  * @param tree	Tree to search.
  * @param data	Data to find in the tree.
  *
- * @return	A read-only pointer to the variant that matches the search
- * 		data or NULL if not found.
+ * @return	A read-only pointer to the entry in the tree that matches
+ * 		the search data or NULL if not found.
  */
-const struct cgs_variant*
+const void*
 cgs_rbt_search(const struct cgs_rbt* tree, const struct cgs_variant* data);
 
