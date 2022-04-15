@@ -26,45 +26,50 @@
  * 3. Leaves are black (or NULL in this implementation).
  * 4. If a node is red, both its children are black.
  * 5. All simple paths from a node have the same black-height.
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 enum cgs_rbt_rules_rc {
-	CGS_RBT_TEST_SUCCESS		= 0,
-	CGS_RBT_TEST_FAIL_COLOR		= 1U,
-	CGS_RBT_TEST_FAIL_ROOT		= 1U << 1,
-	CGS_RBT_TEST_FAIL_RED_CHILDREN	= 1U << 2,
-	CGS_RBT_TEST_FAIL_BLACK_HEIGHT	= 1U << 3,
+	TEST_SUCCESS		= 0,
+	TEST_FAIL_COLOR		= 1U,
+	TEST_FAIL_ROOT		= 1U << 1,
+	TEST_FAIL_RED_CHILDREN	= 1U << 2,
+	TEST_FAIL_BLACK_HEIGHT	= 1U << 3,
 };
 
-int rbt_rules_test(const struct cgs_rbt_node* node)
+unsigned rbt_rules_test(const struct cgs_rbt_node* node)
 {
+	unsigned res = TEST_SUCCESS;
+
 	// 3. Leaves are black (or NULL in this implementation)
 	if (!node)
-		return CGS_RBT_TEST_SUCCESS;
+		return res;
 
 	// 1. Every node is either red or black
-	if (node->color != CGS_RBT_RED && node->color != CGS_RBT_BLACK) {
-		return CGS_RBT_TEST_FAIL_COLOR;
-	}
+	if (node->color != CGS_RBT_RED && node->color != CGS_RBT_BLACK)
+		res |= TEST_FAIL_COLOR;
 
 	// 2. The root is black
 	if (node->parent == NULL && node->color != CGS_RBT_BLACK)
-		return CGS_RBT_TEST_FAIL_ROOT;
+		res |= TEST_FAIL_ROOT;
 
 	// 4. If a node is red, both its children are black
 	if (!cgs_rbt_node_red_children_test(node))
-		return CGS_RBT_TEST_FAIL_RED_CHILDREN;
+		res |= TEST_FAIL_RED_CHILDREN;
 
 	// 5. All simple paths from a node have the same black-height
 	int left_height = cgs_rbt_node_black_height(node->left);
 	int right_height = cgs_rbt_node_black_height(node->right);
 	if (left_height != right_height || left_height < 0)
-		return CGS_RBT_TEST_FAIL_BLACK_HEIGHT;
+		res |= TEST_FAIL_BLACK_HEIGHT;
 
-	return rbt_rules_test(node->left) | rbt_rules_test(node->right);
+	res |= rbt_rules_test(node->left);
+	res |= rbt_rules_test(node->right);
+
+	return res;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Hand-made trees
+ * Hand-made tree helpers
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 enum node_flag { ADD, IGNORE };
@@ -92,12 +97,12 @@ void set_children(struct cgs_rbt_node* node, struct node_data arr[NUMCHILDREN])
 	}
 }
 
-static int tree_teardown(void** state)
-{
-	struct cgs_rbt_node* node = *(struct cgs_rbt_node**)state;
-	cgs_rbt_node_free(node);
-	return 0;
-}
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Good fake tree setups
+ *
+ * - One small tree
+ * - One large tree
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /* fake_tree_good_small
  *               _______________4B______________
@@ -142,112 +147,6 @@ static int fake_tree_good_small_setup(void** state)
 
 	node = node->right;
 	set_children(node, (struct node_data[]){
-		[LEFT]  = { .flag = ADD, .val = 7, .color = CGS_RBT_RED },
-		[RIGHT] = { .flag = IGNORE }
-	});
-
-	*state = root;
-	return 0;
-}
-
-/* fake_tree_bad_bh_small
- *               _______________4B______________
- *              |                               |
- *       _______2R______                 _______6R______
- *      |               |               |               |
- *      0B__            3B              5B            __8B
- *          |                                        |
- *          1R                                       7B*
- */
-static int fake_tree_bad_bh_small_setup(void** state)
-	// violates black-height rule
-{
-	struct cgs_variant v = { 0 };
-	cgs_variant_set_int(&v, 4);
-
-	struct cgs_rbt_node* root = cgs_rbt_node_new(&v);
-	root->color = CGS_RBT_BLACK;
-
-	struct cgs_rbt_node* node = root;
-	set_children(node, (struct node_data[]){
-		[LEFT]  = { .flag = ADD, .val = 2, .color = CGS_RBT_RED },
-		[RIGHT] = { .flag = ADD, .val = 6, .color = CGS_RBT_RED }
-	});
-
-	node = node->left;
-	set_children(node, (struct node_data[]){
-		[LEFT]  = { .flag = ADD, .val = 0, .color = CGS_RBT_BLACK },
-		[RIGHT] = { .flag = ADD, .val = 3, .color = CGS_RBT_BLACK }
-	});
-
-	node = node->left;
-	set_children(node, (struct node_data[]){
-		[LEFT]  = { .flag = IGNORE },
-		[RIGHT] = { .flag = ADD, .val = 1, .color = CGS_RBT_RED }
-	});
-
-	node = root->right;
-	set_children(node, (struct node_data[]){
-		[LEFT]  = { .flag = ADD, .val = 5, .color = CGS_RBT_BLACK },
-		[RIGHT] = { .flag = ADD, .val = 8, .color = CGS_RBT_BLACK }
-	});
-
-	node = node->right;
-	set_children(node, (struct node_data[]){
-		// Changed left node to black
-		[LEFT]  = { .flag = ADD, .val = 7, .color = CGS_RBT_BLACK },
-		[RIGHT] = { .flag = IGNORE }
-	});
-
-	*state = root;
-	return 0;
-}
-
-/* fake_tree_bad_rc_small
- *               _______________4B______________
- *              |                               |
- *       _______2R______                 _______6R______
- *      |               |               |               |
- *      0B__            3R*             5B            __8B
- *          |                                        |
- *          1R                                       7R
- */
-static int fake_tree_bad_rc_small_setup(void** state)
-	// violates red child rule and black-height rule
-{
-	struct cgs_variant v = { 0 };
-	cgs_variant_set_int(&v, 4);
-
-	struct cgs_rbt_node* root = cgs_rbt_node_new(&v);
-	root->color = CGS_RBT_BLACK;
-
-	struct cgs_rbt_node* node = root;
-	set_children(node, (struct node_data[]){
-		[LEFT]  = { .flag = ADD, .val = 2, .color = CGS_RBT_RED },
-		[RIGHT] = { .flag = ADD, .val = 6, .color = CGS_RBT_RED }
-	});
-
-	node = node->left;
-	set_children(node, (struct node_data[]){
-		[LEFT]  = { .flag = ADD, .val = 0, .color = CGS_RBT_BLACK },
-		[RIGHT] = { .flag = ADD, .val = 3, .color = CGS_RBT_RED }
-	});
-
-	node = node->left;
-	set_children(node, (struct node_data[]){
-		[LEFT]  = { .flag = IGNORE },
-		[RIGHT] = { .flag = ADD, .val = 1, .color = CGS_RBT_RED }
-	});
-
-	node = root->right;
-	set_children(node, (struct node_data[]){
-		[LEFT]  = { .flag = ADD, .val = 5, .color = CGS_RBT_BLACK },
-		[RIGHT] = { .flag = ADD, .val = 8, .color = CGS_RBT_BLACK }
-	});
-
-	node = node->right;
-	set_children(node, (struct node_data[]){
-		// Changed left node to black
 		[LEFT]  = { .flag = ADD, .val = 7, .color = CGS_RBT_RED },
 		[RIGHT] = { .flag = IGNORE }
 	});
@@ -347,6 +246,272 @@ static int fake_tree_good_large_setup(void** state)
 	return 0;
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Bad tree setups
+ *
+ * - Bad node color
+ * - Bad root
+ * - Bad black height
+ * - Bad red children and black height (hard to separate)
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+/* fake_tree_bad_color_setup
+ *               _______________4B______________
+ *              |                               |
+ *       _______2R______                 _______6R______
+ *      |               |               |               |
+ *      0B__            3B              5B            __8B
+ *          |                                        |
+ *          1R                                       7(37)*
+ *
+ * The color is stored as an integer from an enum. Here I will just set it
+ * to 37 since there is no other entries in the enumeration other than
+ * red and black.
+ */
+static int fake_tree_bad_color_setup(void** state)
+{
+	struct cgs_variant v = { 0 };
+	cgs_variant_set_int(&v, 4);
+
+	struct cgs_rbt_node* root = cgs_rbt_node_new(&v);
+	root->color = CGS_RBT_BLACK;
+
+	struct cgs_rbt_node* node = root;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = ADD, .val = 2, .color = CGS_RBT_RED },
+		[RIGHT] = { .flag = ADD, .val = 6, .color = CGS_RBT_RED }
+	});
+
+	node = node->left;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = ADD, .val = 0, .color = CGS_RBT_BLACK },
+		[RIGHT] = { .flag = ADD, .val = 3, .color = CGS_RBT_BLACK }
+	});
+
+	node = node->left;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = IGNORE },
+		[RIGHT] = { .flag = ADD, .val = 1, .color = CGS_RBT_RED }
+	});
+
+	node = root->right;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = ADD, .val = 5, .color = CGS_RBT_BLACK },
+		[RIGHT] = { .flag = ADD, .val = 8, .color = CGS_RBT_BLACK }
+	});
+
+	node = node->right;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = ADD, .val = 7, .color = 37 },
+		[RIGHT] = { .flag = IGNORE }
+	});
+
+	*state = root;
+	return 0;
+}
+
+/* fake_tree_bad_root_setup
+ *               _______________4R*_____________
+ *              |                               |
+ *       _______2B______                 _______6B______
+ *      |               |               |               |
+ *      0B__            3B              5B            __8B
+ *          |                                        |
+ *          1R                                       7R
+ */
+static int fake_tree_bad_root_setup(void** state)
+{
+	struct cgs_variant v = { 0 };
+	cgs_variant_set_int(&v, 4);
+
+	struct cgs_rbt_node* root = cgs_rbt_node_new(&v);
+	root->color = CGS_RBT_RED;
+
+	struct cgs_rbt_node* node = root;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = ADD, .val = 2, .color = CGS_RBT_BLACK },
+		[RIGHT] = { .flag = ADD, .val = 6, .color = CGS_RBT_BLACK }
+	});
+
+	node = node->left;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = ADD, .val = 0, .color = CGS_RBT_BLACK },
+		[RIGHT] = { .flag = ADD, .val = 3, .color = CGS_RBT_BLACK }
+	});
+
+	node = node->left;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = IGNORE },
+		[RIGHT] = { .flag = ADD, .val = 1, .color = CGS_RBT_RED }
+	});
+
+	node = root->right;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = ADD, .val = 5, .color = CGS_RBT_BLACK },
+		[RIGHT] = { .flag = ADD, .val = 8, .color = CGS_RBT_BLACK }
+	});
+
+	node = node->right;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = ADD, .val = 7, .color = CGS_RBT_RED },
+		[RIGHT] = { .flag = IGNORE }
+	});
+
+	*state = root;
+	return 0;
+}
+
+/* fake_tree_bad_bh
+ *               _______________4B______________
+ *              |                               |
+ *       _______2R______                 _______6R______
+ *      |               |               |               |
+ *      0B__            3B              5B            __8B
+ *          |                                        |
+ *          1R                                       7B*
+ */
+static int fake_tree_bad_bh_setup(void** state)
+	// violates black-height rule
+{
+	struct cgs_variant v = { 0 };
+	cgs_variant_set_int(&v, 4);
+
+	struct cgs_rbt_node* root = cgs_rbt_node_new(&v);
+	root->color = CGS_RBT_BLACK;
+
+	struct cgs_rbt_node* node = root;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = ADD, .val = 2, .color = CGS_RBT_RED },
+		[RIGHT] = { .flag = ADD, .val = 6, .color = CGS_RBT_RED }
+	});
+
+	node = node->left;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = ADD, .val = 0, .color = CGS_RBT_BLACK },
+		[RIGHT] = { .flag = ADD, .val = 3, .color = CGS_RBT_BLACK }
+	});
+
+	node = node->left;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = IGNORE },
+		[RIGHT] = { .flag = ADD, .val = 1, .color = CGS_RBT_RED }
+	});
+
+	node = root->right;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = ADD, .val = 5, .color = CGS_RBT_BLACK },
+		[RIGHT] = { .flag = ADD, .val = 8, .color = CGS_RBT_BLACK }
+	});
+
+	node = node->right;
+	set_children(node, (struct node_data[]){
+		// Changed left node to black
+		[LEFT]  = { .flag = ADD, .val = 7, .color = CGS_RBT_BLACK },
+		[RIGHT] = { .flag = IGNORE }
+	});
+
+	*state = root;
+	return 0;
+}
+
+/* fake_tree_bad_rc
+ *               _______________4B______________
+ *              |                               |
+ *       _______2R______                 _______6R______
+ *      |               |               |               |
+ *      0B__            3R*             5B            __8B
+ *          |                                        |
+ *          1R                                       7R
+ */
+static int fake_tree_bad_rc_setup(void** state)
+	// violates red child rule and black-height rule
+{
+	struct cgs_variant v = { 0 };
+	cgs_variant_set_int(&v, 4);
+
+	struct cgs_rbt_node* root = cgs_rbt_node_new(&v);
+	root->color = CGS_RBT_BLACK;
+
+	struct cgs_rbt_node* node = root;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = ADD, .val = 2, .color = CGS_RBT_RED },
+		[RIGHT] = { .flag = ADD, .val = 6, .color = CGS_RBT_RED }
+	});
+
+	node = node->left;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = ADD, .val = 0, .color = CGS_RBT_BLACK },
+		[RIGHT] = { .flag = ADD, .val = 3, .color = CGS_RBT_RED }
+	});
+
+	node = node->left;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = IGNORE },
+		[RIGHT] = { .flag = ADD, .val = 1, .color = CGS_RBT_RED }
+	});
+
+	node = root->right;
+	set_children(node, (struct node_data[]){
+		[LEFT]  = { .flag = ADD, .val = 5, .color = CGS_RBT_BLACK },
+		[RIGHT] = { .flag = ADD, .val = 8, .color = CGS_RBT_BLACK }
+	});
+
+	node = node->right;
+	set_children(node, (struct node_data[]){
+		// Changed left node to black
+		[LEFT]  = { .flag = ADD, .val = 7, .color = CGS_RBT_RED },
+		[RIGHT] = { .flag = IGNORE }
+	});
+
+	*state = root;
+	return 0;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Insert tree setup
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+static int rbt_insert_tree_setup(void** state)
+{
+	struct cgs_rbt* tree = cgs_rbt_new(cgs_int_cmp);
+
+	const int arr[] = {
+		2, 17, 16, 1, 8, 14, 15, 5, 6, 10,
+		3, 20, 11, 7, 9, 18, 12, 4, 13, 19,
+	};
+
+	struct cgs_variant v = { 0 };
+	for (size_t i = 0; i < CGS_ARRAY_LENGTH(arr); ++i) {
+		cgs_variant_set_int(&v, arr[i]);
+		cgs_rbt_insert(tree, &v);
+	}
+
+	*state = tree;
+	return 0;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Tree teardown
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+static int tree_node_teardown(void** state)
+{
+	struct cgs_rbt_node* node = *(struct cgs_rbt_node**)state;
+	cgs_rbt_node_free(node);
+	return 0;
+}
+
+static int tree_teardown(void** state)
+{
+	struct cgs_rbt* tree = *(struct cgs_rbt**)state;
+	cgs_rbt_free(tree);
+	return 0;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Actual tests
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 static void rbt_node_small_hand_test(void** state)
 {
 	struct cgs_rbt_node* root = *(struct cgs_rbt_node**)state;
@@ -364,7 +529,11 @@ static void rbt_node_small_hand_test(void** state)
 
 	assert_int_equal(cgs_rbt_node_black_height(root), 3);
 
-	assert_true(rbt_rules_test(root) == CGS_RBT_TEST_SUCCESS);
+	unsigned res = rbt_rules_test(root);
+	assert_int_equal(res & TEST_FAIL_COLOR, 0);
+	assert_int_equal(res & TEST_FAIL_ROOT, 0);
+	assert_int_equal(res & TEST_FAIL_RED_CHILDREN, 0);
+	assert_int_equal(res & TEST_FAIL_BLACK_HEIGHT, 0);
 }
 
 static void rbt_node_large_hand_test(void** state)
@@ -372,48 +541,113 @@ static void rbt_node_large_hand_test(void** state)
 	struct cgs_rbt_node* root = *(struct cgs_rbt_node**)state;
 
 	assert_int_equal(cgs_rbt_node_black_height(root), 4);
-	assert_true(rbt_rules_test(root) == CGS_RBT_TEST_SUCCESS);
+
+	unsigned res = rbt_rules_test(root);
+	assert_int_equal(res & TEST_FAIL_COLOR, 0);
+	assert_int_equal(res & TEST_FAIL_ROOT, 0);
+	assert_int_equal(res & TEST_FAIL_RED_CHILDREN, 0);
+	assert_int_equal(res & TEST_FAIL_BLACK_HEIGHT, 0);
 }
 
-/*
-int rbt_node_fail_test(void* data)
+static void rbt_node_fail_bh_test(void** state)
 {
-	(void)data;
-	struct cgs_rbt_node* root_bh = fake_tree_bad_bh_small();
-	assert(cgs_rbt_node_red_children_test(root_bh));
-	assert(rbt_rules_test(root_bh) == CGS_RBT_TEST_FAIL_BLACK_HEIGHT);
+	struct cgs_rbt_node* root = *(struct cgs_rbt_node**)state;
 
-	cgs_rbt_node_free(root_bh);
+	unsigned res = rbt_rules_test(root);
 
-	struct cgs_rbt_node* root_rc = fake_tree_bad_rc_small();
-	assert(rbt_rules_test(root_rc) == CGS_RBT_TEST_FAIL_RED_CHILDREN);
-
-	cgs_rbt_node_free(root_rc);
-
-	return TEST_SUCCESS;
+	assert_int_equal(res & TEST_FAIL_COLOR, 0);
+	assert_int_equal(res & TEST_FAIL_ROOT, 0);
+	assert_int_equal(res & TEST_FAIL_RED_CHILDREN, 0);
+	assert_int_equal(res & TEST_FAIL_BLACK_HEIGHT, TEST_FAIL_BLACK_HEIGHT);
 }
-*/
 
-/*
-int main(void)
+static void rbt_node_fail_rc_test(void** state)
+	// hard to fail red children without violating black height
 {
-	struct test tests[] = {
-		{ "rbt_node_small_hand", rbt_node_small_hand_test, NULL },
-		{ "rbt_node_large_hand", rbt_node_large_hand_test, NULL },
-		{ "rbt_node_fail", rbt_node_fail_test, NULL },
-	};
+	struct cgs_rbt_node* root = *(struct cgs_rbt_node**)state;
 
-	return cgs_run_tests(tests);
+	unsigned res = rbt_rules_test(root);
+
+	assert_int_equal(res & TEST_FAIL_COLOR, 0);
+	assert_int_equal(res & TEST_FAIL_ROOT, 0);
+	assert_int_equal(res & TEST_FAIL_RED_CHILDREN, TEST_FAIL_RED_CHILDREN);
+	assert_int_equal(res & TEST_FAIL_BLACK_HEIGHT, TEST_FAIL_BLACK_HEIGHT);
 }
-*/
+
+static void rbt_node_fail_root_test(void** state)
+{
+	struct cgs_rbt_node* root = *(struct cgs_rbt_node**)state;
+
+	unsigned res = rbt_rules_test(root);
+	assert_int_equal(res & TEST_FAIL_COLOR, 0);
+	assert_int_equal(res & TEST_FAIL_ROOT, TEST_FAIL_ROOT);
+	assert_int_equal(res & TEST_FAIL_RED_CHILDREN, 0);
+	assert_int_equal(res & TEST_FAIL_BLACK_HEIGHT, 0);
+}
+
+static void rbt_node_fail_color_test(void** state)
+{
+	struct cgs_rbt_node* root = *(struct cgs_rbt_node**)state;
+
+	unsigned res = rbt_rules_test(root);
+	assert_int_equal(res & TEST_FAIL_COLOR, TEST_FAIL_COLOR);
+	assert_int_equal(res & TEST_FAIL_ROOT, 0);
+	assert_int_equal(res & TEST_FAIL_RED_CHILDREN, 0);
+	assert_int_equal(res & TEST_FAIL_BLACK_HEIGHT, 0);
+}
+
+static void rbt_insert_test(void** state)
+{
+	struct cgs_rbt* tree = *(struct cgs_rbt**)state;
+
+	unsigned res = rbt_rules_test(cgs_rbt_root(tree));
+	assert_int_equal(res & TEST_FAIL_COLOR, 0);
+	assert_int_equal(res & TEST_FAIL_ROOT, 0);
+	assert_int_equal(res & TEST_FAIL_RED_CHILDREN, 0);
+	assert_int_equal(res & TEST_FAIL_BLACK_HEIGHT, 0);
+
+	// min-max test
+	const int* min = cgs_rbt_min(tree);
+	const int* max = cgs_rbt_max(tree);
+	assert_int_equal(*min, 1);
+	assert_int_equal(*max, 20);
+
+	// search test
+	struct cgs_variant v = { 0 };
+	const int* found = NULL;
+
+	cgs_variant_set_int(&v, 14);
+	found = cgs_rbt_search(tree, &v);
+	assert_non_null(found);
+	assert_int_equal(*found, 14);
+
+	cgs_variant_set_int(&v, 21);
+	found = cgs_rbt_search(tree, &v);
+	assert_null(found);
+}
 
 int main(void)
 {
 	const struct CMUnitTest tests[] = {
+		// Good hand-made trees
 		cmocka_unit_test_setup_teardown(rbt_node_small_hand_test,
-				fake_tree_good_small_setup, tree_teardown),
+				fake_tree_good_small_setup, tree_node_teardown),
 		cmocka_unit_test_setup_teardown(rbt_node_large_hand_test,
-				fake_tree_good_large_setup, tree_teardown),
+				fake_tree_good_large_setup, tree_node_teardown),
+
+		// Bad hand-made trees
+		cmocka_unit_test_setup_teardown(rbt_node_fail_bh_test,
+				fake_tree_bad_bh_setup, tree_node_teardown),
+		cmocka_unit_test_setup_teardown(rbt_node_fail_rc_test,
+				fake_tree_bad_rc_setup, tree_node_teardown),
+		cmocka_unit_test_setup_teardown(rbt_node_fail_root_test,
+				fake_tree_bad_root_setup, tree_node_teardown),
+		cmocka_unit_test_setup_teardown(rbt_node_fail_color_test,
+				fake_tree_bad_color_setup, tree_node_teardown),
+
+		// Insert tree
+		cmocka_unit_test_setup_teardown(rbt_insert_test,
+				rbt_insert_tree_setup, tree_teardown),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
