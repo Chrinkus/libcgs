@@ -73,3 +73,63 @@ cgs_heap_new(struct cgs_heap* heap, size_t size, CgsCmp3Way cmp);
 void
 cgs_heap_free(struct cgs_heap* heap);
 
+/**
+ * cgs_heap_length
+ *
+ * Length getter.
+ *
+ * @param h     The heap.
+ *
+ * @return      The current length of the heap.
+ */
+inline size_t
+cgs_heap_length(const struct cgs_heap* h)
+{
+        return h->length;
+}
+
+/**
+ * cgs_heap_peek
+ *
+ * Get a read-only pointer to the first (highest priority) element in the
+ * heap.
+ *
+ * @param h     The heap.
+ *
+ * @return      A read-only pointer to the first element.
+ */
+inline const void*
+cgs_heap_peek(const struct cgs_heap* h)
+{
+        return h->length > 0 ? &h->data[0] : NULL;
+}
+
+/**
+ * cgs_heap_push
+ *
+ * Add a value to a heap.
+ *
+ * @param h     The heap to add a value to.
+ * @param val   A read-only pointer to the value to be inserted.
+ *
+ * @return      A read-only pointer to the heap data on success or NULL
+ *              on failure.
+ */
+const void*
+cgs_heap_push(struct cgs_heap* h, const void* val);
+
+/**
+ * cgs_heap_pop
+ *
+ * Remove the highest priority (first) item from the heap. Re-balance the
+ * heap afterwards.
+ *
+ * @param h     The heap.
+ * @param dst   A destination pointer to copy the priority value to.
+ *
+ * @return      A read-only pointer to the heap data if a value is available
+ *              or NULL if heap is empty.
+ */
+const void*
+cgs_heap_pop(struct cgs_heap* h, void* dest);
+
