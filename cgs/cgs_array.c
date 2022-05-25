@@ -195,3 +195,17 @@ cgs_array_find(struct cgs_array* a, const void* val, CgsCmp3Way cmp)
 	return NULL;
 }
 
+void
+cgs_array_foreach(const struct cgs_array* a, CgsUnaryOp f, void* data)
+{
+        for (size_t i = 0, l = a->length; i < l; ++i)
+                f(cgs_array_get(a, i), i, data);
+}
+
+void
+cgs_array_transform(struct cgs_array* a, CgsUnaryOpMut f, void* data)
+{
+        for (size_t i = 0, l = a->length; i < l; ++i)
+                f(cgs_array_get_mutable(a, i), i, data);
+}
+

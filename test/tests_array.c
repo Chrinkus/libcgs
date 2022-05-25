@@ -233,6 +233,61 @@ static void array_strings_test(void** state)
 	cgs_array_free_all(as);
 }
 
+void accum_int(const void* p, size_t i, void* data)
+{
+        int val = *(const int*)p;
+        int* sum = data;
+        (void)i;
+
+        *sum += val;
+}
+
+static void array_foreach_test(void** state)
+{
+        (void)state;
+
+        struct cgs_array* ai = cgs_array_new(int);
+
+        for (int i = 0; i < 10; ++i)
+                cgs_array_push(ai, &i);
+
+        int sum = 0;
+        cgs_array_foreach(ai, accum_int, &sum);
+
+        assert_int_equal(sum, 45);
+
+        cgs_array_free(ai);
+}
+
+void double_int(void* ele, size_t i, void* data)
+{
+        int* p = ele;
+        (void)i;
+        (void)data;
+
+        *p *= 2;
+}
+
+static void array_transform_test(void** state)
+{
+        (void)state;
+
+        struct cgs_array* ai = cgs_array_new(int);
+
+        for (int i = 0; i < 10; ++i)
+                cgs_array_push(ai, &i);
+
+        cgs_array_transform(ai, double_int, NULL);
+
+        const int* p = cgs_array_get(ai, 0);
+        assert_int_equal(p[0], 0);
+        assert_int_equal(p[1], 2);
+        assert_int_equal(p[5], 10);
+        assert_int_equal(p[9], 18);
+
+        cgs_array_free(ai);
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Main
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
@@ -250,6 +305,8 @@ int main(void)
 				teardown_ptr),
 		cmocka_unit_test_setup_teardown(array_strings_test,
 				setup_towns, teardown_ptr),
+		cmocka_unit_test(array_foreach_test),
+		cmocka_unit_test(array_transform_test),
 	};
 
 	return cmocka_run_group_tests(tests, setup_random, teardown_ptr);

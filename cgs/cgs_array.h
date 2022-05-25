@@ -206,3 +206,31 @@ cgs_array_sort(struct cgs_array* a, CgsCmp3Way cmp);
 void*
 cgs_array_find(struct cgs_array* a, const void* val, CgsCmp3Way cmp);
 
+/**
+ * cgs_array_foreach
+ *
+ * Traverse a read-only array and perform an operation using each of its
+ * elements.
+ *
+ * @param a     A read-only pointer to the array.
+ * @param f     A function to perform taking an element, the current index,
+ *              and a pointer to userdata.
+ * @param data  The userdata.
+ */
+void
+cgs_array_foreach(const struct cgs_array* a, CgsUnaryOp f, void* data);
+
+/**
+ * cgs_array_transform
+ *
+ * Traverse an array and perform an operation on each element, possibly
+ * altering their contents.
+ *
+ * @param a     A pointer to the array.
+ * @param f     A function to perform taking an element, the current index,
+ *              and a pointer to userdata.
+ * @param data  The userdata.
+ */
+void
+cgs_array_transform(struct cgs_array* a, CgsUnaryOpMut f, void* data);
+

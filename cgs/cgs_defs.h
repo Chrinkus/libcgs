@@ -110,3 +110,15 @@ typedef char** CgsStrIterMut;
  */
 typedef int (*CgsCmp3Way)(const void*, const void*);
 
+/**
+ * CgsUnaryOp
+ *
+ * This function definition
+ */
+typedef void (*CgsUnaryOp)(const void*, size_t, void*);
+
+/**
+ * CgsUnaryOpMut
+ */
+typedef void (*CgsUnaryOpMut)(void*, size_t, void*);
+
