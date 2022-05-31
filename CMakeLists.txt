@@ -9,6 +9,11 @@ add_compile_options(-Wall -Wextra)
 
 include(GNUInstallDirs)
 
+if(APPLE)
+	include_directories(${CMAKE_INSTALL_PREFIX}/include)
+	link_directories(${CMAKE_INSTALL_PREFIX}/lib)
+endif()
+
 set(LIB_NAME "cgs")
 
 add_subdirectory(src)
