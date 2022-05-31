@@ -32,7 +32,12 @@
  *
  * A generic, dynamic array
  */
-struct cgs_array;
+struct cgs_array {
+	size_t length;
+	size_t capacity;
+	size_t element_size;
+	char* data;
+};
 
 /**
  * cgs_array_new
@@ -42,7 +47,7 @@ struct cgs_array;
  *
  * @param t	Type of array.
  */
-#define cgs_array_new(t) cgs_array_new_from_size(sizeof(t))
+//#define cgs_array_new(t) cgs_array_new_from_size(sizeof(t))
 
 /**
  * cgs_array_new_from_size
@@ -52,23 +57,38 @@ struct cgs_array;
  * @param size	The size in bytes of the array type.
  *
  * @return	A new empty array.
- */
 struct cgs_array*
 cgs_array_new_from_size(size_t size);
+ */
+
+/**
+ * cgs_array_new
+ *
+ * @param a     A pointer to an array object to initialize.
+ * @param size  The size of the elements to be contained in the array.
+ *
+ * @return      A pointer to the array on successful allocation or NULL on
+ *              failure.
+ */
+void*
+cgs_array_new(struct cgs_array* a, size_t size);
 
 /**
  * cgs_array_new_from_array
  *
  * Allocates a new array and fills it with the elements in src.
  *
- * @param src	The source array.
+ * @param a     A pointer to the array structure to create a copy to.
+ * @param size	The size in bytes of the elements in the array.
+ * @param src	A read-only pointer to the source array.
  * @param len	The length of the source array.
- * @param size	The size in bytes of the elements in src.
  *
- * @return	A new array with a copy of the elements in src.
+ * @return      A pointer to the array on successful allocation or NULL on
+ *              failure.
  */
-struct cgs_array*
-cgs_array_new_from_array(const void* src, size_t len, size_t size);
+void*
+cgs_array_new_from_array(struct cgs_array* a, size_t size,
+                const void* src, size_t len);
 
 /**
  * cgs_array_free

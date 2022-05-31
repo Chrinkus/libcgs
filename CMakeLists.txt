@@ -11,7 +11,7 @@ include(GNUInstallDirs)
 
 set(LIB_NAME "cgs")
 
-add_subdirectory(cgs)
+add_subdirectory(src)
 
 enable_testing()
 add_subdirectory(test)

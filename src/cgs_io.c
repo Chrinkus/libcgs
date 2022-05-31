@@ -1,4 +1,4 @@
-/* cgs_io.h
+/* cgs_io.c
  *
  * MIT License
  * 
@@ -22,51 +22,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
+#include "cgs_io.h"
+#include "cgs_string_utils.h"
 
-#include <stdio.h>
-/* The cgs_string and cgs_array headers are included rather than just forward
- * declaring the structs since usage of the io functions demands their
- * inclusion.
- */
-#include "cgs_string.h"
-#include "cgs_array.h"
-
-/**
- * cgs_io_getline
- *
- * Read a line from file and store it in buff. Reading terminates on EOF or
- * newline character. The newline is discarded.
- *
- * @param file	The file or stream to read from.
- * @param buff	The self-managed string buffer.
- *
- * @return	The number of characters read.
- */
 int
-cgs_io_getline(FILE* file, struct cgs_string* buff);
+cgs_io_getline(FILE* file, struct cgs_string* buff)
+{
+	int count = 0;
 
-/**
- * cgs_io_readline
- *
- * Read a line from a file and return a pointer to it.
- *
- * @param file	The file or stream to read from.
- *
- * @return	An allocated null-terminated string.
- */
+	for (int c; (c = fgetc(file)) != EOF && c != '\n'; ++count)
+		cgs_string_push(buff, c);
+
+	return count;
+}
+
 char*
-cgs_io_readline(FILE* file);
+cgs_io_readline(FILE* file)
+{
+	char* p = NULL;
 
-/**
- * cgs_io_readlines
- *
- * Read all lines from a file and store them in a cgs_array sized for char*'s.
- * 
- * @param file	The file or stream to read from.
- *
- * @return	A cgs_array of char*'s.
- */
-struct cgs_array*
-cgs_io_readlines(FILE* file);
+	struct cgs_string* buffer = cgs_string_new();
+	if (cgs_io_getline(file, buffer))
+		p = cgs_string_xfer(buffer);
+	else
+		cgs_string_free(buffer);
+
+	return p;
+}
+
+struct cgs_array
+cgs_io_readlines(FILE* file)
+{
+        struct cgs_array lines = { 0 };
+        cgs_array_new(&lines, sizeof(char*));
+	//struct cgs_array* lines = cgs_array_new(char*);
+	struct cgs_string* buffer = cgs_string_new();
+
+	for ( ; cgs_io_getline(file, buffer) > 0; cgs_string_clear(buffer)) {
+		char* line = cgs_strdup(cgs_string_read(buffer));
+		cgs_array_push(&lines, &line);
+	}
+	cgs_string_free(buffer);
+
+	return lines;
+}
 

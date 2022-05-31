@@ -103,11 +103,11 @@ static void io_readlines_test(void** state)
 {
 	FILE* file = *(FILE**)state;
 
-	struct cgs_array* lines = cgs_io_readlines(file);
-	assert_int_equal(cgs_array_length(lines), 4);
+	struct cgs_array lines = cgs_io_readlines(file);
+	assert_int_equal(cgs_array_length(&lines), 4);
 
-	CgsStrIter b = cgs_array_begin(lines);
-	CgsStrIter e = cgs_array_end(lines);
+	CgsStrIter b = cgs_array_begin(&lines);
+	CgsStrIter e = cgs_array_end(&lines);
 	assert_ptr_not_equal(b, e);
 
 	assert_string_equal(*b++, "Birthday");
@@ -116,7 +116,7 @@ static void io_readlines_test(void** state)
 	assert_string_equal(*b++, "Books for reading");
 	assert_ptr_equal(b, e);
 
-	cgs_array_free_all(lines);
+	cgs_array_free_all(&lines);
 }
 
 int main(void)

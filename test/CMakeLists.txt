@@ -2,7 +2,7 @@
 find_package(cmocka)
 
 # Main project
-include_directories("${PROJECT_SOURCE_DIR}/cgs")
+include_directories("${PROJECT_SOURCE_DIR}/src")
 
 # Test build target
 add_custom_target(tests)

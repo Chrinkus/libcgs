@@ -20,7 +20,6 @@ set(headers
         "cgs_heap.h"
 	"cgs_io.h"
 	"cgs_rbt.h"
-	"cgs_rbt_private.h"
 	"cgs_sort.h"
 	"cgs_string.h"
 	"cgs_string_utils.h"
