@@ -40,15 +40,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*
-struct cgs_array {
-	size_t length;
-	size_t capacity;
-	size_t element_size;
-	char* memory;
-};
-*/
-
 enum cgs_array_constants {
 	CGS_ARRAY_INITIAL_CAPACITY = 8,
 	CGS_ARRAY_GROWTH_RATE = 2,
@@ -68,26 +59,6 @@ cgs_array_new(struct cgs_array* a, size_t size)
 
         return a;
 }
-/*
-struct cgs_array*
-cgs_array_new_from_size(size_t size)
-{
-	struct cgs_array* a = malloc(sizeof(struct cgs_array));
-	if (!a)
-		return NULL;
-
-	a->element_size = size;
-	a->capacity = CGS_ARRAY_INITIAL_CAPACITY;
-	a->memory = malloc(a->element_size * a->capacity);
-	if (!a->memory) {
-		free(a);
-		return NULL;
-	}
-
-	a->length = 0;
-	return a;
-}
-*/
 
 void*
 cgs_array_new_from_array(struct cgs_array* a, size_t size,
@@ -105,28 +76,6 @@ cgs_array_new_from_array(struct cgs_array* a, size_t size,
 
         return a;
 }
-/*
-struct cgs_array*
-cgs_array_new_from_array(const void* src, size_t len, size_t size)
-{
-	struct cgs_array* a = malloc(sizeof(struct cgs_array));
-	if (!a)
-		return NULL;
-
-	a->element_size = size;
-	a->capacity = len;
-	a->memory = malloc(a->element_size * a->capacity);
-	if (!a->memory) {
-		free(a);
-		return NULL;
-	}
-
-	a->length = len;
-	memcpy(a->memory, src, a->length * a->element_size);
-
-	return a;
-}
-*/
 
 void
 cgs_array_free(struct cgs_array* a)
@@ -164,9 +113,8 @@ cgs_array_length(const struct cgs_array* a)
 static const void*
 cgs_array_grow(struct cgs_array* a)
 {
-	size_t new_capacity = a->capacity > 0
-		? a->capacity * CGS_ARRAY_GROWTH_RATE
-		: CGS_ARRAY_INITIAL_CAPACITY;
+	size_t new_capacity = a->capacity == 0 ? CGS_ARRAY_INITIAL_CAPACITY
+		: a->capacity * CGS_ARRAY_GROWTH_RATE;
 	
 	char* p = realloc(a->data, a->element_size * new_capacity);
         if (!p)

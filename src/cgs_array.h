@@ -42,28 +42,6 @@ struct cgs_array {
 /**
  * cgs_array_new
  *
- * A convenience macro that calls 'sizeof' on a given type to call the
- * 'cgs_array_new_from size' function below.
- *
- * @param t	Type of array.
- */
-//#define cgs_array_new(t) cgs_array_new_from_size(sizeof(t))
-
-/**
- * cgs_array_new_from_size
- *
- * Allocates a new array for elements the size of the given type's size.
- *
- * @param size	The size in bytes of the array type.
- *
- * @return	A new empty array.
-struct cgs_array*
-cgs_array_new_from_size(size_t size);
- */
-
-/**
- * cgs_array_new
- *
  * @param a     A pointer to an array object to initialize.
  * @param size  The size of the elements to be contained in the array.
  *
