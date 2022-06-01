@@ -47,57 +47,91 @@
  * - prev
  */
 
-/*
- * Struct forward declarations
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * BST Types
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+/**
+ * struct cgs_bst
+ *
+ * Forward declaration of struct defined in private header.
  */
-struct cgs_bst;
 struct cgs_bst_node;
+
+/**
+ * struct cgs_bst
+ *
+ * The BST container struct.
+ *
+ * @member root         The root node of the tree.
+ * @member length       The number of elements in the tree.
+ * @member cmp          A comparison function to order the tree with.
+ */
+struct cgs_bst {
+        struct cgs_bst_node* root;
+        size_t length;
+        CgsCmp3Way cmp;
+};
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * BST Management Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
  * cgs_bst_new
  *
- * Allocate a new binary search tree and return it. Size will be 0, the root
- * will be NULL and cmp will be set.
+ * Set the initial values for a new binary search tree.
  *
- * @param cmp	The comparison function to order the tree with.
- *
- * @return	An empty binary search tree.
+ * @param tree  A pointer to a tree struct.
+ * @param cmp   The comparison function to order the tree with.
  */
-struct cgs_bst* cgs_bst_new(CgsCmp3Way cmp);
+void
+cgs_bst_new(struct cgs_bst* tree, CgsCmp3Way cmp);
 
 /**
  * cgs_bst_free
  *
- * Deallocate a binary search tree. Will first free the elements of the tree
- * then the tree itself.
+ * Deallocate the nodes of a binary search tree.
  *
- * @param tree	Tree to be freed. May be NULL.
+ * @param tree  Tree to be freed. May be NULL.
  */
-void cgs_bst_free(struct cgs_bst* tree);
+void
+cgs_bst_free(struct cgs_bst* tree);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * BST Inline Getters
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
- * cgs_bst_size
+ * cgs_bst_length
  *
- * Get the size of the tree.
+ * Get the length of the tree.
  *
- * @param tree	The tree to get the size of. Read only.
+ * @param tree  A read-only pointer to a binary search tree.
  *
- * @return	The size of the tree.
+ * @return      The length of the tree.
  */
-size_t cgs_bst_size(const struct cgs_bst* tree);
+inline size_t
+cgs_bst_length(const struct cgs_bst* tree)
+{
+        return tree->length;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * BST Standard Operations
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
  * cgs_bst_insert
  *
- * Insert a node into the tree.
+ * Allocate a new node and insert it into the tree.
  *
  * @param tree	Tree to insert node into.
  * @param val	Value to insert into tree.
  *
- * @return	A read-only pointer to inserted node if successful, NULL
- * 		on failure.
+ * @return	A valid pointer if successful, NULL on failure.
  */
-const struct cgs_bst_node*
+const void*
 cgs_bst_insert(struct cgs_bst* tree, struct cgs_variant* data);
 
 /**
@@ -106,11 +140,12 @@ cgs_bst_insert(struct cgs_bst* tree, struct cgs_variant* data);
  * Search the tree for an entry. Uses the 3-way comparison function of the
  * tree to find a matching variant.
  *
- * @param tree	Tree to search.
- * @param data	Data to find in the tree.
+ * @param tree  Tree to search.
+ * @param tree  A read-only pointer to a binary search tree.
+ * @param data  Data to find in the tree.
  *
- * @return	A pointer to the variant that matches the search data or NULL
- * 		if not found.
+ * @return      A pointer to the variant that matches the search data or NULL
+ *              if not found.
  */
 const struct cgs_variant*
 cgs_bst_search(const struct cgs_bst* tree, const struct cgs_variant* data);
@@ -120,9 +155,10 @@ cgs_bst_search(const struct cgs_bst* tree, const struct cgs_variant* data);
  *
  * Get the minimum value in the tree.
  *
- * @param tree	Tree to find minimum value of.
+ * @param tree  A read-only pointer to a binary search tree.
  *
- * @return	Minimum value in the tree.
+ * @return      A read-only pointer directly to the data of the minimum
+ *              element or NULL if tree is empty.
  */
 const void*
 cgs_bst_min(const struct cgs_bst* tree);
@@ -132,9 +168,10 @@ cgs_bst_min(const struct cgs_bst* tree);
  *
  * Get the maximum value in the tree.
  *
- * @param tree	Tree to find maximum value of.
+ * @param tree  A read-only pointer to a binary search tree.
  *
- * @return	Maximum value in the tree.
+ * @return      A read-only pointer directly to the data of the maximum
+ *              element or NULL if tree is empty.
  */
 const void*
 cgs_bst_max(const struct cgs_bst* tree);
