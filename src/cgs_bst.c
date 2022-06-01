@@ -35,7 +35,7 @@
 struct cgs_bst_node*
 cgs_bst_node_new(const struct cgs_variant* data)
 {
-	struct cgs_bst_node* node = malloc(sizeof(struct cgs_bst_node));
+        struct cgs_bst_node* node = malloc(sizeof(struct cgs_bst_node));
         if (!node)
                 return NULL;
 
@@ -50,12 +50,12 @@ cgs_bst_node_new(const struct cgs_variant* data)
 void
 cgs_bst_node_free(struct cgs_bst_node* node)
 {
-	if (node) {
-		cgs_bst_node_free(node->left);
-		cgs_bst_node_free(node->right);
-		cgs_variant_free_data(&node->data);
-	}
-	free(node);
+        if (node) {
+                cgs_bst_node_free(node->left);
+                cgs_bst_node_free(node->right);
+                cgs_variant_free_data(&node->data);
+        }
+        free(node);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
