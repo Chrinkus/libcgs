@@ -27,10 +27,20 @@
 #include <stddef.h>
 #include "cgs_defs.h"
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Array Types
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 /**
  * struct cgs_array
  *
  * A generic, dynamic array
+ *
+ * @member length       The number of elements in the array.
+ * @member capacity     The current number of elements that the array has
+ *                      room for.
+ * @member element_size The size of the elements in the array in bytes.
+ * @member data         A pointer to the allocated memory.
  */
 struct cgs_array {
 	size_t length;
@@ -38,6 +48,10 @@ struct cgs_array {
 	size_t element_size;
 	char* data;
 };
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Array Management Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
  * cgs_array_new
@@ -83,6 +97,9 @@ cgs_array_free(struct cgs_array* a);
  *
  * Deallocates the elements of an array then the array itself.
  *
+ * Warning: If the elements have a custom clean up function use
+ * 'cgs_array_transform' instead then 'cgs_array_free' afterwards.
+ *
  * @param a	The array of allocated elements to free.
  */
 void
@@ -91,16 +108,20 @@ cgs_array_free_all(struct cgs_array* a);
 /**
  * cgs_array_xfer
  *
- * Releases ownership of array memory. Frees the array structure.
+ * Releases ownership of array memory.
  *
  * @param a	The array to transfer ownership from.
- * @param len	A pointer to a variable to store the length of the array in
- * 		or NULL.
+ * @param len	Optional pointer to a size_t variable to store the length of
+ *              the array in or NULL.
  *
  * @return	A pointer to the transferred memory.
  */
 void*
 cgs_array_xfer(struct cgs_array* a, size_t* len);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Array Inline Getters
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
  * cgs_array_length
@@ -111,8 +132,29 @@ cgs_array_xfer(struct cgs_array* a, size_t* len);
  *
  * @return	The array length.
  */
-size_t
-cgs_array_length(const struct cgs_array* a);
+inline size_t
+cgs_array_length(const struct cgs_array* a)
+{
+	return a->length;
+}
+
+/**
+ * cgs_array_data
+ *
+ * Get a pointer to the array object.
+ *
+ * Warning: The 'data' member is cast to a void* on return to alleviate
+ * compiler warnings when assigning to the proper type.
+ *
+ * @param a     The array.
+ *
+ * @return      A void-pointer to the data object.
+ */
+inline void*
+cgs_array_data(struct cgs_array* a)
+{
+        return (void*)a->data;
+}
 
 
 /**
@@ -125,8 +167,11 @@ cgs_array_length(const struct cgs_array* a);
  *
  * @return	A read-only pointer to the element.
  */
-const void*
-cgs_array_get(const struct cgs_array* a, size_t index);
+inline const void*
+cgs_array_get(const struct cgs_array* a, size_t index)
+{
+	return &a->data[a->element_size * index];
+}
 
 /**
  * cgs_array_get_mutable
@@ -138,8 +183,11 @@ cgs_array_get(const struct cgs_array* a, size_t index);
  *
  * @return	A mutable pointer to the element.
  */
-void*
-cgs_array_get_mutable(struct cgs_array* a, size_t index);
+inline void*
+cgs_array_get_mutable(struct cgs_array* a, size_t index)
+{
+	return &a->data[a->element_size * index];
+}
 
 /**
  * cgs_array_begin
@@ -150,8 +198,11 @@ cgs_array_get_mutable(struct cgs_array* a, size_t index);
  *
  * @return	A read-only pointer to the first element.
  */
-const void*
-cgs_array_begin(const struct cgs_array* a);
+inline const void*
+cgs_array_begin(const struct cgs_array* a)
+{
+	return a->data;
+}
 
 /**
  * cgs_array_end
@@ -162,8 +213,15 @@ cgs_array_begin(const struct cgs_array* a);
  *
  * @return	A read-only pointer to the element past the last element.
  */
-const void*
-cgs_array_end(const struct cgs_array* a);
+inline const void*
+cgs_array_end(const struct cgs_array* a)
+{
+	return a->data + a->length * a->element_size;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Array Standard Operations
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
  * cgs_array_push
@@ -178,6 +236,10 @@ cgs_array_end(const struct cgs_array* a);
  */
 void*
 cgs_array_push(struct cgs_array* a, const void* src);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Array Standard Algorithms
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
  * cgs_array_sort

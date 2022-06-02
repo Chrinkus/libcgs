@@ -40,10 +40,37 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Array Types
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 enum cgs_array_constants {
 	CGS_ARRAY_INITIAL_CAPACITY = 8,
 	CGS_ARRAY_GROWTH_RATE = 2,
 };
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Array Static Helpers - move to private header?
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+static const void*
+cgs_array_grow(struct cgs_array* a)
+{
+	size_t new_capacity = a->capacity == 0 ? CGS_ARRAY_INITIAL_CAPACITY
+		: a->capacity * CGS_ARRAY_GROWTH_RATE;
+	
+	char* p = realloc(a->data, a->element_size * new_capacity);
+        if (!p)
+                return NULL;
+
+        a->data = p;
+        a->capacity = new_capacity;
+	return p;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Array Management Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 void*
 cgs_array_new(struct cgs_array* a, size_t size)
@@ -104,50 +131,31 @@ cgs_array_xfer(struct cgs_array* a, size_t* len)
 	return p;
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Array Inline Getter Symbols
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 size_t
-cgs_array_length(const struct cgs_array* a)
-{
-	return a->length;
-}
-
-static const void*
-cgs_array_grow(struct cgs_array* a)
-{
-	size_t new_capacity = a->capacity == 0 ? CGS_ARRAY_INITIAL_CAPACITY
-		: a->capacity * CGS_ARRAY_GROWTH_RATE;
-	
-	char* p = realloc(a->data, a->element_size * new_capacity);
-        if (!p)
-                return NULL;
-
-        a->data = p;
-        a->capacity = new_capacity;
-	return p;
-}
-
-const void*
-cgs_array_get(const struct cgs_array* a, size_t index)
-{
-	return &a->data[a->element_size * index];
-}
+cgs_array_length(const struct cgs_array* a);
 
 void*
-cgs_array_get_mutable(struct cgs_array* a, size_t index)
-{
-	return &a->data[a->element_size * index];
-}
+cgs_array_data(struct cgs_array* a);
 
 const void*
-cgs_array_begin(const struct cgs_array* a)
-{
-	return a->data;
-}
+cgs_array_get(const struct cgs_array* a, size_t index);
+
+void*
+cgs_array_get_mutable(struct cgs_array* a, size_t index);
 
 const void*
-cgs_array_end(const struct cgs_array* a)
-{
-	return a->data + a->length * a->element_size;
-}
+cgs_array_begin(const struct cgs_array* a);
+
+const void*
+cgs_array_end(const struct cgs_array* a);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Array Standard Operations
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 void*
 cgs_array_push(struct cgs_array* a, const void* src)
@@ -160,6 +168,10 @@ cgs_array_push(struct cgs_array* a, const void* src)
 	++a->length;
 	return a;
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Array Standard Algorithms
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 void
 cgs_array_sort(struct cgs_array* a, CgsCmp3Way cmp)
