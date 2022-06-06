@@ -25,13 +25,16 @@
 #include "cgs_io.h"
 #include "cgs_string_utils.h"
 
+#include <stdlib.h>
+
 int
 cgs_io_getline(FILE* file, struct cgs_string* buff)
 {
 	int count = 0;
 
 	for (int c; (c = fgetc(file)) != EOF && c != '\n'; ++count)
-		cgs_string_push(buff, c);
+                if (!cgs_string_push(buff, c))
+                        return -1;
 
 	return count;
 }
@@ -39,31 +42,44 @@ cgs_io_getline(FILE* file, struct cgs_string* buff)
 char*
 cgs_io_readline(FILE* file)
 {
-	char* p = NULL;
+        struct cgs_string buffer = { 0 };
+        if (!cgs_string_new(&buffer))
+                return NULL;
 
-	struct cgs_string* buffer = cgs_string_new();
-	if (cgs_io_getline(file, buffer))
-		p = cgs_string_xfer(buffer);
-	else
-		cgs_string_free(buffer);
+	if (cgs_io_getline(file, &buffer) > 0)
+                return cgs_string_xfer(&buffer);
 
-	return p;
+        cgs_string_free(&buffer);
+
+	return NULL;
 }
 
-struct cgs_array
-cgs_io_readlines(FILE* file)
+void*
+cgs_io_readlines(FILE* file, struct cgs_array* lines)
 {
-        struct cgs_array lines = { 0 };
-        cgs_array_new(&lines, sizeof(char*));
-	//struct cgs_array* lines = cgs_array_new(char*);
-	struct cgs_string* buffer = cgs_string_new();
+        struct cgs_string buffer = { 0 };
+        if (!cgs_string_new(&buffer))
+                return NULL;
 
-	for ( ; cgs_io_getline(file, buffer) > 0; cgs_string_clear(buffer)) {
-		char* line = cgs_strdup(cgs_string_read(buffer));
-		cgs_array_push(&lines, &line);
-	}
-	cgs_string_free(buffer);
+        char* line = NULL;
+        while (cgs_io_getline(file, &buffer) > 0) {
+                line = cgs_strdup(cgs_string_data(&buffer));
+                if (!line)
+                        goto error_cleanup;
+                if (!cgs_array_push(lines, &line))
+                        goto push_error_cleanup;
 
+                cgs_string_clear(&buffer);
+        }
+
+	cgs_string_free(&buffer);
 	return lines;
+
+push_error_cleanup:
+        free(line);
+
+error_cleanup:
+        cgs_string_free(&buffer);
+        return NULL;
 }
 

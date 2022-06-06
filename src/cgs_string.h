@@ -26,37 +26,52 @@
 
 #include <stddef.h>	/* size_t */
 
-struct cgs_string;
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * String Types
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+struct cgs_string {
+        size_t length;
+        size_t capacity;
+        char* data;
+};
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * String Management Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
  * cgs_string_new
  *
- * Allocate a new string and return it. Size will be 0 and the first character
- * will be '\0'.
+ * Initialize and allocate a new cgs_string struct. Length will be 0, capacity
+ * will be set to a reasonable default and the first character will be '\0'.
  *
- * @return	The newly allocated string.
+ * @param s     The string struct to initialize.
+ *
+ * @return      A valid pointer on successful allocation or NULL on failure.
  */
-struct cgs_string*
-cgs_string_new(void);
+void*
+cgs_string_new(struct cgs_string* s);
 
 /**
  * cgs_string_new_from_string
  *
- * Create a new string by copying the contents of another string.
+ * Create a new string by copying the contents of a standard string.
  *
- * @param src	Source string to copy from.
+ * @param s     The destination string struct to allocate and copy to.
+ * @param src   A read-only pointer to the source string to copy from.
  *
- * @return	The newly allocated string.
+ * @return      A valid pointer on successful allocation or NULL on failure.
  */
-struct cgs_string*
-cgs_string_new_from_string(const char* src);
+void*
+cgs_string_new_from_string(struct cgs_string* s, const char* src);
 
 /**
  * cgs_string_free
  *
  * Deallocate a string.
  *
- * @param s	The string to be freed.
+ * @param s     The string to be freed.
  */
 void
 cgs_string_free(struct cgs_string* s);
@@ -66,36 +81,50 @@ cgs_string_free(struct cgs_string* s);
  *
  * Release ownership of the inner string buffer.
  *
- * @param s	The string struct to release ownership from.
+ * @param s     The string struct to release ownership from.
  *
- * @return	A pointer to the transferred memory.
+ * @return      A pointer to the transferred memory.
  */
 char*
 cgs_string_xfer(struct cgs_string* s);
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * String Inline Getters
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 /**
- * cgs_string_read
+ * cgs_string_data
  *
- * Get read-access to the string.
+ * Get read-only access to the string.
  *
- * @param s	The string to read.
+ * @param s     The string to read.
  *
- * @return	A read-only pointer to the inner string.
+ * @return      A read-only pointer to the data member of the string.
  */
-const char*
-cgs_string_read(const struct cgs_string* s);
+inline const char*
+cgs_string_data(const struct cgs_string* s)
+{
+        return s->data;
+}
 
 /**
  * cgs_string_length
  *
  * Get the length of the string.
  *
- * @param s	The string to get the length of.
+ * @param s     The string to get the length of.
  *
- * @return	The length of the string.
+ * @return      The length of the string.
  */
-size_t
-cgs_string_length(const struct cgs_string* s);
+inline size_t
+cgs_string_length(const struct cgs_string* s)
+{
+        return s->length;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * String Standard Operations
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
  * cgs_string_push
@@ -148,3 +177,4 @@ cgs_string_erase(struct cgs_string* s);
  */
 void
 cgs_string_sort(struct cgs_string* s);
+

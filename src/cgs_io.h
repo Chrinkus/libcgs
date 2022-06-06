@@ -41,7 +41,8 @@
  * @param file	The file or stream to read from.
  * @param buff	The self-managed string buffer.
  *
- * @return	The number of characters read.
+ * @return	The number of characters read or -1 on failure to add a
+ *              character to the string.
  */
 int
 cgs_io_getline(FILE* file, struct cgs_string* buff);
@@ -53,7 +54,8 @@ cgs_io_getline(FILE* file, struct cgs_string* buff);
  *
  * @param file	The file or stream to read from.
  *
- * @return	An allocated null-terminated string.
+ * @return	An allocated null-terminated string on successful read or
+ *              NULL on failure.
  */
 char*
 cgs_io_readline(FILE* file);
@@ -64,9 +66,10 @@ cgs_io_readline(FILE* file);
  * Read all lines from a file and store them in a cgs_array sized for char*'s.
  * 
  * @param file	The file or stream to read from.
+ * @param lines A cgs_array allocated for char*'s to store the lines in.
  *
- * @return	A cgs_array of char*'s.
+ * @return	A valid pointer on success or NULL on failure.
  */
-struct cgs_array
-cgs_io_readlines(FILE* file);
+void*
+cgs_io_readlines(FILE* file, struct cgs_array* lines);
 

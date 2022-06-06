@@ -29,82 +29,69 @@
 #include <string.h>
 
 enum cgs_string_defaults {
-	CGS_STRING_INITIAL_CAPACITY = 16,
-	CGS_STRING_GROWTH_RATE = 2,
+        CGS_STRING_INITIAL_CAPACITY = 16,
+        CGS_STRING_GROWTH_RATE = 2,
 };
 
-struct cgs_string {
-	size_t length;
-	size_t capacity;
-	char* memory;
-};
-
-struct cgs_string*
-cgs_string_new(void)
+void*
+cgs_string_new(struct cgs_string* s)
 {
-	struct cgs_string* s = malloc(sizeof(struct cgs_string));
-	if (!s)
-		return NULL;
+        char* p = malloc(sizeof(char) * CGS_STRING_INITIAL_CAPACITY);
+        if (!p)
+                return NULL;
 
-	s->capacity = CGS_STRING_INITIAL_CAPACITY;
-	s->memory = malloc(sizeof(char) * s->capacity);
-	if (!s->memory) {
-		free(s);
-		return NULL;
-	}
+        p[0] = '\0';
+        s->length = 0;
+        s->capacity = CGS_STRING_INITIAL_CAPACITY;
+        s->data = p;
 
-	s->length = 0;
-	s->memory[0] = '\0';
-	return s;
+        return s;
 }
 
-struct cgs_string*
-cgs_string_new_from_string(const char* src)
+void*
+cgs_string_new_from_string(struct cgs_string* s, const char* src)
 {
-	struct cgs_string* s = malloc(sizeof(struct cgs_string));
-	if (!s)
-		return NULL;
+        int len = strlen(src);
+        char* p = malloc(len + 1);
+        if (!p)
+                return NULL;
 
-	s->length = strlen(src);
-	s->capacity = s->length + 1;
-	s->memory = malloc(sizeof(char) * s->capacity);
-	if (!s->memory) {
-		free(s);
-		return NULL;
-	}
-	strcpy(s->memory, src);
+        strcpy(p, src);
+        s->length = len;
+        s->capacity = len + 1;
+        s->data = p;
+
 	return s;
 }
 
 void
 cgs_string_free(struct cgs_string* s)
 {
-	if (s) {
-		free(s->memory);
-		free(s);
-	}
+	if (s)
+		free(s->data);
 }
 
 char*
 cgs_string_xfer(struct cgs_string* s)
 {
-	char* p = s->memory;
-	s->memory = NULL;
-	free(s);
+	char* p = s->data;
+	s->data = NULL;
 	return p;
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * String Inline Symbols
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 const char*
-cgs_string_read(const struct cgs_string* s)
-{
-	return s->memory;
-}
+cgs_string_data(const struct cgs_string* s);
 
 size_t
-cgs_string_length(const struct cgs_string* s)
-{
-	return s->length;
-}
+cgs_string_length(const struct cgs_string* s);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * String Static Helper Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 static const char*
 cgs_string_grow(struct cgs_string* s)
@@ -113,35 +100,40 @@ cgs_string_grow(struct cgs_string* s)
 		? s->capacity * CGS_STRING_GROWTH_RATE
 		: CGS_STRING_INITIAL_CAPACITY;
 
-	char* p = realloc(s->memory, new_cap);
-	if (p) {
-		s->memory = p;
-		s->capacity = new_cap;
-	}
+	char* p = realloc(s->data, new_cap);
+        if (!p)
+                return NULL;
+
+        s->data = p;
+        s->capacity = new_cap;
 	return p;
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * String Standard Operations
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 const char*
 cgs_string_push(struct cgs_string* s, int c)
 {
 	if (s->length == s->capacity - 1 && !cgs_string_grow(s))
 		return NULL;
-	s->memory[s->length++] = c;
-	s->memory[s->length] = '\0';
-	return s->memory;
+	s->data[s->length++] = c;
+	s->data[s->length] = '\0';
+	return s->data;
 }
 
 void
 cgs_string_clear(struct cgs_string* s)
 {
-	s->memory[0] = '\0';
+	s->data[0] = '\0';
 	s->length = 0;
 }
 
 void
 cgs_string_erase(struct cgs_string* s)
 {
-	for (char* p = s->memory; p < s->memory + s->capacity; ++p)
+	for (char* p = s->data; p < s->data + s->capacity; ++p)
 		*p = '\0';
 	s->length = 0;
 }
@@ -149,6 +141,6 @@ cgs_string_erase(struct cgs_string* s)
 void
 cgs_string_sort(struct cgs_string* s)
 {
-	qsort(s->memory, s->length, sizeof(char), cgs_char_cmp);
+	qsort(s->data, s->length, sizeof(char), cgs_char_cmp);
 }
 

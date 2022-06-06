@@ -7,13 +7,13 @@ int string_new_test(void* data)
 {
 	(void)data;
 
-	struct cgs_string* s = cgs_string_new();
+        struct cgs_string s = { 0 };
+        assert(cgs_string_new(&s) != NULL);
 
-	assert(s != NULL);
-	assert(cgs_string_length(s) == 0);
-	assert(strcmp(cgs_string_read(s), "") == 0);
+	assert(cgs_string_length(&s) == 0);
+	assert(strcmp(cgs_string_data(&s), "") == 0);
 
-	cgs_string_free(s);
+	cgs_string_free(&s);
 
 	return TEST_SUCCESS;
 }
@@ -22,17 +22,17 @@ int string_new_from_string_test(void* data)
 {
 	const char* test = (const char*)data;
 
-	struct cgs_string* s = cgs_string_new_from_string(test);
+        struct cgs_string s = { 0 };
+        assert(cgs_string_new_from_string(&s, test) != NULL);
 
-	assert(s != NULL);
-	assert(cgs_string_length(s) == strlen(test));
-	assert(strcmp(cgs_string_read(s), test) == 0);
-	assert(cgs_string_read(s) != test);
+	assert(cgs_string_length(&s) == strlen(test));
+	assert(strcmp(cgs_string_data(&s), test) == 0);
+	assert(cgs_string_data(&s) != test);
 
-	cgs_string_push(s, '!');
-	assert(strcmp(cgs_string_read(s), test) != 0);
+	cgs_string_push(&s, '!');
+	assert(strcmp(cgs_string_data(&s), test) != 0);
 
-	cgs_string_free(s);
+	cgs_string_free(&s);
 
 	return TEST_SUCCESS;
 }
@@ -41,9 +41,10 @@ int string_xfer_test(void* data)
 {
 	const char* test = (const char*)data;
 
-	struct cgs_string* s = cgs_string_new_from_string(test);
+        struct cgs_string s = { 0 };
+        cgs_string_new_from_string(&s, test);
 
-	char* p = cgs_string_xfer(s);
+	char* p = cgs_string_xfer(&s);
 
 	assert(strcmp(p, test) == 0);
 	assert(p != test);
@@ -57,17 +58,18 @@ int string_push_test(void* data)
 {
 	(void)data;
 
-	struct cgs_string* s = cgs_string_new();
+        struct cgs_string s = { 0 };
+        cgs_string_new(&s);
 
-	cgs_string_push(s, 'p');
-	cgs_string_push(s, 'u');
-	cgs_string_push(s, 's');
-	cgs_string_push(s, 'h');
+	cgs_string_push(&s, 'p');
+	cgs_string_push(&s, 'u');
+	cgs_string_push(&s, 's');
+	cgs_string_push(&s, 'h');
 
-	assert(cgs_string_length(s) == 4);
-	assert(strcmp(cgs_string_read(s), "push") == 0);
+	assert(cgs_string_length(&s) == 4);
+	assert(strcmp(cgs_string_data(&s), "push") == 0);
 
-	cgs_string_free(s);
+	cgs_string_free(&s);
 
 	return TEST_SUCCESS;
 }
@@ -76,21 +78,22 @@ int string_clear_test(void* data)
 {
 	(void)data;
 
-	struct cgs_string* s = cgs_string_new_from_string("Howdy");
+        struct cgs_string s = { 0 };
+	cgs_string_new_from_string(&s, "Howdy");
 
-	cgs_string_clear(s);
+	cgs_string_clear(&s);
 
-	assert(cgs_string_length(s) == 0);
-	assert(cgs_string_read(s) != NULL);
+	assert(cgs_string_length(&s) == 0);
+	assert(cgs_string_data(&s) != NULL);
 
 	// 'clear' just changes first char to '\0'
-	assert(cgs_string_read(s)[1] == 'o');
-	assert(cgs_string_read(s)[2] == 'w');
-	assert(cgs_string_read(s)[3] == 'd');
-	assert(cgs_string_read(s)[4] == 'y');
-	assert(cgs_string_read(s)[5] == '\0');
+	assert(cgs_string_data(&s)[1] == 'o');
+	assert(cgs_string_data(&s)[2] == 'w');
+	assert(cgs_string_data(&s)[3] == 'd');
+	assert(cgs_string_data(&s)[4] == 'y');
+	assert(cgs_string_data(&s)[5] == '\0');
 
-	cgs_string_free(s);
+	cgs_string_free(&s);
 
 	return TEST_SUCCESS;
 }
@@ -99,21 +102,22 @@ int string_erase_test(void* data)
 {
 	(void)data;
 
-	struct cgs_string* s = cgs_string_new_from_string("Howdy");
+        struct cgs_string s = { 0 };
+	cgs_string_new_from_string(&s, "Howdy");
 
-	cgs_string_erase(s);
+	cgs_string_erase(&s);
 
-	assert(cgs_string_length(s) == 0);
-	assert(cgs_string_read(s) != NULL);
+	assert(cgs_string_length(&s) == 0);
+	assert(cgs_string_data(&s) != NULL);
 
 	// 'erase' overwrites all characters with '\0'
-	assert(cgs_string_read(s)[1] == '\0');
-	assert(cgs_string_read(s)[2] == '\0');
-	assert(cgs_string_read(s)[3] == '\0');
-	assert(cgs_string_read(s)[4] == '\0');
-	assert(cgs_string_read(s)[5] == '\0');
+	assert(cgs_string_data(&s)[1] == '\0');
+	assert(cgs_string_data(&s)[2] == '\0');
+	assert(cgs_string_data(&s)[3] == '\0');
+	assert(cgs_string_data(&s)[4] == '\0');
+	assert(cgs_string_data(&s)[5] == '\0');
 
-	cgs_string_free(s);
+	cgs_string_free(&s);
 
 	return TEST_SUCCESS;
 }
@@ -122,13 +126,14 @@ int string_sort_test(void* data)
 {
 	(void)data;
 
-	struct cgs_string* s = cgs_string_new_from_string("abcdabcdabcd");
+        struct cgs_string s = { 0 };
+	cgs_string_new_from_string(&s, "abcdabcdabcd");
 
-	cgs_string_sort(s);
+	cgs_string_sort(&s);
 
-	assert(strcmp(cgs_string_read(s), "aaabbbcccddd") == 0);
+	assert(strcmp(cgs_string_data(&s), "aaabbbcccddd") == 0);
 
-	cgs_string_free(s);
+	cgs_string_free(&s);
 
 	return TEST_SUCCESS;
 }
