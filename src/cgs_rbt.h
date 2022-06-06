@@ -54,73 +54,118 @@
 #include "cgs_variant.h"
 #include "cgs_defs.h"
 
-/*
- * Struct forward declarations
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * RBT Types
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+/**
+ * struct cgs_rbt_node
+ *
+ * Forward declaration of struct defined in private header.
  */
-struct cgs_rbt;
 struct cgs_rbt_node;
 
+/**
+ * struct cgs_rbt
+ *
+ * The RBT container struct.
+ *
+ * @member root         The root node of the tree.
+ * @member length       The number of elements in the tree.
+ * @member cmp          A comparison function to order the tree with.
+ */
+struct cgs_rbt {
+        struct cgs_rbt_node* root;
+        size_t length;
+        CgsCmp3Way cmp;
+};
+
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Red-Black Tree Operations
+ * RBT Mangement Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
  * cgs_rbt_new
  *
- * Allocate a new red-black tree and return it. Size will be 0, the root
- * will be NULL and cmp will be set.
+ * Set the initial values for a new red-black tree.
  *
- * @param cmp	The comparison function to order the tree with.
- *
- * @return	An empty red-black tree.
+ * @param tree  A pointer to an rbt struct to initialize.
+ * @param cmp   The comparison function to order the tree with.
  */
-struct cgs_rbt*
-cgs_rbt_new(CgsCmp3Way cmp);
+void
+cgs_rbt_new(struct cgs_rbt* tree, CgsCmp3Way cmp);
 
 /**
  * cgs_rbt_free
  *
- * Deallocate a red-black tree. Will first free the elements of the tree
- * then the tree itself.
+ * Deallocate the nodes of a red-black tree.
  *
- * @param tree	Tree to be freed. May be NULL.
+ * @param tree  A pointer to the tree to be freed.
  */
 void
 cgs_rbt_free(struct cgs_rbt* tree);
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * RBT Inline Getters
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 /**
- * cgs_rbt_size
+ * cgs_rbt_length
  *
- * Get the size of the tree.
+ * Get the number of elements in the tree.
  *
- * @param tree	The tree to get the size of. Read-only.
+ * @param tree  A read-only pointer to a red-black tree.
  *
- * @return	The size of the tree.
+ * @return      The length member of the tree.
  */
-size_t
-cgs_rbt_size(const struct cgs_rbt* tree);
+inline size_t
+cgs_rbt_length(const struct cgs_rbt* tree)
+{
+        return tree->length;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * RBT Standard Operations
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
  * cgs_rbt_insert
  *
- * Insert a node into the tree.
+ * Allocate a new node and insert it into the tree.
  *
- * @param tree	Tree to insert node into.
- * @param val	Value to insert into tree.
+ * @param tree  A pointer to a tree to insert a node into.
+ * @param val   Value of the node.
  *
- * @return	Pointer to inserted node if successful, NULL on failure.
+ * @return      A valid pointer if successful, NULL on failure.
  */
-struct cgs_rbt_node*
+const void*
 cgs_rbt_insert(struct cgs_rbt* tree, struct cgs_variant* data);
+
+/**
+ * cgs_rbt_search
+ *
+ * Search the tree for an entry. Uses the 3-way comparison function of the
+ * tree to find a matching variant.
+ *
+ * @param tree  Tree to search.
+ * @param data  Data to find in the tree.
+ *
+ * @return      A read-only pointer to the variant that matches the search
+ *              data or NULL if not found.
+ */
+const struct cgs_variant*
+cgs_rbt_search(const struct cgs_rbt* tree, const struct cgs_variant* data);
 
 /**
  * cgs_rbt_min
  *
  * Get the minimum value in the tree.
  *
- * @param tree	Tree to find minimum value of.
+ * @param tree  Tree to find minimum value of.
  *
- * @return	A read-only pointer to the minimum value in the tree.
+ * @return      A read-only pointer to the minimum value in the tree or NULL
+ *              if tree is empty.
  */
 const void*
 cgs_rbt_min(const struct cgs_rbt* tree);
@@ -130,25 +175,11 @@ cgs_rbt_min(const struct cgs_rbt* tree);
  *
  * Get the maximum value in the tree.
  *
- * @param tree	Tree to find maximum value of.
+ * @param tree  Tree to find maximum value of.
  *
- * @return	A read-only pointer to the maximum value in the tree.
+ * @return      A read-only pointer to the maximum value in the tree or NULL
+ *              if tree is empty.
  */
 const void*
 cgs_rbt_max(const struct cgs_rbt* tree);
-
-/**
- * cgs_rbt_search
- *
- * Search the tree for an entry. Uses the 3-way comparison function of the
- * tree to find a matching variant.
- *
- * @param tree	Tree to search.
- * @param data	Data to find in the tree.
- *
- * @return	A read-only pointer to the entry in the tree that matches
- * 		the search data or NULL if not found.
- */
-const void*
-cgs_rbt_search(const struct cgs_rbt* tree, const struct cgs_variant* data);
 

@@ -40,89 +40,130 @@
 #include "cgs_variant.h"
 #include "cgs_compare.h"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-// Node functions - private
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * RBT Private Types
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-struct cgs_rbt_node*
+/**
+ * enum cgs_rbt_color
+ *
+ * Constant values representing the possible colors of tree nodes.
+ */
+enum cgs_rbt_color { CGS_RBT_RED, CGS_RBT_BLACK };
+
+/**
+ * struct cgs_rbt_node
+ *
+ * A data structure representing a node in a red-black tree.
+ */
+struct cgs_rbt_node {
+        struct cgs_variant data;
+        struct cgs_rbt_node* parent;
+        struct cgs_rbt_node* left;
+        struct cgs_rbt_node* right;
+        enum cgs_rbt_color color;
+};
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * RBT Node Management Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+static struct cgs_rbt_node*
 cgs_rbt_node_new(const struct cgs_variant* data)
 {
-	struct cgs_rbt_node* node = malloc(sizeof(struct cgs_rbt_node));
-	if (node) {
-		memcpy(&node->data, data, sizeof(struct cgs_variant));
-		node->color = CGS_RBT_RED;
-		node->parent = NULL;
-		node->left = NULL;
-		node->right = NULL;
-	}
-	return node;
+        struct cgs_rbt_node* node = malloc(sizeof(struct cgs_rbt_node));
+        if (!node)
+                return NULL;
+
+        memcpy(&node->data, data, sizeof(struct cgs_variant));
+        node->color = CGS_RBT_RED;
+        node->parent = NULL;
+        node->left = NULL;
+        node->right = NULL;
+
+        return node;
 }
 
-void
+static void
 cgs_rbt_node_free(struct cgs_rbt_node* node)
 {
-	if (node) {
-		cgs_rbt_node_free(node->left);
-		cgs_rbt_node_free(node->right);
-		cgs_variant_free_data(&node->data);
-		if (node->parent) {
-			if (node == node->parent->left)
-				node->parent->left = NULL;
-			else
-				node->parent->right = NULL;
-		}
-	}
-	free(node);
+        if (!node)
+                return;
+
+        cgs_rbt_node_free(node->left);
+        cgs_rbt_node_free(node->right);
+        cgs_variant_free_data(&node->data);
+        if (node->parent) {
+                if (node == node->parent->left)
+                        node->parent->left = NULL;
+                else
+                        node->parent->right = NULL;
+        }
+        free(node);
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-// Tree functions - private
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * RBT Balancing Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
  * cgs_rbt_rotate_left
  *
- * Swap a node with it's right child. Only called under conditions where the
- * "child" is guaranteed to exist.
+ * Swap a node's tree-position with it's right child. Rotate elements to
+ * preserve binary-search-tree property.
+ *
+ * Warning: Only call-able under conditions where the "child" is guaranteed
+ * to exist.
+ *
+ * @param tree  A pointer to the tree in case the rotation alters the root.
+ * @param node  The node to rotate "left".
  */
 static void
 cgs_rbt_rotate_left(struct cgs_rbt* tree, struct cgs_rbt_node* node)
 {
-	struct cgs_rbt_node* child = node->right;
-	node->right = child->left;
-	if (child->left)
-		child->left->parent = node;
-	child->parent = node->parent;
-	if (!child->parent)
-		tree->root = child;
-	else if (node == node->parent->left)
-		node->parent->left = child;
-	else
-		node->parent->right = child;
-	child->left = node;
-	node->parent = child;
+        struct cgs_rbt_node* child = node->right;
+        node->right = child->left;
+        if (child->left)
+                child->left->parent = node;
+        child->parent = node->parent;
+        if (!child->parent)
+                tree->root = child;
+        else if (node == node->parent->left)
+                node->parent->left = child;
+        else
+                node->parent->right = child;
+        child->left = node;
+        node->parent = child;
 }
 
 /**
  * cgs_rbt_rotate_right
  *
- * Swap a node with it's left child. Only called under conditions where the
- * "child" is guaranteed to exist.
+ * Swap a node's tree-position with it's left child. Rotate elements to
+ * preserve binary-search-tree property.
+ *
+ * Warning: Only call-able under conditions where the "child" is guaranteed
+ * to exist.
+ *
+ * @param tree  A pointer to the tree in case the rotation alters the root.
+ * @param node  The node to rotate "right".
  */
 static void
 cgs_rbt_rotate_right(struct cgs_rbt* tree, struct cgs_rbt_node* node)
 {
-	struct cgs_rbt_node* child = node->left;
-	node->left = child->right;
-	if (child->right)
-		child->right->parent = node;
-	child->parent = node->parent;
-	if (!child->parent)
-		tree->root = child;
-	else if (node == node->parent->left)
-		node->parent->left = child;
-	else
-		node->parent->right = child;
-	child->right = node;
-	node->parent = child;
+        struct cgs_rbt_node* child = node->left;
+        node->left = child->right;
+        if (child->right)
+                child->right->parent = node;
+        child->parent = node->parent;
+        if (!child->parent)
+                tree->root = child;
+        else if (node == node->parent->left)
+                node->parent->left = child;
+        else
+                node->parent->right = child;
+        child->right = node;
+        node->parent = child;
 }
 
 /**
@@ -161,83 +202,86 @@ cgs_rbt_rotate_right(struct cgs_rbt* tree, struct cgs_rbt_node* node)
  *
  * Double parent dereferencing may result in NULL leaves which are assumed to
  * be BLACK.
+ *
+ * @param tree  The tree to rebalance.
+ * @param node  A pointer to a node within the tree at the point of alteration.
  */
 static void
 cgs_rbt_rebalance(struct cgs_rbt* tree, struct cgs_rbt_node* node)
 {
-	// Fix-up tree-structure
-	while (node->parent && node->parent->color == CGS_RBT_RED) {
-		struct cgs_rbt_node* aunt = NULL;
-		if (node->parent == node->parent->parent->left) {
-			aunt = node->parent->parent->right;
-			if (aunt && aunt->color == CGS_RBT_RED) {
-				node->parent->color = CGS_RBT_BLACK;
-				aunt->color = CGS_RBT_BLACK;
-				node->parent->parent->color = CGS_RBT_RED;
-				node = node->parent->parent;
-			} else if (node == node->parent->right) {
-				node = node->parent;
-				cgs_rbt_rotate_left(tree, node);
-			} else {
-				node->parent->color = CGS_RBT_BLACK;
-				node->parent->parent->color = CGS_RBT_RED;
-				cgs_rbt_rotate_right(tree, node->parent->parent);
-			}
-		} else {
-			aunt = node->parent->parent->left;
-			if (aunt && aunt->color == CGS_RBT_RED) {
-				node->parent->color = CGS_RBT_BLACK;
-				aunt->color = CGS_RBT_BLACK;
-				node->parent->parent->color = CGS_RBT_RED;
-				node = node->parent->parent;
-			} else if (node == node->parent->left) {
-				node = node->parent;
-				cgs_rbt_rotate_right(tree, node);
-			} else {
-				node->parent->color = CGS_RBT_BLACK;
-				node->parent->parent->color = CGS_RBT_RED;
-				cgs_rbt_rotate_left(tree, node->parent->parent);
-			}
-		}
-	}
-	tree->root->color = CGS_RBT_BLACK;
+        while (node->parent && node->parent->color == CGS_RBT_RED) {
+                struct cgs_rbt_node* aunt = NULL;
+                if (node->parent == node->parent->parent->left) {
+                        aunt = node->parent->parent->right;
+                        if (aunt && aunt->color == CGS_RBT_RED) {
+                                node->parent->color = CGS_RBT_BLACK;
+                                aunt->color = CGS_RBT_BLACK;
+                                node->parent->parent->color = CGS_RBT_RED;
+                                node = node->parent->parent;
+                        } else if (node == node->parent->right) {
+                                node = node->parent;
+                                cgs_rbt_rotate_left(tree, node);
+                        } else {
+                                node->parent->color = CGS_RBT_BLACK;
+                                node->parent->parent->color = CGS_RBT_RED;
+                                cgs_rbt_rotate_right(tree, node->parent->parent);
+                        }
+                } else {
+                        aunt = node->parent->parent->left;
+                        if (aunt && aunt->color == CGS_RBT_RED) {
+                                node->parent->color = CGS_RBT_BLACK;
+                                aunt->color = CGS_RBT_BLACK;
+                                node->parent->parent->color = CGS_RBT_RED;
+                                node = node->parent->parent;
+                        } else if (node == node->parent->left) {
+                                node = node->parent;
+                                cgs_rbt_rotate_right(tree, node);
+                        } else {
+                                node->parent->color = CGS_RBT_BLACK;
+                                node->parent->parent->color = CGS_RBT_RED;
+                                cgs_rbt_rotate_left(tree, node->parent->parent);
+                        }
+                }
+        }
+        tree->root->color = CGS_RBT_BLACK;
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-// Tree functions - public
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * RBT Management Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-struct cgs_rbt*
-cgs_rbt_new(CgsCmp3Way cmp)
+void
+cgs_rbt_new(struct cgs_rbt* tree, CgsCmp3Way cmp)
 {
-	struct cgs_rbt* tree = malloc(sizeof(struct cgs_rbt));
-	if (tree) {
-		tree->root = NULL;
-		tree->size = 0;
-		tree->cmp = cmp;
-	}
-	return tree;
+        tree->root = NULL;
+        tree->length = 0;
+        tree->cmp = cmp;
 }
 
 void
 cgs_rbt_free(struct cgs_rbt* tree)
 {
-	if (tree) {
+	if (tree)
 		cgs_rbt_node_free(tree->root);
-		free(tree);
-	}
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * RBT Inline Symbols
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 size_t
-cgs_rbt_size(const struct cgs_rbt* tree)
-{
-	return tree->size;
-}
+cgs_rbt_length(const struct cgs_rbt* tree);
 
-struct cgs_rbt_node*
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * RBT Standard Operations
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+const void*
 cgs_rbt_insert(struct cgs_rbt* tree, struct cgs_variant* data)
 {
-	// Create new node
 	struct cgs_rbt_node* node = cgs_rbt_node_new(data);
+        if (!node)
+                return NULL;
 
 	// Walk the tree to find insertion point. Track most recent parent
 	// node and result of comparison.
@@ -264,8 +308,23 @@ cgs_rbt_insert(struct cgs_rbt* tree, struct cgs_variant* data)
 	// Rebalance tree
 	cgs_rbt_rebalance(tree, node);
 
-	++tree->size;
+	++tree->length;
 	return node;
+}
+
+const struct cgs_variant*
+cgs_rbt_search(const struct cgs_rbt* tree, const struct cgs_variant* data)
+{
+	const struct cgs_rbt_node* node = tree->root;
+	const void* a = cgs_variant_get(data);
+
+	for (int rc; node; node = rc < 0 ? node->left : node->right) {
+		const void* b = cgs_variant_get(&node->data);
+		rc = tree->cmp(a, b);
+		if (rc == 0)
+			return &node->data;
+	}
+	return NULL;
 }
 
 const void*
@@ -288,24 +347,9 @@ cgs_rbt_max(const struct cgs_rbt* tree)
 	return node ? cgs_variant_get(&node->data) : NULL;
 }
 
-const void*
-cgs_rbt_search(const struct cgs_rbt* tree, const struct cgs_variant* data)
-{
-	const struct cgs_rbt_node* node = tree->root;
-	const void* a = cgs_variant_get(data);
-
-	for (int rc; node; ) {
-		const void* b = cgs_variant_get(&node->data);
-		rc = tree->cmp(a, b);
-		if (rc == 0)
-			return b;
-		node = rc < 0 ? node->left : node->right;
-	}
-	return NULL;
-}
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-// Tree functions - diagnostic
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * RBT Diagnostic Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 const struct cgs_rbt_node*
 cgs_rbt_root(const struct cgs_rbt* tree)

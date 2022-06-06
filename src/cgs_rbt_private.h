@@ -40,37 +40,6 @@
 #include "cgs_defs.h"
 
 /**
- * enum cgs_rbt_color
- *
- * Constant values representing the possible colors of tree nodes.
- */
-enum cgs_rbt_color { CGS_RBT_RED, CGS_RBT_BLACK };
-
-/**
- * struct cgs_rbt_node
- *
- * A data structure representing a node in a red-black tree.
- */
-struct cgs_rbt_node {
-	struct cgs_variant data;
-	struct cgs_rbt_node* parent;
-	struct cgs_rbt_node* left;
-	struct cgs_rbt_node* right;
-	enum cgs_rbt_color color;
-};
-
-/**
- * struct cgs_rbt
- *
- * A data structure containing the elements of a red-black tree.
- */
-struct cgs_rbt {
-	struct cgs_rbt_node* root;
-	size_t size;
-	CgsCmp3Way cmp;
-};
-
-/**
  * cgs_rbt_root
  *
  * Get a read-only pointer to the tree's root node. For testing purposes only.
@@ -91,9 +60,9 @@ cgs_rbt_root(const struct cgs_rbt* tree);
  * @param data	A variant with data of the appropriate type.
  *
  * @return	A pointer to a newly allocated node.
- */
 struct cgs_rbt_node*
 cgs_rbt_node_new(const struct cgs_variant* data);
+ */
 
 /**
  * cgs_rbt_free
@@ -102,9 +71,9 @@ cgs_rbt_node_new(const struct cgs_variant* data);
  * then free the data. Set's parent's pointer to node to NULL.
  *
  * @param node	The node to free.
- */
 void
 cgs_rbt_node_free(struct cgs_rbt_node* node);
+ */
 
 /**
  * cgs_rbt_node_is_red
