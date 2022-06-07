@@ -138,8 +138,11 @@ cgs_array_xfer(struct cgs_array* a, size_t* len)
 size_t
 cgs_array_length(const struct cgs_array* a);
 
+const void*
+cgs_array_data(const struct cgs_array* a);
+
 void*
-cgs_array_data(struct cgs_array* a);
+cgs_array_data_mutable(struct cgs_array* a);
 
 const void*
 cgs_array_get(const struct cgs_array* a, size_t index);

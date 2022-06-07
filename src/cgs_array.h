@@ -141,7 +141,25 @@ cgs_array_length(const struct cgs_array* a)
 /**
  * cgs_array_data
  *
- * Get a pointer to the array object.
+ * Get a read-only pointer to the array object.
+ *
+ * Warning: The 'data' member is cast to a const void* on return to alleviate
+ * compiler warnings when assigning to the proper type.
+ *
+ * @param a     The array.
+ *
+ * @return      A const void-pointer to the data object.
+ */
+inline const void*
+cgs_array_data(const struct cgs_array* a)
+{
+        return (const void*)a->data;
+}
+
+/**
+ * cgs_array_data_mutable
+ *
+ * Get a writable pointer to the array object.
  *
  * Warning: The 'data' member is cast to a void* on return to alleviate
  * compiler warnings when assigning to the proper type.
@@ -151,11 +169,10 @@ cgs_array_length(const struct cgs_array* a)
  * @return      A void-pointer to the data object.
  */
 inline void*
-cgs_array_data(struct cgs_array* a)
+cgs_array_data_mutable(struct cgs_array* a)
 {
         return (void*)a->data;
 }
-
 
 /**
  * cgs_array_get
