@@ -111,6 +111,13 @@ typedef char** CgsStrIterMut;
 typedef int (*CgsCmp3Way)(const void*, const void*);
 
 /**
+ * CgsPredicate
+ *
+ * This comparison function returns non-zero for true and zero for false.
+ */
+typedef int (*CgsPredicate)(const void*, const void*);
+
+/**
  * CgsUnaryOp
  *
  * This function definition

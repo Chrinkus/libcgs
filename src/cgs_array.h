@@ -275,13 +275,15 @@ cgs_array_sort(struct cgs_array* a, CgsCmp3Way cmp);
  * Find an element in an array.
  *
  * @param a	The array.
- * @param val	A read-only pointer matching the element to find.
- * @param cmp	A three-way compare function for the elements of the array.
+ * @param pred  A comparison function that will be passed an element and the
+ *              optional userdata parameter.
+ * @param data  A pointer to userdata that will be passed as the second
+ *              argument to the compare function.
  *
  * @return	A pointer to the element if found or NULL if not found.
  */
 void*
-cgs_array_find(struct cgs_array* a, const void* val, CgsCmp3Way cmp);
+cgs_array_find(struct cgs_array* a, CgsPredicate pred, const void* data);
 
 /**
  * cgs_array_foreach

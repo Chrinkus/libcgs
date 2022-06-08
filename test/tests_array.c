@@ -147,16 +147,12 @@ static void array_find_test(void** state)
 
         struct cgs_array ai = { 0 };
         cgs_array_new_from_array(&ai, sizeof(ints[0]), ints, NUM_RANDOMS);
-        /*
-	struct cgs_array* ai = cgs_array_new_from_array(ints, NUM_RANDOMS,
-			sizeof(int));
-        */
 
 	int x = 99;
-	int* found = cgs_array_find(&ai, &x, cgs_int_cmp);
+	int* found = cgs_array_find(&ai, cgs_int_pred, &x);
 	assert_null(found);
 	x = -13;
-	found = cgs_array_find(&ai, &x, cgs_int_cmp);
+	found = cgs_array_find(&ai, cgs_int_pred, &x);
 	assert_non_null(found);
 	assert_ptr_not_equal(found, &x);
 	assert_int_equal(*found, -13);

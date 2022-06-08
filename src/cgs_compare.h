@@ -60,3 +60,15 @@ int cgs_str_cmp(const void* a, const void* b);
  */
 int cgs_char_cmp(const void* a, const void* b);
 
+/**
+ * cgs_int_pred
+ *
+ * True or false comparison function for integers.
+ *
+ * @param a     A pointer to the target integer.
+ * @param b     A pointer to the compare integer.
+ *
+ * @return      The result of an equality comparison.
+ */
+int cgs_int_pred(const void* a, const void* b);
+

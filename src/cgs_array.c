@@ -183,10 +183,10 @@ cgs_array_sort(struct cgs_array* a, CgsCmp3Way cmp)
 }
 
 void*
-cgs_array_find(struct cgs_array* a, const void* val, CgsCmp3Way cmp)
+cgs_array_find(struct cgs_array* a, CgsPredicate pred, const void* data)
 {
 	for (size_t i = 0; i < a->length; ++i)
-		if (cmp(cgs_array_get(a, i), val) == 0)
+		if (pred(cgs_array_get(a, i), data))
 			return cgs_array_get_mutable(a, i);
 	return NULL;
 }

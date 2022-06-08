@@ -52,3 +52,11 @@ int cgs_char_cmp(const void* a, const void* b)
 	return *(char*)a - *(char*)b;
 }
 
+int cgs_int_pred(const void* a, const void* b)
+{
+        int v1 = *(const int*)a;
+        int v2 = *(const int*)b;
+
+        return v1 == v2;
+}
+
