@@ -169,7 +169,7 @@ cgs_array_push(struct cgs_array* a, const void* src)
 	char* dst = cgs_array_get_mutable(a, a->length);
 	memcpy(dst, src, a->element_size);
 	++a->length;
-	return a;
+	return dst;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
