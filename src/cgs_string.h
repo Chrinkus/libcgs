@@ -157,6 +157,34 @@ const char*
 cgs_string_push(struct cgs_string* s, int c);
 
 /**
+ * cgs_string_prepend
+ *
+ * Insert a character string to the beginning of the string struct. May result
+ * in a reallocation.
+ *
+ * @param s     The string to prepend to.
+ * @param add   The string to add to the front of s.
+ * @return	A read-only pointer to the inner string on success, NULL on
+ * 		failure.
+ */
+const char*
+cgs_string_prepend(struct cgs_string* s, const char* add, size_t len);
+
+/**
+ * cgs_string_append
+ *
+ * Insert a character string to the end of the string struct. May result
+ * in a reallocation.
+ *
+ * @param s     The string to append to.
+ * @param add   The string to add to the end of s.
+ * @return	A read-only pointer to the inner string on success, NULL on
+ * 		failure.
+ */
+const char*
+cgs_string_append(struct cgs_string* s, const char* add, size_t len);
+
+/**
  * cgs_string_clear
  *
  * Clear the contents of the string and set the length to 0. Does not

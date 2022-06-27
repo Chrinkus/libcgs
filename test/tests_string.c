@@ -138,6 +138,34 @@ int string_sort_test(void* data)
 	return TEST_SUCCESS;
 }
 
+int string_prepend_test(void* data)
+{
+        (void)data;
+
+        struct cgs_string s = { 0 };
+        cgs_string_new_from_string(&s, "Feature");
+
+        const char* add = "Creature ";
+        assert(cgs_string_prepend(&s, add, strlen(add)) != NULL);
+
+        assert(strcmp(cgs_string_data(&s), "Creature Feature") == 0);
+
+        return TEST_SUCCESS;
+}
+
+int string_append_test(void* data)
+{
+        (void)data;
+        struct cgs_string s = { 0 };
+        cgs_string_new_from_string(&s, "Colorado");
+
+        const char* add = " Avalanche";
+        assert(cgs_string_append(&s, add, strlen(add)) != NULL);
+        assert(strcmp(cgs_string_data(&s), "Colorado Avalanche") == 0);
+
+        return TEST_SUCCESS;
+}
+
 int main(void)
 {
 	struct test tests[] = {
@@ -149,6 +177,8 @@ int main(void)
 		{ "string_new_from_string", string_new_from_string_test,
 			"Super test string" },
 		{ "string_sort", string_sort_test, NULL },
+		{ "string_prepend", string_prepend_test, NULL },
+		{ "string_append", string_append_test, NULL },
 	};
 
 	return cgs_run_tests(tests);

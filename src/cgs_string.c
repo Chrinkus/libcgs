@@ -126,6 +126,28 @@ cgs_string_push(struct cgs_string* s, int c)
 	return s->data;
 }
 
+const char*
+cgs_string_prepend(struct cgs_string* s, const char* add, size_t len)
+{
+        if (s->length + len >= s->capacity - 1 && !cgs_string_grow(s))
+                return NULL;
+
+        char* src = s->data;
+        char* dst = src + len;
+        memmove(dst, src, s->length);
+        strncpy(src, add, len);
+        return src;
+}
+
+const char*
+cgs_string_append(struct cgs_string* s, const char* add, size_t len)
+{
+        if (s->length + len >= s->capacity - 1 && !cgs_string_grow(s))
+                return NULL;
+        strcat(s->data, add);
+        return s->data;
+}
+
 void
 cgs_string_clear(struct cgs_string* s)
 {
