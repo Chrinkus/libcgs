@@ -108,6 +108,21 @@ cgs_string_data(const struct cgs_string* s)
 }
 
 /**
+ * cgs_string_data
+ *
+ * Get writable access to the string.
+ *
+ * @param s     The string to read.
+ *
+ * @return      A writable pointer to the data member of the string.
+ */
+inline char*
+cgs_string_data_mutable(struct cgs_string* s)
+{
+        return s->data;
+}
+
+/**
  * cgs_string_length
  *
  * Get the length of the string.

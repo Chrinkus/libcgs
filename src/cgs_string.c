@@ -86,6 +86,9 @@ cgs_string_xfer(struct cgs_string* s)
 const char*
 cgs_string_data(const struct cgs_string* s);
 
+char*
+cgs_string_data_mutable(struct cgs_string* s);
+
 size_t
 cgs_string_length(const struct cgs_string* s);
 
