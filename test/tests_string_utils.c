@@ -24,25 +24,81 @@ int strdup_test(void* data)
 	return TEST_SUCCESS;
 }
 
-int strappend_test(void* data)
+int strmove_test(void* data)
+{
+        (void)data;
+
+        char s1[12] = "World";
+        cgs_strmove(s1, 6);
+        assert(s1[6] == 'W');
+        assert(s1[7] == 'o');
+        assert(s1[8] == 'r');
+        assert(s1[9] == 'l');
+        assert(s1[10] == 'd');
+        assert(s1[11] == '\0');
+
+        char* s2 = malloc(128);
+        for (int i = 0; i < 128; ++i)
+                s2[i] = '\0';
+
+        s2[0] = 'H';
+        s2[1] = 'e';
+        s2[2] = 'l';
+        s2[3] = 'l';
+        s2[4] = 'o';
+
+        cgs_strmove(s2, 60);
+        assert(s2[60] == 'H');
+        assert(s2[61] == 'e');
+        assert(s2[62] == 'l');
+        assert(s2[63] == 'l');
+        assert(s2[64] == 'o');
+
+        free(s2);
+
+        return TEST_SUCCESS;
+}
+
+int strprepend_test(void* data)
+{
+        (void)data;
+
+        char s1[32] = "World!";
+        const char s2[] = "Hello ";
+        cgs_strprepend(s1, s2, strlen(s2));
+        assert(strcmp(s1, "Hello World!") == 0);
+
+        char* s3 = malloc(128);
+        strcpy(s3, " useful?");
+        cgs_strprepend(s3, " it", 3);
+        cgs_strprepend(s3, " is", 3);
+        cgs_strprepend(s3, "Butter,", 3);
+        assert(strcmp(s3, "But is it useful?") == 0);
+
+        free(s3);
+
+        return TEST_SUCCESS;
+}
+
+int strappendch_test(void* data)
 {
 	(void)data;
 
 	char s1[10] = "";
 
-	cgs_strappend(s1, 'a');
+	cgs_strappendch(s1, 'a');
 	assert(strcmp(s1, "a") == 0);
 
-	cgs_strappend(s1, 'b');
+	cgs_strappendch(s1, 'b');
 	assert(strcmp(s1, "ab") == 0);
 
 	char* s2 = malloc(sizeof(char) * 10);
 	*s2 = '\0';
 
-	cgs_strappend(s2, '0');
+	cgs_strappendch(s2, '0');
 	assert(strcmp(s2, "0") == 0);
 
-	cgs_strappend(s2, '1');
+	cgs_strappendch(s2, '1');
 	assert(strcmp(s2, "01") == 0);
 
 	free(s2);
@@ -50,22 +106,22 @@ int strappend_test(void* data)
 	return TEST_SUCCESS;
 }
 
-int strprepend_test(void* data)
+int strprependch_test(void* data)
 {
 	(void)data;
 
 	char s1[10] = "mile";
 
-	cgs_strprepend(s1, 's');
+	cgs_strprependch(s1, 's');
 	assert(strcmp(s1, "smile") == 0);
 
 	char* s2 = malloc(sizeof(char) * 10);
 	*s2 = '\0';
 
-	cgs_strprepend(s2, 't');
-	cgs_strprepend(s2, 'a');
-	cgs_strprepend(s2, 'o');
-	cgs_strprepend(s2, 'g');
+	cgs_strprependch(s2, 't');
+	cgs_strprependch(s2, 'a');
+	cgs_strprependch(s2, 'o');
+	cgs_strprependch(s2, 'g');
 	assert(strcmp(s2, "goat") == 0);
 
 	free(s2);
@@ -73,37 +129,61 @@ int strprepend_test(void* data)
 	return TEST_SUCCESS;
 }
 
-int strshift_test(void* data)
+int strshiftl_test(void* data)
 {
 	(void)data;
 
 	char s1[] = "Hello!";
 
-	cgs_strshift(s1, 1);
+	cgs_strshiftl(s1, 1, '\0');
 	assert(strcmp(s1, "ello!") == 0);
 
-	cgs_strshift(s1, 0);
+	cgs_strshiftl(s1, 0, '\0');
 	assert(strcmp(s1, "ello!") == 0);
 
-	cgs_strshift(s1, 2);
-	assert(strcmp(s1, "lo!") == 0);
+	cgs_strshiftl(s1, 2, '!');
+	assert(strcmp(s1, "lo!!!") == 0);
 
-	cgs_strshift(s1, 10);
+	cgs_strshiftl(s1, 10, '\0');
 	assert(strcmp(s1, "") == 0);
 
 	char* s2 = malloc(sizeof(char) * 20);
 	strcpy(s2, "less than 18");
 
-	cgs_strshift(s2, 5);
-	assert(strcmp(s2, "than 18") == 0);
+	cgs_strshiftl(s2, 5, '-');
+	assert(strcmp(s2, "than 18-----") == 0);
 
 	free(s2);
 
 	char s3[] = "Such a long string! Who knows how many characters?!";
-	cgs_strshift(s3, -1);
+	cgs_strshiftl(s3, -1, '\0');
 	assert(strcmp(s3, "") == 0);
 
 	return TEST_SUCCESS;
+}
+
+int strshiftr_test(void* data)
+{
+        (void) data;
+
+        char s1[] = "Hello";
+        cgs_strshiftr(s1, 2, '\0');
+        assert(strlen(s1) == 0);
+        assert(s1[0] == '\0');
+        assert(s1[1] == '\0');
+        assert(s1[2] == 'H');
+        assert(s1[3] == 'e');
+        assert(s1[4] == 'l');
+        assert(s1[5] == '\0');
+
+        char* s2 = malloc(32);
+        strcpy(s2, "00000000");
+
+        cgs_strshiftr(s2, 4, '1');
+        assert(strcmp(s2, "11110000") == 0);
+        free(s2);
+
+        return TEST_SUCCESS;
 }
 
 int strtrim_test(void* data)
@@ -159,9 +239,12 @@ int main(void)
 {
 	struct test tests[] = {
 		{ "strdup", strdup_test, "Ninja doesn't like gnu_strdup" },
-		{ "strappend", strappend_test, NULL },
-		{ "strprepend", strprepend_test, NULL },
-		{ "strshift", strshift_test, NULL },
+                { "strmove", strmove_test, NULL },
+                { "strprepend", strprepend_test, NULL },
+		{ "strappendch", strappendch_test, NULL },
+		{ "strprependch", strprependch_test, NULL },
+		{ "strshiftl", strshiftl_test, NULL },
+		{ "strshiftr", strshiftr_test, NULL },
 		{ "strtrim", strtrim_test, NULL },
 		{ "strtrimch", strtrimch_test, NULL },
 	};

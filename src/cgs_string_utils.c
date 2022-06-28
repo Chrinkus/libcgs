@@ -30,15 +30,29 @@
 
 char* cgs_strdup(const char* src)
 {
-	int len = strlen(src) + 1;
-	char* dst = malloc(len * sizeof(src[0]));
+	char* dst = malloc(strlen(src) + 1);
+        if (!dst)
+                return NULL;
 
-	if (dst)
-		strcpy(dst, src);
+        strcpy(dst, src);
+
 	return dst;
 }
 
-void cgs_strappend(char* s, char ch)
+void cgs_strmove(char* s, size_t n)
+{
+        char* p = s + n;
+        memmove(p, s, strlen(s) + 1);
+}
+
+void cgs_strprepend(char* dst, const char* src, size_t n)
+{
+        cgs_strmove(dst, n);
+        for (size_t i = 0; i < n; ++i)
+                dst[i] = src[i];
+}
+
+void cgs_strappendch(char* s, char ch)
 {
 	while (*s)
 		++s;
@@ -46,7 +60,7 @@ void cgs_strappend(char* s, char ch)
 	*s = '\0';
 }
 
-void cgs_strprepend(char* s, char ch)
+void cgs_strprependch(char* s, char ch)
 {
 	for (char tmp = *s; ch; *s++ = ch, ch = tmp)
 		if (tmp)
@@ -54,14 +68,34 @@ void cgs_strprepend(char* s, char ch)
 	*s = '\0';
 }
 
-void cgs_strshift(char* s, size_t n)
+void cgs_strshiftl(char* s, size_t n, int c)
 {
-	if (strlen(s) < n) {
-		*s = '\0';
-	} else {
-		for (char* p = s+n; *s; ++s, ++p)
-			*s = *p;
-	}
+        const size_t len = strlen(s);
+        if (len < n) {
+                for (size_t i = 0; i < len; ++i)
+                        s[i] = c;
+        } else {
+                size_t i = 0;
+                while (s[n])
+                        s[i++] = s[n++];
+                while (i < len)
+                        s[i++] = c;
+        }
+}
+
+void cgs_strshiftr(char* s, size_t n, int c)
+{
+        const size_t len = strlen(s);
+        if (len < n) {
+                for (size_t i = 0; i < len; ++i)
+                        s[i] = c;
+        } else {
+                size_t i = len - 1;
+                for (size_t j = i - n; j < i; --j, --i)
+                        s[i] = s[j];
+                while (i < len)
+                        s[i--] = c;
+        }
 }
 
 void cgs_strtrim(char* s)
