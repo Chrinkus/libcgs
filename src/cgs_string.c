@@ -23,7 +23,9 @@
  * SOFTWARE.
  */
 #include "cgs_string.h"
+#include "cgs_string_utils.h"
 #include "cgs_compare.h"
+#include "cgs_defs.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -95,13 +97,17 @@ cgs_string_length(const struct cgs_string* s);
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * String Static Helper Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+static size_t
+cgs_string_new_capacity(size_t old)
+{
+        return old > 0 ? old * CGS_STRING_GROWTH_RATE
+                       : CGS_STRING_INITIAL_CAPACITY;
+}
 
 static const char*
 cgs_string_grow(struct cgs_string* s)
 {
-	size_t new_cap = s->capacity > 0
-		? s->capacity * CGS_STRING_GROWTH_RATE
-		: CGS_STRING_INITIAL_CAPACITY;
+	size_t new_cap = cgs_string_new_capacity(s->capacity);
 
 	char* p = realloc(s->data, new_cap);
         if (!p)
@@ -110,6 +116,21 @@ cgs_string_grow(struct cgs_string* s)
         s->data = p;
         s->capacity = new_cap;
 	return p;
+}
+
+static const char*
+cgs_string_grow_len(struct cgs_string* s, size_t len)
+{
+        size_t new_cap = cgs_string_new_capacity(s->capacity);
+        new_cap = CGS_MAX(len + 1, new_cap);
+
+        char* p = realloc(s->data, new_cap);
+        if (!p)
+                return NULL;
+
+        s->data = p;
+        s->capacity = new_cap;
+        return p;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -129,22 +150,39 @@ cgs_string_push(struct cgs_string* s, int c)
 const char*
 cgs_string_prepend(struct cgs_string* s, const char* add, size_t len)
 {
-        if (s->length + len >= s->capacity - 1 && !cgs_string_grow(s))
+        size_t new_len = s->length + len;
+        if (new_len >= s->capacity - 1 && !cgs_string_grow_len(s, new_len))
                 return NULL;
 
+        /*
         char* src = s->data;
-        char* dst = src + len;
-        memmove(dst, src, s->length);
-        strncpy(src, add, len);
-        return src;
+        memmove(src + len, src, s->length + 1);
+
+        for (size_t i = 0; i < len; ++i)
+                src[i] = add[i];
+        */
+        cgs_strprepend(s->data, add, len);
+
+        s->length = new_len;
+        return s->data;
 }
 
 const char*
 cgs_string_append(struct cgs_string* s, const char* add, size_t len)
 {
-        if (s->length + len >= s->capacity - 1 && !cgs_string_grow(s))
+        size_t new_len = s->length + len;
+        if (new_len >= s->capacity - 1 && !cgs_string_grow_len(s, new_len))
                 return NULL;
-        strcat(s->data, add);
+
+        /*
+        char* p = s->data + s->length;
+        for (size_t i = 0; i < len; ++i)
+                *p++ = *add++;
+        *p = '\0';
+        */
+        strncat(s->data, add, len);
+
+        s->length = new_len;
         return s->data;
 }
 

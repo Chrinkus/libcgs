@@ -148,8 +148,10 @@ int string_prepend_test(void* data)
         const char* add = "Creature ";
         assert(cgs_string_prepend(&s, add, strlen(add)) != NULL);
 
+        assert(cgs_string_length(&s) == strlen("Creature Feature"));
         assert(strcmp(cgs_string_data(&s), "Creature Feature") == 0);
 
+        cgs_string_free(&s);
         return TEST_SUCCESS;
 }
 
@@ -161,8 +163,10 @@ int string_append_test(void* data)
 
         const char* add = " Avalanche";
         assert(cgs_string_append(&s, add, strlen(add)) != NULL);
+        assert(cgs_string_length(&s) == strlen("Colorado Avalanche"));
         assert(strcmp(cgs_string_data(&s), "Colorado Avalanche") == 0);
 
+        cgs_string_free(&s);
         return TEST_SUCCESS;
 }
 
