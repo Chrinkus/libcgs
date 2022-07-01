@@ -1,4 +1,4 @@
-/* cgs.h
+/* cgs_error.h
  *
  * MIT License
  * 
@@ -24,15 +24,12 @@
  */
 #pragma once
 
-#include <cgs/cgs_array.h>
-#include <cgs/cgs_bst.h>
-#include <cgs/cgs_compare.h>
-#include <cgs/cgs_defs.h>
-#include <cgs/cgs_error.h>
-#include <cgs/cgs_heap.h>
-#include <cgs/cgs_io.h>
-#include <cgs/cgs_rbt.h>
-#include <cgs/cgs_variant.h>
-#include <cgs/cgs_string.h>
-#include <cgs/cgs_string_utils.h>
+int
+cgs_error_retfail(const char* format, ...);
+
+void*
+cgs_error_retnull(const char* format, ...);
+
+int
+cgs_error_retbool(const char* format, ...);
 

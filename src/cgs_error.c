@@ -1,4 +1,4 @@
-/* cgs.h
+/* cgs_error.c
  *
  * MIT License
  * 
@@ -22,17 +22,63 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
+#include "cgs_error.h"
+#include "cgs_defs.h"
 
-#include <cgs/cgs_array.h>
-#include <cgs/cgs_bst.h>
-#include <cgs/cgs_compare.h>
-#include <cgs/cgs_defs.h>
-#include <cgs/cgs_error.h>
-#include <cgs/cgs_heap.h>
-#include <cgs/cgs_io.h>
-#include <cgs/cgs_rbt.h>
-#include <cgs/cgs_variant.h>
-#include <cgs/cgs_string.h>
-#include <cgs/cgs_string_utils.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+enum { ERROR_BUFFMIN = 256, ERROR_BUFFMAX = 512 };
+
+static void
+cgs_error_print(const char* format, va_list ap)
+{
+        char buf[ERROR_BUFFMAX];
+        char msg[ERROR_BUFFMIN];
+
+        vsnprintf(msg, ERROR_BUFFMIN, format, ap);
+
+        snprintf(buf, ERROR_BUFFMAX, "LIBCGS ERROR: %s\n", msg);
+
+        fflush(stdout);
+        fputs(buf, stderr);
+        fflush(stderr);
+}
+
+int
+cgs_error_retfail(const char* format, ...)
+{
+        va_list ap;
+
+        va_start(ap, format);
+        cgs_error_print(format, ap);
+        va_end(ap);
+
+        return EXIT_FAILURE;
+}
+
+void*
+cgs_error_retnull(const char* format, ...)
+{
+        va_list ap;
+
+        va_start(ap, format);
+        cgs_error_print(format, ap);
+        va_end(ap);
+
+        return NULL;
+}
+
+int
+cgs_error_retbool(const char* format, ...)
+{
+        va_list ap;
+
+        va_start(ap, format);
+        cgs_error_print(format, ap);
+        va_end(ap);
+
+        return CGS_FALSE;
+}
 
