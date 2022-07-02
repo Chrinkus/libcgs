@@ -1,6 +1,7 @@
 #include "cmocka_headers.h"
 
 #include <stdlib.h>     /* EXIT_FAILURE */
+#include <stdio.h>      /* fopen */
 
 #include "cgs_error.h"
 
@@ -31,12 +32,25 @@ error_retbool_test(void** state)
         assert_int_equal(ret, 0);
 }
 
+static void
+error_sysstr_test(void** state)
+{
+        (void)state;
+
+        FILE* f = fopen("/ridiculous_filename.txt", "r");
+        if (!f) {
+                f = cgs_error_retnull("Sysstr: %s", cgs_error_sysstr());
+                assert_null(f);
+        }
+}
+
 int main(void)
 {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(error_retfail_test),
 		cmocka_unit_test(error_retnull_test),
 		cmocka_unit_test(error_retbool_test),
+		cmocka_unit_test(error_sysstr_test),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

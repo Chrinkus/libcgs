@@ -24,12 +24,54 @@
  */
 #pragma once
 
+/**
+ * cgs_error_retfail
+ *
+ * Prints the error message to stderr and returns EXIT_FAILURE.
+ *
+ * @param format        Printf-style format string.
+ * @param ...           Additional arguments to format string.
+ *
+ * @return              EXIT_FAILURE.
+ */
 int
 cgs_error_retfail(const char* format, ...);
 
+/**
+ * cgs_error_retnull
+ *
+ * Prints the error message to stderr and returns NULL.
+ *
+ * @param format        Printf-style format string.
+ * @param ...           Additional arguments to format string.
+ *
+ * @return              NULL.
+ */
 void*
 cgs_error_retnull(const char* format, ...);
 
+/**
+ * cgs_error_retbool
+ *
+ * Prints the error message to stderr and returns zero.
+ *
+ * @param format        Printf-style format string.
+ * @param ...           Additional arguments to format string.
+ *
+ * @return              Zero (0).
+ */
 int
 cgs_error_retbool(const char* format, ...);
+
+/**
+ * cgs_error_sysstr
+ *
+ * Gets the corresponding error string to the current value of errno. Saves
+ * the caller from having to include headers for error handling.
+ *
+ * Warning: Though the string returned is a 'char*' do not modify it, the
+ * buffer belongs to the system and may be reused by another system call.
+ */
+char*
+cgs_error_sysstr(void);
 

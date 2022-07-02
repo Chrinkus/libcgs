@@ -28,6 +28,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
 enum { ERROR_BUFFMIN = 256, ERROR_BUFFMAX = 512 };
 
@@ -80,5 +82,11 @@ cgs_error_retbool(const char* format, ...)
         va_end(ap);
 
         return CGS_FALSE;
+}
+
+char*
+cgs_error_sysstr(void)
+{
+        return strerror(errno);
 }
 
