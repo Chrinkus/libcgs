@@ -64,7 +64,7 @@ int
 cgs_error_retbool(const char* format, ...);
 
 /**
- * cgs_error_sysstr
+ * cgs_error_sys
  *
  * Gets the corresponding error string to the current value of errno. Saves
  * the caller from having to include headers for error handling.
@@ -73,5 +73,5 @@ cgs_error_retbool(const char* format, ...);
  * buffer belongs to the system and may be reused by another system call.
  */
 char*
-cgs_error_sysstr(void);
+cgs_error_sys(void);
 

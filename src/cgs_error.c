@@ -85,7 +85,7 @@ cgs_error_retbool(const char* format, ...)
 }
 
 char*
-cgs_error_sysstr(void)
+cgs_error_sys(void)
 {
         return strerror(errno);
 }
