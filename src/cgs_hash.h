@@ -35,14 +35,20 @@
 /**
  * CgsHashFunc
  *
- * The expected signature of a hash function.
+ * The expected signature of a hash function. The hash value is not adjusted
+ * for the number of elements in the table.
  */
-typedef size_t (*CgsHashFunc)(const struct cgs_variant* var, size_t size);
+typedef size_t (*CgsHashFunc)(const void* key);
 
-struct cgs_list {
+/**
+ * struct cgs_bucket
+ *
+ * A singly-linked list of buckets for managing collisions.
+ */
+struct cgs_bucket {
         void* key;
         struct cgs_variant data;
-        struct cgs_list* next;
+        struct cgs_bucket* next;
 };
 
 /**
@@ -61,13 +67,13 @@ struct cgs_hash {
         size_t size;
         CgsHashFunc hash;
         CgsCmp3Way cmp;
-        struct cgs_list** table;
+        struct cgs_bucket** table;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-size_t cgs_string_hash(const struct cgs_variant* var, size_t size);
+size_t cgs_string_hash(const void* key);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Management Functions
@@ -97,4 +103,8 @@ cgs_hash_new(struct cgs_hash* tab, CgsHashFunc hash, CgsCmp3Way cmp);
  */
 void
 cgs_hash_free(struct cgs_hash* h);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Table Operations
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 

@@ -26,23 +26,28 @@
 
 #include <stdlib.h>
 
-enum { CGS_HASH_INIT = 31, CGS_HASH_MULT = 37, };
+enum {
+        CGS_HASH_MULTIPLIER = 37,
+        CGS_HASH_NUM_BUCKETS = 31,
+        CGS_HASH_BUCKET_PSIZE = sizeof(struct cgs_bucket*),
+        CGS_HASH_INITIAL_ALLOC = CGS_HASH_NUM_BUCKETS * CGS_HASH_BUCKET_PSIZE,
+};
 
 void*
 cgs_hash_new(struct cgs_hash* tab, CgsHashFunc hash, CgsCmp3Way cmp)
 {
-        struct cgs_list** p = malloc(CGS_HASH_INIT * sizeof(struct cgs_list*));
-        if (!p)
+        struct cgs_bucket** ppb = malloc(CGS_HASH_INITIAL_ALLOC);
+        if (!ppb)
                 return NULL;
 
-        for (int i = 0; i < CGS_HASH_INIT; ++i)
-                p[i] = NULL;
+        for (int i = 0; i < CGS_HASH_NUM_BUCKETS; ++i)
+                ppb[i] = NULL;
 
         tab->length = 0;
-        tab->size = CGS_HASH_INIT;
+        tab->size = CGS_HASH_NUM_BUCKETS;
         tab->hash = hash;
         tab->cmp = cmp;
-        tab->table = p;
+        tab->table = ppb;
 
         return tab;
 }
@@ -54,7 +59,7 @@ cgs_hash_free(struct cgs_hash* tab)
                 return;
         for (size_t i = 0; i < tab->size; ++i)
                 while (tab->table[i]) {
-                        struct cgs_list* p = tab->table[i];
+                        struct cgs_bucket* p = tab->table[i];
                         tab->table[i] = p->next;
                         free(p);
                 }
@@ -65,11 +70,15 @@ cgs_hash_free(struct cgs_hash* tab)
  * Hash Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 size_t
-cgs_string_hash(const struct cgs_variant* var, size_t size)
+cgs_string_hash(const void* key)
 {
         size_t h = 0;
-        for (const char* s = cgs_variant_get(var); *s; ++s)
-                h = CGS_HASH_MULT * h + *s;
-        return h % size;
+        for (const char* s = key; *s; ++s)
+                h = CGS_HASH_MULTIPLIER * h + *s;
+        return h;
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Table Operations
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
