@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 #include "cgs_hash.h"
+#include "cgs_compare.h"
 
 #include <stdlib.h>
 
@@ -34,7 +35,7 @@ enum {
 };
 
 void*
-cgs_hash_new(struct cgs_hash* tab, CgsHashFunc hash, CgsCmp3Way cmp)
+cgs_hash_new(struct cgs_hash* tab)
 {
         struct cgs_bucket** ppb = malloc(CGS_HASH_INITIAL_ALLOC);
         if (!ppb)
@@ -45,8 +46,8 @@ cgs_hash_new(struct cgs_hash* tab, CgsHashFunc hash, CgsCmp3Way cmp)
 
         tab->length = 0;
         tab->size = CGS_HASH_NUM_BUCKETS;
-        tab->hash = hash;
-        tab->cmp = cmp;
+        tab->hash = cgs_string_hash;
+        tab->cmp = cgs_str_cmp;
         tab->table = ppb;
 
         return tab;
@@ -61,6 +62,8 @@ cgs_hash_free(struct cgs_hash* tab)
                 while (tab->table[i]) {
                         struct cgs_bucket* p = tab->table[i];
                         tab->table[i] = p->next;
+                        cgs_variant_free_data(&p->value);
+                        free(p->key);
                         free(p);
                 }
         free(tab->table);

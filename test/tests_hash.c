@@ -1,7 +1,6 @@
 #include "cmocka_headers.h"
 
 #include "cgs_hash.h"
-#include "cgs_compare.h"        /* cgs_str_cmp */
 
 static void
 hash_new_test(void** state)
@@ -9,7 +8,7 @@ hash_new_test(void** state)
         (void)state;
 
         struct cgs_hash h = { 0 };
-        assert_non_null(cgs_hash_new(&h, cgs_string_hash, cgs_str_cmp));
+        assert_non_null(cgs_hash_new(&h));
 
         cgs_hash_free(&h);
 }

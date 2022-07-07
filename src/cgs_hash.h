@@ -29,9 +29,8 @@
 #include "cgs_defs.h"
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Hash Types
+ * Hash Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-
 /**
  * CgsHashFunc
  *
@@ -40,14 +39,25 @@
  */
 typedef size_t (*CgsHashFunc)(const void* key);
 
+size_t
+cgs_string_hash(const void* key);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Types
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 /**
  * struct cgs_bucket
  *
  * A singly-linked list of buckets for managing collisions.
+ *
+ * @member key          An allocated string.
+ * @member value        A cgs_variant containing the value. 
+ * @member next         A single-linked list of collisions.
  */
 struct cgs_bucket {
-        void* key;
-        struct cgs_variant data;
+        char* key;
+        struct cgs_variant value;
         struct cgs_bucket* next;
 };
 
@@ -71,11 +81,6 @@ struct cgs_hash {
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Hash Functions
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-size_t cgs_string_hash(const void* key);
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Management Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
@@ -84,15 +89,16 @@ size_t cgs_string_hash(const void* key);
  *
  * A function to allocate and initialize a new hash table.
  *
+ * Note: Hash and comparison functions are not required for this version. The
+ * current implementation uses string keys so these functions are known.
+ *
  * @param tab   A pointer to the hash table object to create.
- * @param hash  The function to use for the elements.
- * @param cmp   The function used for lookup matching.
  *
  * @return      A pointer to the hash table object on success or NULL on
  *              failure.
  */
 void*
-cgs_hash_new(struct cgs_hash* tab, CgsHashFunc hash, CgsCmp3Way cmp);
+cgs_hash_new(struct cgs_hash* tab);
 
 /**
  * cgs_hash_free
