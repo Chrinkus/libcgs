@@ -85,3 +85,14 @@ cgs_string_hash(const void* key)
  * Hash Table Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
+const void*
+cgs_hash_lookup(const struct cgs_hash* h, const char* key)
+{
+        size_t hashval = h->hash(key) % h->size;
+        for (const struct cgs_bucket* b = h->table[hashval]; b; b = b->next)
+                if (h->cmp(b->key, key) == 0)
+                        return cgs_variant_get(&b->value);
+
+        return NULL;
+}
+

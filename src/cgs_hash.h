@@ -114,3 +114,18 @@ cgs_hash_free(struct cgs_hash* h);
  * Hash Table Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
+/**
+ * cgs_hash_lookup
+ *
+ * Searches the hash table for a given key and returns a read-only pointer to
+ * the corresponding value if found.
+ *
+ * @param h     The hash table
+ * @param key   The key to look up.
+ *
+ * @return      A read-only pointer to the value object if found or NULL if
+ *              not found.
+ */
+const void*
+cgs_hash_lookup(const struct cgs_hash* h, const char* key);
+
