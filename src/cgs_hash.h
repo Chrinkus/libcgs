@@ -25,8 +25,13 @@
 #pragma once
 
 #include <stddef.h>
-#include "cgs_variant.h"
+#include "cgs_variant.h"        // Users will need so include here
 #include "cgs_defs.h"
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Struct Forward Declarations
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+struct cgs_bucket;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Functions
@@ -38,27 +43,22 @@
  */
 typedef size_t (*CgsHashFunc)(const void* key, size_t size);
 
+/**
+ * cgs_string_hash
+ *
+ * Simple hash function for strings.
+ *
+ * @param key   A void pointer to a string to be hashed.
+ * @param size  The number of buckets in the table to compress the hash to.
+ *
+ * @return      An unsigned value in the range of [0-size).
+ */
 size_t
 cgs_string_hash(const void* key, size_t size);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Hash Types
+ * Hash Table Types
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-
-/**
- * struct cgs_bucket
- *
- * A singly-linked list of buckets for managing collisions.
- *
- * @member key          An allocated string.
- * @member value        A cgs_variant containing the value. 
- * @member next         A single-linked list of collisions.
- */
-struct cgs_bucket {
-        char* key;
-        struct cgs_variant value;
-        struct cgs_bucket* next;
-};
 
 /**
  * struct cgs_hash
@@ -66,17 +66,22 @@ struct cgs_bucket {
  * A hash table implementation.
  *
  * @member length       The number of elements currently in the table.
- * @member size         The number of buckets in the table.
+ * @member table        The hash table.
  * @member hash         A function to hash the elements.
  * @member cmp          The function used for lookup matching.
- * @member table        The hash table.
+ * @member size         The number of buckets in the table.
+ * @member max_load     The highest the ratio of length to size is allowed to
+ *                      get to before re-hashing.
  */
 struct cgs_hash {
         size_t length;
-        size_t size;
+        struct cgs_bucket** table;
+
         CgsHashFunc hash;
         CgsCmp3Way cmp;
-        struct cgs_bucket** table;
+
+        size_t size;
+        double max_load;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -110,7 +115,7 @@ void
 cgs_hash_free(struct cgs_hash* h);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Hash Inline Getters
+ * Hash Table Inline Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 inline size_t
 cgs_hash_length(const struct cgs_hash* h)

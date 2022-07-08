@@ -1,7 +1,6 @@
 #include "cmocka_headers.h"
 
 #include "cgs_hash.h"
-#include <stdio.h>
 
 struct goal_scorer {
         char* name;

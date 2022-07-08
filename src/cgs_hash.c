@@ -28,16 +28,62 @@
 
 #include <stdlib.h>
 
-enum {
-        CGS_HASH_MULTIPLIER = 37,
-        CGS_HASH_NUM_BUCKETS = 31,
-        CGS_HASH_BUCKET_PSIZE = sizeof(struct cgs_bucket*),
-        CGS_HASH_INITIAL_ALLOC = CGS_HASH_NUM_BUCKETS * CGS_HASH_BUCKET_PSIZE,
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+enum hash_function_magic {
+        STRING_HASH_MULTIPLIER = 37,
+};
+
+size_t
+cgs_string_hash(const void* key, size_t size)
+{
+        size_t h = 0;
+        for (const char* s = key; *s; ++s)
+                h = STRING_HASH_MULTIPLIER * h + *s;
+        return h % size;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Table Private Types
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+enum hash_table_magic {
+        HASHTAB_NUM_BUCKETS = 31,
+        HASHTAB_BUCKET_PSIZE = sizeof(struct cgs_bucket*),
+        HASHTAB_INITIAL_ALLOC = HASHTAB_NUM_BUCKETS * HASHTAB_BUCKET_PSIZE,
+};
+
+const double HASHTAB_DEFAULT_LOAD_FACTOR = 0.8;
+
+/**
+ * struct cgs_bucket
+ *
+ * A singly-linked list of buckets for managing collisions.
+ *
+ * @member key          An allocated string.
+ * @member value        A cgs_variant containing the value. 
+ * @member next         A single-linked list of collisions.
+ */
+struct cgs_bucket {
+        char* key;
+        struct cgs_variant value;
+        struct cgs_bucket* next;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Bucket Management Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+/**
+ * cgs_bucket_new
+ *
+ * Allocates a new bucket and key-string.
+ * 
+ * @param key   The string to use as a key.
+ *
+ * @return      A pointer to the newly allocated bucket on success or NULL
+ *              on failure.
+ */
 static struct cgs_bucket*
 cgs_bucket_new(const char* key)
 {
@@ -53,6 +99,14 @@ cgs_bucket_new(const char* key)
         return b;
 }
 
+/**
+ * cgs_bucket_free
+ *
+ * Frees the memory allocated to a bucket, its key and any memory allocated
+ * to the variant value.
+ *
+ * @param b     The bucket to free.
+ */
 static void
 cgs_bucket_free(struct cgs_bucket* b)
 {
@@ -67,18 +121,19 @@ cgs_bucket_free(struct cgs_bucket* b)
 void*
 cgs_hash_new(struct cgs_hash* tab)
 {
-        struct cgs_bucket** ppb = malloc(CGS_HASH_INITIAL_ALLOC);
+        struct cgs_bucket** ppb = malloc(HASHTAB_INITIAL_ALLOC);
         if (!ppb)
                 return NULL;
 
-        for (int i = 0; i < CGS_HASH_NUM_BUCKETS; ++i)
+        for (int i = 0; i < HASHTAB_NUM_BUCKETS; ++i)
                 ppb[i] = NULL;
 
         tab->length = 0;
-        tab->size = CGS_HASH_NUM_BUCKETS;
+        tab->table = ppb;
         tab->hash = cgs_string_hash;
         tab->cmp = cgs_str_cmp;
-        tab->table = ppb;
+        tab->size = HASHTAB_NUM_BUCKETS;
+        tab->max_load = HASHTAB_DEFAULT_LOAD_FACTOR;
 
         return tab;
 }
@@ -98,22 +153,10 @@ cgs_hash_free(struct cgs_hash* tab)
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Hash Inline Getters
+ * Hash Table Inline Function Symbols
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 size_t
 cgs_hash_length(const struct cgs_hash* h);
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Hash Functions
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-size_t
-cgs_string_hash(const void* key, size_t size)
-{
-        size_t h = 0;
-        for (const char* s = key; *s; ++s)
-                h = CGS_HASH_MULTIPLIER * h + *s;
-        return h % size;
-}
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Operations
