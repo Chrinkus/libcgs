@@ -138,6 +138,20 @@ cgs_hash_length(const struct cgs_hash* h)
 const void*
 cgs_hash_lookup(const struct cgs_hash* h, const char* key);
 
+/**
+ * cgs_hash_get
+ *
+ * Searches the hash table for a given key. If not found, creates a
+ * new bucket and adds it to the table. Returns a writable pointer to the
+ * variant containing the value or NULL if there was an error in creating a
+ * new bucket.
+ *
+ * @param h     The hash table.
+ * @param key   The key to get.
+ *
+ * @return      A writable pointer to the variant value on success or NULL on
+ *              allocation error (bucket or key-dup).
+ */
 struct cgs_variant*
 cgs_hash_get(struct cgs_hash* h, const char* key);
 

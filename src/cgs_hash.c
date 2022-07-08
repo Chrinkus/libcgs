@@ -118,7 +118,7 @@ cgs_hash_lookup(const struct cgs_hash* h, const char* key)
 {
         size_t hashval = h->hash(key) % h->size;
         for (const struct cgs_bucket* b = h->table[hashval]; b; b = b->next)
-                if (h->cmp(b->key, key) == 0)
+                if (h->cmp(&b->key, &key) == 0)                 // &!!
                         return cgs_variant_get(&b->value);
 
         return NULL;
@@ -132,7 +132,7 @@ cgs_hash_get(struct cgs_hash* h, const char* key)
         struct cgs_bucket* p = h->table[hashval];
         if (p) {
                 for (struct cgs_bucket* tmp = p; tmp; tmp = tmp->next)
-                        if (h->cmp(tmp->key, key) == 0)
+                        if (h->cmp(&tmp->key, &key) == 0)       // &!!
                                 return &tmp->value;
         }
 
