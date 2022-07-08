@@ -111,6 +111,15 @@ void
 cgs_hash_free(struct cgs_hash* h);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Inline Getters
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+inline size_t
+cgs_hash_length(const struct cgs_hash* h)
+{
+        return h->length;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
@@ -128,4 +137,7 @@ cgs_hash_free(struct cgs_hash* h);
  */
 const void*
 cgs_hash_lookup(const struct cgs_hash* h, const char* key);
+
+struct cgs_variant*
+cgs_hash_get(struct cgs_hash* h, const char* key);
 

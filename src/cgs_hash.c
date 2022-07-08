@@ -24,6 +24,7 @@
  */
 #include "cgs_hash.h"
 #include "cgs_compare.h"
+#include "cgs_string_utils.h"
 
 #include <stdlib.h>
 
@@ -34,6 +35,9 @@ enum {
         CGS_HASH_INITIAL_ALLOC = CGS_HASH_NUM_BUCKETS * CGS_HASH_BUCKET_PSIZE,
 };
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Table Management Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 void*
 cgs_hash_new(struct cgs_hash* tab)
 {
@@ -60,14 +64,38 @@ cgs_hash_free(struct cgs_hash* tab)
                 return;
         for (size_t i = 0; i < tab->size; ++i)
                 while (tab->table[i]) {
-                        struct cgs_bucket* p = tab->table[i];
-                        tab->table[i] = p->next;
-                        cgs_variant_free_data(&p->value);
-                        free(p->key);
-                        free(p);
+                        struct cgs_bucket* b = tab->table[i];
+                        tab->table[i] = b->next;
+                        cgs_variant_free_data(&b->value);
+                        free(b->key);
+                        free(b);
                 }
         free(tab->table);
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Bucket Management Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+static struct cgs_bucket*
+cgs_bucket_new(const char* key)
+{
+        struct cgs_bucket* b = malloc(sizeof(struct cgs_bucket));
+        if (!b)
+                return NULL;
+        char* p = cgs_strdup(key);
+        if (!p) {
+                free(b);
+                return NULL;
+        }
+        b->key = p;
+        return b;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Inline Getters
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+size_t
+cgs_hash_length(const struct cgs_hash* h);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Functions
@@ -94,5 +122,26 @@ cgs_hash_lookup(const struct cgs_hash* h, const char* key)
                         return cgs_variant_get(&b->value);
 
         return NULL;
+}
+
+struct cgs_variant*
+cgs_hash_get(struct cgs_hash* h, const char* key)
+{
+        size_t hashval = h->hash(key) % h->size;
+
+        struct cgs_bucket* p = h->table[hashval];
+        if (p) {
+                for (struct cgs_bucket* tmp = p; tmp; tmp = tmp->next)
+                        if (h->cmp(tmp->key, key) == 0)
+                                return &tmp->value;
+        }
+
+        struct cgs_bucket* b = cgs_bucket_new(key);
+        if (!b)
+                return NULL;
+        b->next = p;            // works if p is NULL or a list!
+        h->table[hashval] = b;
+        ++h->length;
+        return &b->value;
 }
 
