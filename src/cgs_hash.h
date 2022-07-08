@@ -34,13 +34,12 @@
 /**
  * CgsHashFunc
  *
- * The expected signature of a hash function. The hash value is not adjusted
- * for the number of elements in the table.
+ * The expected signature of a hash function. 
  */
-typedef size_t (*CgsHashFunc)(const void* key);
+typedef size_t (*CgsHashFunc)(const void* key, size_t size);
 
 size_t
-cgs_string_hash(const void* key);
+cgs_string_hash(const void* key, size_t size);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Types
@@ -155,3 +154,14 @@ cgs_hash_lookup(const struct cgs_hash* h, const char* key);
 struct cgs_variant*
 cgs_hash_get(struct cgs_hash* h, const char* key);
 
+/**
+ * cgs_hash_remove
+ *
+ * Searches the hash table for a given key. If found, removes the bucket from
+ * the table. No error is indicated if the key is not found.
+ *
+ * @param h     The hash table.
+ * @param key   The key of the value to remove.
+ */
+void
+cgs_hash_remove(struct cgs_hash* h, const char* key);

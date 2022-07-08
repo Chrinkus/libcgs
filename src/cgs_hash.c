@@ -36,6 +36,32 @@ enum {
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Bucket Management Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+static struct cgs_bucket*
+cgs_bucket_new(const char* key)
+{
+        struct cgs_bucket* b = malloc(sizeof(struct cgs_bucket));
+        if (!b)
+                return NULL;
+        char* p = cgs_strdup(key);
+        if (!p) {
+                free(b);
+                return NULL;
+        }
+        b->key = p;
+        return b;
+}
+
+static void
+cgs_bucket_free(struct cgs_bucket* b)
+{
+        cgs_variant_free_data(&b->value);
+        free(b->key);
+        free(b);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Management Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 void*
@@ -66,29 +92,9 @@ cgs_hash_free(struct cgs_hash* tab)
                 while (tab->table[i]) {
                         struct cgs_bucket* b = tab->table[i];
                         tab->table[i] = b->next;
-                        cgs_variant_free_data(&b->value);
-                        free(b->key);
-                        free(b);
+                        cgs_bucket_free(b);
                 }
         free(tab->table);
-}
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Bucket Management Functions
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-static struct cgs_bucket*
-cgs_bucket_new(const char* key)
-{
-        struct cgs_bucket* b = malloc(sizeof(struct cgs_bucket));
-        if (!b)
-                return NULL;
-        char* p = cgs_strdup(key);
-        if (!p) {
-                free(b);
-                return NULL;
-        }
-        b->key = p;
-        return b;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -101,12 +107,12 @@ cgs_hash_length(const struct cgs_hash* h);
  * Hash Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 size_t
-cgs_string_hash(const void* key)
+cgs_string_hash(const void* key, size_t size)
 {
         size_t h = 0;
         for (const char* s = key; *s; ++s)
                 h = CGS_HASH_MULTIPLIER * h + *s;
-        return h;
+        return h % size;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -116,7 +122,7 @@ cgs_string_hash(const void* key)
 const void*
 cgs_hash_lookup(const struct cgs_hash* h, const char* key)
 {
-        size_t hashval = h->hash(key) % h->size;
+        size_t hashval = h->hash(key, h->size);
         for (const struct cgs_bucket* b = h->table[hashval]; b; b = b->next)
                 if (h->cmp(&b->key, &key) == 0)                 // &!!
                         return cgs_variant_get(&b->value);
@@ -127,7 +133,7 @@ cgs_hash_lookup(const struct cgs_hash* h, const char* key)
 struct cgs_variant*
 cgs_hash_get(struct cgs_hash* h, const char* key)
 {
-        size_t hashval = h->hash(key) % h->size;
+        size_t hashval = h->hash(key, h->size);
 
         struct cgs_bucket* p = h->table[hashval];
         if (p) {
@@ -143,5 +149,30 @@ cgs_hash_get(struct cgs_hash* h, const char* key)
         h->table[hashval] = b;
         ++h->length;
         return &b->value;
+}
+
+void
+cgs_hash_remove(struct cgs_hash* h, const char* key)
+{
+        size_t hashval = h->hash(key, h->size);
+        struct cgs_bucket* b = h->table[hashval];
+        if (!b)
+                return;
+
+        struct cgs_bucket* parent = NULL;
+        while (b) {
+                if (h->cmp(&b->key, &key) == 0)
+                        break;
+                parent = b;
+                b = b->next;
+        }
+
+        if (parent)
+                parent->next = b->next;
+        else
+                h->table[hashval] = b->next;
+
+        --h->length;
+        cgs_bucket_free(b);
 }
 

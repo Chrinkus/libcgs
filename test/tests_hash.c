@@ -31,8 +31,13 @@ const struct goal_scorer top_scorers[] = {
         { .name = "Dino Ciccarelli",    .goals = 608,   .games = 1232 },
         { .name = "Jari Kurri",         .goals = 601,   .games = 1251 },
 };
-
 const size_t top_scorers_len = sizeof(top_scorers) / sizeof(top_scorers[0]);
+
+static double
+goals_per_game(double goals, double games)
+{
+        return goals / games;
+}
 
 static void
 hash_new_test(void** state)
@@ -109,6 +114,39 @@ hash_get_lookup_test(void** state)
         cgs_hash_free(&h);
 }
 
+static void
+hash_remove_test(void** state)
+{
+        (void)state;
+        struct cgs_hash h = { 0 };
+        assert_non_null(cgs_hash_new(&h));
+
+        for (size_t i = 0; i < top_scorers_len; ++i) {
+                const struct goal_scorer* gs = &top_scorers[i];
+                double gpg = goals_per_game(gs->goals, gs->games);
+
+                struct cgs_variant* pv = cgs_hash_get(&h, gs->name);
+                cgs_variant_set_double(pv, gpg);
+        }
+
+        assert_int_equal(cgs_hash_length(&h), 20);
+
+        const double* pd = NULL;
+        pd = cgs_hash_lookup(&h, "Mario Lemieux");
+        assert_non_null(pd);
+
+        cgs_hash_remove(&h, "Mario Lemieux");
+        pd = cgs_hash_lookup(&h, "Mario Lemieux");
+        assert_null(pd);
+
+        assert_int_equal(cgs_hash_length(&h), 19);
+
+        cgs_hash_remove(&h, "Ron Francis");             // not in list
+        assert_int_equal(cgs_hash_length(&h), 19);      // length is same
+
+        cgs_hash_free(&h);
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Main
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
@@ -120,6 +158,7 @@ int main(void)
                 cmocka_unit_test(hash_lookup_fail_test),
 		cmocka_unit_test(hash_get_success_test),
                 cmocka_unit_test(hash_get_lookup_test),
+                cmocka_unit_test(hash_remove_test),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
