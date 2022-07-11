@@ -14,7 +14,7 @@ set(test_sources
 	"tests_compare.c"
 	"tests_defs.c"
         "tests_error.c"
-        "tests_hash.c"
+        "tests_hashtab.c"
         "tests_heap.c"
         "tests_heap_private.c"
 	"tests_io.c"

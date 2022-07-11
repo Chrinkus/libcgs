@@ -1,6 +1,6 @@
 #include "cmocka_headers.h"
 
-#include "cgs_hash.h"
+#include "cgs_hashtab.h"
 
 struct goal_scorer {
         char* name;
@@ -39,111 +39,112 @@ goals_per_game(double goals, double games)
 }
 
 static void
-hash_new_test(void** state)
+hashtab_new_test(void** state)
 {
         (void)state;
 
-        struct cgs_hash h = { 0 };
-        assert_non_null(cgs_hash_new(&h));
+        struct cgs_hashtab h = { 0 };
+        assert_non_null(cgs_hashtab_new(&h));
 
-        assert_int_equal(cgs_hash_length(&h), 0);
+        assert_int_equal(cgs_hashtab_length(&h), 0);
 
-        cgs_hash_free(&h);
+        cgs_hashtab_free(&h);
 }
 
 static void
-hash_lookup_fail_test(void** state)
+hashtab_lookup_fail_test(void** state)
 {
         (void)state;
 
-        struct cgs_hash h = { 0 };
-        assert_non_null(cgs_hash_new(&h));
+        struct cgs_hashtab h = { 0 };
+        assert_non_null(cgs_hashtab_new(&h));
 
-        assert_null(cgs_hash_lookup(&h, "article"));
-        assert_null(cgs_hash_lookup(&h, "section"));
-        assert_null(cgs_hash_lookup(&h, "h1"));
-        assert_null(cgs_hash_lookup(&h, "div"));
+        assert_null(cgs_hashtab_lookup(&h, "article"));
+        assert_null(cgs_hashtab_lookup(&h, "section"));
+        assert_null(cgs_hashtab_lookup(&h, "h1"));
+        assert_null(cgs_hashtab_lookup(&h, "div"));
 
-        cgs_hash_free(&h);
+        cgs_hashtab_free(&h);
 }
 
 static void
-hash_get_success_test(void** state)
+hashtab_get_success_test(void** state)
 {
         (void)state;
-        struct cgs_hash h = { 0 };
-        assert_non_null(cgs_hash_new(&h));
+        struct cgs_hashtab h = { 0 };
+        assert_non_null(cgs_hashtab_new(&h));
 
         for (size_t i = 0; i < top_scorers_len; ++i) {
                 struct cgs_variant* pv = NULL;
-                pv = cgs_hash_get(&h, top_scorers[i].name);
+                pv = cgs_hashtab_get(&h, top_scorers[i].name);
                 assert_non_null(pv);
                 cgs_variant_set_int(pv, top_scorers[i].goals);
         }
 
-        assert_int_equal(cgs_hash_length(&h), top_scorers_len);
+        assert_int_equal(cgs_hashtab_length(&h), top_scorers_len);
 
-        cgs_hash_free(&h);
+        cgs_hashtab_free(&h);
 }
 
 static void
-hash_get_lookup_test(void** state)
+hashtab_get_lookup_test(void** state)
 {
         (void)state;
-        struct cgs_hash h = { 0 };
-        assert_non_null(cgs_hash_new(&h));
+        struct cgs_hashtab h = { 0 };
+        assert_non_null(cgs_hashtab_new(&h));
 
         for (size_t i = 0; i < top_scorers_len; ++i) {
-                struct cgs_variant* pv = cgs_hash_get(&h, top_scorers[i].name);
-                cgs_variant_set_int(pv, top_scorers[i].goals);
+                const struct goal_scorer* gs = &top_scorers[i];
+                struct cgs_variant* pv = cgs_hashtab_get(&h, gs->name);
+                cgs_variant_set_int(pv, gs->goals);
         }
 
         const int* g = NULL;
-        g = cgs_hash_lookup(&h, "Joe Sakic");
+        g = cgs_hashtab_lookup(&h, "Joe Sakic");
         assert_non_null(g);
         assert_int_equal(*g, 625);
 
-        g = cgs_hash_lookup(&h, "Teemu Selanne");
+        g = cgs_hashtab_lookup(&h, "Teemu Selanne");
         assert_non_null(g);
         assert_int_equal(*g, 684);
 
-        g = cgs_hash_lookup(&h, "Ron Francis");
+        g = cgs_hashtab_lookup(&h, "Ron Francis");
         assert_null(g);
 
-        cgs_hash_free(&h);
+        cgs_hashtab_free(&h);
 }
 
 static void
-hash_remove_test(void** state)
+hashtab_remove_test(void** state)
 {
         (void)state;
-        struct cgs_hash h = { 0 };
-        assert_non_null(cgs_hash_new(&h));
+        struct cgs_hashtab h = { 0 };
+        assert_non_null(cgs_hashtab_new(&h));
 
         for (size_t i = 0; i < top_scorers_len; ++i) {
                 const struct goal_scorer* gs = &top_scorers[i];
                 double gpg = goals_per_game(gs->goals, gs->games);
 
-                struct cgs_variant* pv = cgs_hash_get(&h, gs->name);
+                struct cgs_variant* pv = cgs_hashtab_get(&h, gs->name);
                 cgs_variant_set_double(pv, gpg);
         }
 
-        assert_int_equal(cgs_hash_length(&h), 20);
+        assert_int_equal(cgs_hashtab_length(&h), 20);
 
         const double* pd = NULL;
-        pd = cgs_hash_lookup(&h, "Mario Lemieux");
+        pd = cgs_hashtab_lookup(&h, "Mario Lemieux");
         assert_non_null(pd);
 
-        cgs_hash_remove(&h, "Mario Lemieux");
-        pd = cgs_hash_lookup(&h, "Mario Lemieux");
+        cgs_hashtab_remove(&h, "Mario Lemieux");
+        pd = cgs_hashtab_lookup(&h, "Mario Lemieux");
         assert_null(pd);
 
-        assert_int_equal(cgs_hash_length(&h), 19);
+        assert_int_equal(cgs_hashtab_length(&h), 19);
 
-        cgs_hash_remove(&h, "Ron Francis");             // not in list
-        assert_int_equal(cgs_hash_length(&h), 19);      // length is same
+        cgs_hashtab_remove(&h, "Ron Francis");             // not in list
+        assert_int_equal(cgs_hashtab_length(&h), 19);      // length is same
 
-        cgs_hash_free(&h);
+        cgs_hashtab_free(&h);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -153,11 +154,11 @@ hash_remove_test(void** state)
 int main(void)
 {
 	const struct CMUnitTest tests[] = {
-		cmocka_unit_test(hash_new_test),
-                cmocka_unit_test(hash_lookup_fail_test),
-		cmocka_unit_test(hash_get_success_test),
-                cmocka_unit_test(hash_get_lookup_test),
-                cmocka_unit_test(hash_remove_test),
+		cmocka_unit_test(hashtab_new_test),
+                cmocka_unit_test(hashtab_lookup_fail_test),
+		cmocka_unit_test(hashtab_get_success_test),
+                cmocka_unit_test(hashtab_get_lookup_test),
+                cmocka_unit_test(hashtab_remove_test),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

@@ -1,4 +1,4 @@
-/* cgs_hash.c
+/* cgs_hashtab.c
  *
  * MIT License
  * 
@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "cgs_hash.h"
+#include "cgs_hashtab.h"
 #include "cgs_compare.h"
 #include "cgs_string_utils.h"
 
@@ -119,7 +119,7 @@ cgs_bucket_free(struct cgs_bucket* b)
  * Hash Table Management Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 void*
-cgs_hash_new(struct cgs_hash* tab)
+cgs_hashtab_new(struct cgs_hashtab* tab)
 {
         struct cgs_bucket** ppb = malloc(HASHTAB_INITIAL_ALLOC);
         if (!ppb)
@@ -139,7 +139,7 @@ cgs_hash_new(struct cgs_hash* tab)
 }
 
 void
-cgs_hash_free(struct cgs_hash* tab)
+cgs_hashtab_free(struct cgs_hashtab* tab)
 {
         if (!tab)
                 return;
@@ -156,14 +156,14 @@ cgs_hash_free(struct cgs_hash* tab)
  * Hash Table Inline Function Symbols
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 size_t
-cgs_hash_length(const struct cgs_hash* h);
+cgs_hashtab_length(const struct cgs_hashtab* h);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 const void*
-cgs_hash_lookup(const struct cgs_hash* h, const char* key)
+cgs_hashtab_lookup(const struct cgs_hashtab* h, const char* key)
 {
         size_t hashval = h->hash(key, h->size);
         for (const struct cgs_bucket* b = h->table[hashval]; b; b = b->next)
@@ -174,7 +174,7 @@ cgs_hash_lookup(const struct cgs_hash* h, const char* key)
 }
 
 struct cgs_variant*
-cgs_hash_get(struct cgs_hash* h, const char* key)
+cgs_hashtab_get(struct cgs_hashtab* h, const char* key)
 {
         size_t hashval = h->hash(key, h->size);
 
@@ -195,7 +195,7 @@ cgs_hash_get(struct cgs_hash* h, const char* key)
 }
 
 void
-cgs_hash_remove(struct cgs_hash* h, const char* key)
+cgs_hashtab_remove(struct cgs_hashtab* h, const char* key)
 {
         size_t hashval = h->hash(key, h->size);
         struct cgs_bucket* b = h->table[hashval];

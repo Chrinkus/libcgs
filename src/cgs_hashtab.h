@@ -1,4 +1,4 @@
-/* cgs_hash.h
+/* cgs_hashtab.h
  *
  * MIT License
  * 
@@ -61,7 +61,7 @@ cgs_string_hash(const void* key, size_t size);
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
- * struct cgs_hash
+ * struct cgs_hashtab
  *
  * A hash table implementation.
  *
@@ -73,7 +73,7 @@ cgs_string_hash(const void* key, size_t size);
  * @member max_load     The highest the ratio of length to size is allowed to
  *                      get to before re-hashing.
  */
-struct cgs_hash {
+struct cgs_hashtab {
         size_t length;
         struct cgs_bucket** table;
 
@@ -89,7 +89,7 @@ struct cgs_hash {
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
- * cgs_hash_new
+ * cgs_hashtab_new
  *
  * A function to allocate and initialize a new hash table.
  *
@@ -102,23 +102,23 @@ struct cgs_hash {
  *              failure.
  */
 void*
-cgs_hash_new(struct cgs_hash* tab);
+cgs_hashtab_new(struct cgs_hashtab* tab);
 
 /**
- * cgs_hash_free
+ * cgs_hashtab_free
  *
  * A function to de-allocate a hash table.
  *
  * @param h     A pointer to the hash table object to deallocate.
  */
 void
-cgs_hash_free(struct cgs_hash* h);
+cgs_hashtab_free(struct cgs_hashtab* h);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Inline Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 inline size_t
-cgs_hash_length(const struct cgs_hash* h)
+cgs_hashtab_length(const struct cgs_hashtab* h)
 {
         return h->length;
 }
@@ -128,7 +128,7 @@ cgs_hash_length(const struct cgs_hash* h)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
- * cgs_hash_lookup
+ * cgs_hashtab_lookup
  *
  * Searches the hash table for a given key and returns a read-only pointer to
  * the corresponding value if found.
@@ -140,10 +140,10 @@ cgs_hash_length(const struct cgs_hash* h)
  *              not found.
  */
 const void*
-cgs_hash_lookup(const struct cgs_hash* h, const char* key);
+cgs_hashtab_lookup(const struct cgs_hashtab* h, const char* key);
 
 /**
- * cgs_hash_get
+ * cgs_hashtab_get
  *
  * Searches the hash table for a given key. If not found, creates a
  * new bucket and adds it to the table. Returns a writable pointer to the
@@ -157,10 +157,10 @@ cgs_hash_lookup(const struct cgs_hash* h, const char* key);
  *              allocation error (bucket or key-dup).
  */
 struct cgs_variant*
-cgs_hash_get(struct cgs_hash* h, const char* key);
+cgs_hashtab_get(struct cgs_hashtab* h, const char* key);
 
 /**
- * cgs_hash_remove
+ * cgs_hashtab_remove
  *
  * Searches the hash table for a given key. If found, removes the bucket from
  * the table. No error is indicated if the key is not found.
@@ -169,4 +169,4 @@ cgs_hash_get(struct cgs_hash* h, const char* key);
  * @param key   The key of the value to remove.
  */
 void
-cgs_hash_remove(struct cgs_hash* h, const char* key);
+cgs_hashtab_remove(struct cgs_hashtab* h, const char* key);
