@@ -2,6 +2,9 @@
 
 #include "cgs_hashtab.h"
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * NHL Goal Scorer Data
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 struct goal_scorer {
         char* name;
         int goals;
@@ -38,6 +41,48 @@ goals_per_game(double goals, double games)
         return goals / games;
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Number Data
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+struct number {
+        char* word;
+        int n;
+};
+
+const struct number numdata[] = {
+        { .word = "one",                .n = 1 },
+        { .word = "two",                .n = 2 },
+        { .word = "three",              .n = 3 },
+        { .word = "four",               .n = 4 },
+        { .word = "five",               .n = 5 },
+        { .word = "six",                .n = 6 },
+        { .word = "seven",              .n = 7 },
+        { .word = "eight",              .n = 8 },
+        { .word = "nine",               .n = 9 },
+        { .word = "ten",                .n = 10 },
+        { .word = "eleven",             .n = 11 },
+        { .word = "twelve",             .n = 12 },
+        { .word = "thirteen",           .n = 13 },
+        { .word = "fourteen",           .n = 14 },
+        { .word = "fifteen",            .n = 15 },
+        { .word = "sixteen",            .n = 16 },
+        { .word = "seventeen",          .n = 17 },
+        { .word = "eighteen",           .n = 18 },
+        { .word = "nineteen",           .n = 19 },
+        { .word = "twenty",             .n = 20 },
+        { .word = "twenty-one",         .n = 21 },
+        { .word = "twenty-two",         .n = 22 },
+        { .word = "twenty-three",       .n = 23 },
+        { .word = "twenty-four",        .n = 24 },
+        { .word = "twenty-five",        .n = 25 },
+        { .word = "twenty-six",         .n = 26 },
+        { .word = "twenty-seven",       .n = 27 },
+};
+const size_t numdata_len = sizeof(numdata) / sizeof(numdata[0]);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Tests
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 static void
 hashtab_new_test(void** state)
 {
@@ -147,6 +192,50 @@ hashtab_remove_test(void** state)
         cgs_hashtab_free(&h);
 }
 
+static void
+hashtab_load_test(void** state)
+{
+        (void)state;
+
+        struct cgs_hashtab ht = { 0 };
+        cgs_hashtab_new(&ht);
+        assert_float_equal(cgs_hashtab_current_load(&ht), 0.0, 0.0);
+
+        size_t i = 0;           // bookmark index
+
+        const struct number* pn = &numdata[i];
+        struct cgs_variant* pv = cgs_hashtab_get(&ht, pn->word);
+        cgs_variant_set_int(pv, pn->n);
+        // load factor with 1 value: 1 / 31 = 0.032258
+        assert_float_equal(cgs_hashtab_current_load(&ht), 0.03, 0.01);
+
+        for ( ; i < 10; ++i) {
+                pn = &numdata[i];
+                pv = cgs_hashtab_get(&ht, pn->word);
+                cgs_variant_set_int(pv, pn->n);
+        }
+        // load factor with 10 values: 10 / 31 = 0.32258
+        assert_float_equal(cgs_hashtab_current_load(&ht), 0.322, 0.01);
+
+        for ( ; i < 24; ++i) {
+                pn = &numdata[i];
+                pv = cgs_hashtab_get(&ht, pn->word);
+                cgs_variant_set_int(pv, pn->n);
+        }
+        // load factor with 24 values: 24 / 31 = 0.77419
+        assert_float_equal(cgs_hashtab_current_load(&ht), 0.774, 0.01);
+
+        // adding a value should trigger re-hash
+        pn = &numdata[i++];
+        pv = cgs_hashtab_get(&ht, pn->word);
+        cgs_variant_set_int(pv, pn->n);
+        // hashtab size jumps from 31 to next prime after 31 * 2 => 67
+        // load factor with 25 elements: 25 / 67 = 0.37313
+        assert_float_equal(cgs_hashtab_current_load(&ht), 0.373, 0.01);
+
+        cgs_hashtab_free(&ht);
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Main
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
@@ -159,6 +248,7 @@ int main(void)
 		cmocka_unit_test(hashtab_get_success_test),
                 cmocka_unit_test(hashtab_get_lookup_test),
                 cmocka_unit_test(hashtab_remove_test),
+                cmocka_unit_test(hashtab_load_test),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

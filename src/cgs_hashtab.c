@@ -25,6 +25,7 @@
 #include "cgs_hashtab.h"
 #include "cgs_compare.h"
 #include "cgs_string_utils.h"
+#include "cgs_numeric.h"
 
 #include <stdlib.h>
 
@@ -48,9 +49,11 @@ cgs_string_hash(const void* key, size_t size)
  * Hash Table Private Types
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 enum hash_table_magic {
-        HASHTAB_NUM_BUCKETS = 31,
+        /* Moved to public header as CGS_HASHTAB_DEFAULT_SIZE
+         * HASHTAB_DEFAULT_SIZE = 31,
+         */
         HASHTAB_BUCKET_PSIZE = sizeof(struct cgs_bucket*),
-        HASHTAB_INITIAL_ALLOC = HASHTAB_NUM_BUCKETS * HASHTAB_BUCKET_PSIZE,
+        HASHTAB_INITIAL_ALLOC = CGS_HASHTAB_DEFAULT_SIZE * HASHTAB_BUCKET_PSIZE,
 };
 
 const double HASHTAB_DEFAULT_LOAD_FACTOR = 0.8;
@@ -116,6 +119,16 @@ cgs_bucket_free(struct cgs_bucket* b)
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Table Private Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+static void
+hashtab_check_load_factor(struct cgs_hashtab* ht)
+{
+        if (cgs_hashtab_current_load(ht) > ht->max_load)
+                cgs_hashtab_rehash(ht, 0);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Management Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 void*
@@ -125,14 +138,14 @@ cgs_hashtab_new(struct cgs_hashtab* tab)
         if (!ppb)
                 return NULL;
 
-        for (int i = 0; i < HASHTAB_NUM_BUCKETS; ++i)
+        for (int i = 0; i < CGS_HASHTAB_DEFAULT_SIZE; ++i)
                 ppb[i] = NULL;
 
         tab->length = 0;
         tab->table = ppb;
         tab->hash = cgs_string_hash;
         tab->cmp = cgs_str_cmp;
-        tab->size = HASHTAB_NUM_BUCKETS;
+        tab->size = CGS_HASHTAB_DEFAULT_SIZE;
         tab->max_load = HASHTAB_DEFAULT_LOAD_FACTOR;
 
         return tab;
@@ -152,11 +165,53 @@ cgs_hashtab_free(struct cgs_hashtab* tab)
         free(tab->table);
 }
 
+void*
+cgs_hashtab_rehash(struct cgs_hashtab* ht, size_t size)
+{
+        // Get new size or return if smaller
+        size_t new_size = 0;
+        if (size == 0)
+                new_size = cgs_next_prime(ht->size * 2);
+        else if (size > ht->size)
+                new_size = size;
+        else
+                return NULL;
+
+        // Allocate new table and set all buckets to NULL
+        struct cgs_bucket** new_tab = malloc(new_size * HASHTAB_BUCKET_PSIZE);
+        if (!new_tab)
+                return NULL;
+
+        for (size_t i = 0; i < new_size; ++i)
+                new_tab[i] = NULL;
+
+        // Rehash table
+        for (size_t i = 0; i < ht->size; ++i) {
+                struct cgs_bucket* bp = ht->table[i];
+                while (bp) {
+                        struct cgs_bucket* tmp = bp->next;
+                        size_t hash = cgs_string_hash(bp->key, new_size);
+                        bp->next = new_tab[hash];
+                        new_tab[hash] = bp;
+                        bp = tmp;
+                }
+        }
+
+        free(ht->table);
+        ht->table = new_tab;
+        ht->size = new_size;
+
+        return ht;
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Inline Function Symbols
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 size_t
 cgs_hashtab_length(const struct cgs_hashtab* h);
+
+double
+cgs_hashtab_current_load(const struct cgs_hashtab* h);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Operations
@@ -191,6 +246,9 @@ cgs_hashtab_get(struct cgs_hashtab* h, const char* key)
         b->next = p;            // works if p is NULL or a list!
         h->table[hashval] = b;
         ++h->length;
+
+        hashtab_check_load_factor(h);
+
         return &b->value;
 }
 

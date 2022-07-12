@@ -60,6 +60,10 @@ cgs_string_hash(const void* key, size_t size);
  * Hash Table Types
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
+enum {
+        CGS_HASHTAB_DEFAULT_SIZE = 31,
+};
+
 /**
  * struct cgs_hashtab
  *
@@ -114,6 +118,26 @@ cgs_hashtab_new(struct cgs_hashtab* tab);
 void
 cgs_hashtab_free(struct cgs_hashtab* h);
 
+/**
+ * cgs_hashtab_rehash
+ *
+ * Request a rehash of the table to the new size. The behaviour is dependent
+ * on the requested size:
+ *
+ * - A request of 0 will trigger a rehash attempt using a size equal the next
+ *   prime value that is larger than double the current size.
+ * - A request equal-to or smaller than the current size will not trigger
+ *   a rehash attempt.
+ * - A request greater than the current size will trigger a rehash attempt.
+ *
+ * @param ht    The hash table.
+ * @param size  The requested new size.
+ *
+ * @return      A pointer to the hash table if resized or NULL if not.
+ */
+void*
+cgs_hashtab_rehash(struct cgs_hashtab* ht, size_t size);
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Inline Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
@@ -121,6 +145,12 @@ inline size_t
 cgs_hashtab_length(const struct cgs_hashtab* h)
 {
         return h->length;
+}
+
+inline double
+cgs_hashtab_current_load(const struct cgs_hashtab* h)
+{
+        return (double)h->length / (double)h->size;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
