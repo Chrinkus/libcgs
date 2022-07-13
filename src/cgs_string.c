@@ -73,11 +73,24 @@ cgs_string_free(struct cgs_string* s)
 		free(s->data);
 }
 
+void*
+cgs_string_shrink(struct cgs_string* s)
+{
+        char* p = realloc(s->data, s->length + 1);
+        if (!p)
+                return NULL;
+
+        s->data = p;
+        s->capacity = s->length + 1;
+        return s;
+}
+
 char*
 cgs_string_xfer(struct cgs_string* s)
 {
 	char* p = s->data;
 	s->data = NULL;
+        s->capacity = 0;
 	return p;
 }
 
@@ -97,6 +110,16 @@ cgs_string_length(const struct cgs_string* s);
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * String Static Helper Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+/**
+ * cgs_string_new_capacity
+ *
+ * Calculate an appropriate new capacity for a string based off of the current
+ * capacity.
+ *
+ * @param old   The old capacity of a string.
+ *
+ * @return      A new capacity based off the old.
+ */
 static size_t
 cgs_string_new_capacity(size_t old)
 {
@@ -147,43 +170,42 @@ cgs_string_push(struct cgs_string* s, int c)
 	return s->data;
 }
 
-const char*
-cgs_string_prepend(struct cgs_string* s, const char* add, size_t len)
+struct cgs_string*
+cgs_string_prepend_str(struct cgs_string* s, const char* add, size_t len)
 {
         size_t new_len = s->length + len;
         if (new_len >= s->capacity - 1 && !cgs_string_grow_len(s, new_len))
                 return NULL;
 
-        /*
-        char* src = s->data;
-        memmove(src + len, src, s->length + 1);
-
-        for (size_t i = 0; i < len; ++i)
-                src[i] = add[i];
-        */
         cgs_strprepend(s->data, add, len);
 
         s->length = new_len;
-        return s->data;
+        return s;
 }
 
-const char*
-cgs_string_append(struct cgs_string* s, const char* add, size_t len)
+struct cgs_string*
+cgs_string_append_str(struct cgs_string* s, const char* add, size_t len)
 {
         size_t new_len = s->length + len;
         if (new_len >= s->capacity - 1 && !cgs_string_grow_len(s, new_len))
                 return NULL;
 
-        /*
-        char* p = s->data + s->length;
-        for (size_t i = 0; i < len; ++i)
-                *p++ = *add++;
-        *p = '\0';
-        */
         strncat(s->data, add, len);
 
         s->length = new_len;
-        return s->data;
+        return s;
+}
+
+struct cgs_string*
+cgs_string_prepend(struct cgs_string* s, const struct cgs_string* add)
+{
+        return cgs_string_prepend_str(s, add->data, add->length);
+}
+
+struct cgs_string*
+cgs_string_append(struct cgs_string* s, const struct cgs_string* add)
+{
+        return cgs_string_append_str(s, add->data, add->length);
 }
 
 void

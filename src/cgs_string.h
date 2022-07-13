@@ -77,6 +77,19 @@ void
 cgs_string_free(struct cgs_string* s);
 
 /**
+ * cgs_string_shrink
+ *
+ * Shrinks the allocation of a string to the smallest necessary size.
+ *
+ * @param s     The string struct to shrink.
+ *
+ * @return      A pointer to the string if shrink was successful, NULL on
+ *              failure.
+ */
+void*
+cgs_string_shrink(struct cgs_string* s);
+
+/**
  * cgs_string_xfer
  *
  * Release ownership of the inner string buffer.
@@ -157,32 +170,62 @@ const char*
 cgs_string_push(struct cgs_string* s, int c);
 
 /**
- * cgs_string_prepend
+ * cgs_string_prepend_str
  *
- * Insert a character string to the beginning of the string struct. May result
+ * Insert a standard C-string to the beginning of a string struct. May result
  * in a reallocation.
  *
  * @param s     The string to prepend to.
- * @param add   The string to add to the front of s.
- * @return	A read-only pointer to the inner string on success, NULL on
- * 		failure.
+ * @param add   The standard string to add to the front of s.
+ * @param len   The length of the add string.
+ *
+ * @return	A pointer back to s on success, NULL on failure.
  */
-const char*
-cgs_string_prepend(struct cgs_string* s, const char* add, size_t len);
+struct cgs_string*
+cgs_string_prepend_str(struct cgs_string* s, const char* add, size_t len);
 
 /**
- * cgs_string_append
+ * cgs_string_append_str
  *
- * Insert a character string to the end of the string struct. May result
- * in a reallocation.
+ * Insert a standard C-string to the end of a string struct. May result in a
+ * reallocation.
  *
  * @param s     The string to append to.
- * @param add   The string to add to the end of s.
- * @return	A read-only pointer to the inner string on success, NULL on
- * 		failure.
+ * @param add   The standard string to add to the end of s.
+ * @param len   The length of the add string.
+ *
+ * @return	A pointer back to s on success, NULL on failure.
  */
-const char*
-cgs_string_append(struct cgs_string* s, const char* add, size_t len);
+struct cgs_string*
+cgs_string_append_str(struct cgs_string* s, const char* add, size_t len);
+
+/**
+ * cgs_string_prepend
+ *
+ * Insert the contents of a string struct to the beginning of another string
+ * struct. May result in an reallocation.
+ *
+ * @param s     The string struct to add to.
+ * @param add   The string struct to add to the front of s.
+ *
+ * @return      A pointer back to s on success, NULL on failure.
+ */
+struct cgs_string*
+cgs_string_prepend(struct cgs_string* s, const struct cgs_string* add);
+
+/**
+ * cgs_string_prepend
+ *
+ * Insert the contents of a string struct to the end of another string struct.
+ * May result in an reallocation.
+ *
+ * @param s     The string struct to add to.
+ * @param add   The string struct to add to the end of s.
+ *
+ * @return      A pointer back to s on success, NULL on failure.
+ */
+struct cgs_string*
+cgs_string_append(struct cgs_string* s, const struct cgs_string* add);
 
 /**
  * cgs_string_clear

@@ -142,31 +142,41 @@ int string_prepend_test(void* data)
 {
         (void)data;
 
-        struct cgs_string s = { 0 };
-        cgs_string_new_from_string(&s, "Feature");
+        struct cgs_string s1 = { 0 };
+        cgs_string_new_from_string(&s1, "Feature");
 
-        const char* add = "Creature ";
-        assert(cgs_string_prepend(&s, add, strlen(add)) != NULL);
+        struct cgs_string s2 = { 0 };
+        cgs_string_new_from_string(&s2, "Creature ");
+        assert(cgs_string_prepend(&s1, &s2) != NULL);
 
-        assert(cgs_string_length(&s) == strlen("Creature Feature"));
-        assert(strcmp(cgs_string_data(&s), "Creature Feature") == 0);
+        assert(cgs_string_length(&s1) == strlen("Creature Feature"));
+        assert(strcmp(cgs_string_data(&s1), "Creature Feature") == 0);
 
-        cgs_string_free(&s);
+        assert(cgs_string_length(&s2) == strlen("Creature "));
+        assert(strcmp(cgs_string_data(&s2), "Creature ") == 0);
+
+        cgs_string_free(&s1);
+        cgs_string_free(&s2);
         return TEST_SUCCESS;
 }
 
 int string_append_test(void* data)
 {
         (void)data;
-        struct cgs_string s = { 0 };
-        cgs_string_new_from_string(&s, "Colorado");
+        struct cgs_string s1 = { 0 };
+        cgs_string_new_from_string(&s1, "Colorado");
 
-        const char* add = " Avalanche";
-        assert(cgs_string_append(&s, add, strlen(add)) != NULL);
-        assert(cgs_string_length(&s) == strlen("Colorado Avalanche"));
-        assert(strcmp(cgs_string_data(&s), "Colorado Avalanche") == 0);
+        struct cgs_string s2 = { 0 };
+        cgs_string_new_from_string(&s2, " Avalanche");
+        assert(cgs_string_append(&s1, &s2) != NULL);
+        assert(cgs_string_length(&s1) == strlen("Colorado Avalanche"));
+        assert(strcmp(cgs_string_data(&s1), "Colorado Avalanche") == 0);
 
-        cgs_string_free(&s);
+        assert(cgs_string_length(&s2) == strlen(" Avalanche"));
+        assert(strcmp(cgs_string_data(&s2), " Avalanche") == 0);
+
+        cgs_string_free(&s1);
+        cgs_string_free(&s2);
         return TEST_SUCCESS;
 }
 
