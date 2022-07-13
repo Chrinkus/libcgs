@@ -50,6 +50,7 @@ struct number {
 };
 
 const struct number numdata[] = {
+        { .word = "zero",               .n = 0 },
         { .word = "one",                .n = 1 },
         { .word = "two",                .n = 2 },
         { .word = "three",              .n = 3 },
@@ -193,45 +194,79 @@ hashtab_remove_test(void** state)
 }
 
 static void
-hashtab_load_test(void** state)
+hashtab_current_load_test(void** state)
 {
         (void)state;
 
-        struct cgs_hashtab ht = { 0 };
-        cgs_hashtab_new(&ht);
+        /* WARNING: This is not proper table usage. Instead of allocating and
+         * initializing an actual table I am just adjusting the length and
+         * size values to affect a "load".
+         */
+
+        // default size of hashtable is 31 elements
+        struct cgs_hashtab ht = { .length = 0, .size = 31 };
         assert_float_equal(cgs_hashtab_current_load(&ht), 0.0, 0.0);
 
-        size_t i = 0;           // bookmark index
-
-        const struct number* pn = &numdata[i];
-        struct cgs_variant* pv = cgs_hashtab_get(&ht, pn->word);
-        cgs_variant_set_int(pv, pn->n);
         // load factor with 1 value: 1 / 31 = 0.032258
+        ht.length = 1;
         assert_float_equal(cgs_hashtab_current_load(&ht), 0.03, 0.01);
 
-        for ( ; i < 10; ++i) {
-                pn = &numdata[i];
-                pv = cgs_hashtab_get(&ht, pn->word);
-                cgs_variant_set_int(pv, pn->n);
-        }
         // load factor with 10 values: 10 / 31 = 0.32258
+        ht.length = 10;
         assert_float_equal(cgs_hashtab_current_load(&ht), 0.322, 0.01);
 
+        // after a rehash size will change and affect load balance
+        // load factor with 10 values: 10 / 67 = 0.14925
+        ht.size = 67;
+        assert_float_equal(cgs_hashtab_current_load(&ht), 0.149, 0.01);
+}
+
+static void
+hashtab_rehash_test(void** state)
+{
+        (void)state;
+        struct cgs_hashtab ht = { 0 };
+        cgs_hashtab_new(&ht);
+
+        const struct number* pnum = NULL;       // ease of access
+        struct cgs_variant* pvar = NULL;        // used to insert elements
+        size_t i = 0;                           // bookmark
+
+        // load hash table up to default initial max-load
         for ( ; i < 24; ++i) {
-                pn = &numdata[i];
-                pv = cgs_hashtab_get(&ht, pn->word);
-                cgs_variant_set_int(pv, pn->n);
+                pnum = &numdata[i];
+                pvar = cgs_hashtab_get(&ht, pnum->word);
+                cgs_variant_set_int(pvar, pnum->n);
         }
+
         // load factor with 24 values: 24 / 31 = 0.77419
         assert_float_equal(cgs_hashtab_current_load(&ht), 0.774, 0.01);
 
-        // adding a value should trigger re-hash
-        pn = &numdata[i++];
-        pv = cgs_hashtab_get(&ht, pn->word);
-        cgs_variant_set_int(pv, pn->n);
-        // hashtab size jumps from 31 to next prime after 31 * 2 => 67
+        // add one more element, trigger rehash..
+        pnum = &numdata[i];
+        pvar = cgs_hashtab_get(&ht, pnum->word);
+        cgs_variant_set_int(pvar, pnum->n);
+        // ..hashtab size jumps from 31 to next prime after 31 * 2 => 67
         // load factor with 25 elements: 25 / 67 = 0.37313
         assert_float_equal(cgs_hashtab_current_load(&ht), 0.373, 0.01);
+
+        // prove values still in table
+        const int* pn = NULL;
+        pn = cgs_hashtab_lookup(&ht, "zero");
+        assert_non_null(pn);
+        assert_int_equal(*pn, 0);
+
+        pn = cgs_hashtab_lookup(&ht, "seven");
+        assert_non_null(pn);
+        assert_int_equal(*pn, 7);
+
+        pn = cgs_hashtab_lookup(&ht, "twenty-three");
+        assert_non_null(pn);
+        assert_int_equal(*pn, 23);
+
+        pn = cgs_hashtab_lookup(&ht, "twenty-four");
+        assert_non_null(pn);
+        assert_int_equal(*pn, 24);
 
         cgs_hashtab_free(&ht);
 }
@@ -248,7 +283,8 @@ int main(void)
 		cmocka_unit_test(hashtab_get_success_test),
                 cmocka_unit_test(hashtab_get_lookup_test),
                 cmocka_unit_test(hashtab_remove_test),
-                cmocka_unit_test(hashtab_load_test),
+                cmocka_unit_test(hashtab_current_load_test),
+                cmocka_unit_test(hashtab_rehash_test),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
