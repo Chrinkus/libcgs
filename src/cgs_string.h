@@ -54,7 +54,7 @@ void*
 cgs_string_new(struct cgs_string* s);
 
 /**
- * cgs_string_new_from_string
+ * cgs_string_new_from_str
  *
  * Create a new string by copying the contents of a standard string.
  *
@@ -64,7 +64,7 @@ cgs_string_new(struct cgs_string* s);
  * @return      A valid pointer on successful allocation or NULL on failure.
  */
 void*
-cgs_string_new_from_string(struct cgs_string* s, const char* src);
+cgs_string_new_from_str(struct cgs_string* s, const char* src);
 
 /**
  * cgs_string_free
@@ -148,6 +148,24 @@ inline size_t
 cgs_string_length(const struct cgs_string* s)
 {
         return s->length;
+}
+
+inline const char*
+cgs_string_get(const struct cgs_string* s, size_t i)
+{
+        return &s->data[i];
+}
+
+inline char*
+cgs_string_get_mutable(struct cgs_string* s, size_t i)
+{
+        return &s->data[i];
+}
+
+inline char
+cgs_string_char(const struct cgs_string* s, size_t i)
+{
+        return s->data[i];
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

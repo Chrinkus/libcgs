@@ -51,7 +51,7 @@ cgs_string_new(struct cgs_string* s)
 }
 
 void*
-cgs_string_new_from_string(struct cgs_string* s, const char* src)
+cgs_string_new_from_str(struct cgs_string* s, const char* src)
 {
         int len = strlen(src);
         char* p = malloc(len + 1);
@@ -106,6 +106,15 @@ cgs_string_data_mutable(struct cgs_string* s);
 
 size_t
 cgs_string_length(const struct cgs_string* s);
+
+const char*
+cgs_string_get(const struct cgs_string* s, size_t i);
+
+char*
+cgs_string_get_mutable(struct cgs_string* s, size_t i);
+
+char
+cgs_string_char(const struct cgs_string* s, size_t i);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * String Static Helper Functions

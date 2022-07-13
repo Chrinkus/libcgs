@@ -18,12 +18,12 @@ int string_new_test(void* data)
 	return TEST_SUCCESS;
 }
 
-int string_new_from_string_test(void* data)
+int string_new_from_str_test(void* data)
 {
 	const char* test = (const char*)data;
 
         struct cgs_string s = { 0 };
-        assert(cgs_string_new_from_string(&s, test) != NULL);
+        assert(cgs_string_new_from_str(&s, test) != NULL);
 
 	assert(cgs_string_length(&s) == strlen(test));
 	assert(strcmp(cgs_string_data(&s), test) == 0);
@@ -42,7 +42,7 @@ int string_xfer_test(void* data)
 	const char* test = (const char*)data;
 
         struct cgs_string s = { 0 };
-        cgs_string_new_from_string(&s, test);
+        cgs_string_new_from_str(&s, test);
 
 	char* p = cgs_string_xfer(&s);
 
@@ -79,7 +79,7 @@ int string_clear_test(void* data)
 	(void)data;
 
         struct cgs_string s = { 0 };
-	cgs_string_new_from_string(&s, "Howdy");
+	cgs_string_new_from_str(&s, "Howdy");
 
 	cgs_string_clear(&s);
 
@@ -103,7 +103,7 @@ int string_erase_test(void* data)
 	(void)data;
 
         struct cgs_string s = { 0 };
-	cgs_string_new_from_string(&s, "Howdy");
+	cgs_string_new_from_str(&s, "Howdy");
 
 	cgs_string_erase(&s);
 
@@ -127,7 +127,7 @@ int string_sort_test(void* data)
 	(void)data;
 
         struct cgs_string s = { 0 };
-	cgs_string_new_from_string(&s, "abcdabcdabcd");
+	cgs_string_new_from_str(&s, "abcdabcdabcd");
 
 	cgs_string_sort(&s);
 
@@ -143,10 +143,10 @@ int string_prepend_test(void* data)
         (void)data;
 
         struct cgs_string s1 = { 0 };
-        cgs_string_new_from_string(&s1, "Feature");
+        cgs_string_new_from_str(&s1, "Feature");
 
         struct cgs_string s2 = { 0 };
-        cgs_string_new_from_string(&s2, "Creature ");
+        cgs_string_new_from_str(&s2, "Creature ");
         assert(cgs_string_prepend(&s1, &s2) != NULL);
 
         assert(cgs_string_length(&s1) == strlen("Creature Feature"));
@@ -164,10 +164,10 @@ int string_append_test(void* data)
 {
         (void)data;
         struct cgs_string s1 = { 0 };
-        cgs_string_new_from_string(&s1, "Colorado");
+        cgs_string_new_from_str(&s1, "Colorado");
 
         struct cgs_string s2 = { 0 };
-        cgs_string_new_from_string(&s2, " Avalanche");
+        cgs_string_new_from_str(&s2, " Avalanche");
         assert(cgs_string_append(&s1, &s2) != NULL);
         assert(cgs_string_length(&s1) == strlen("Colorado Avalanche"));
         assert(strcmp(cgs_string_data(&s1), "Colorado Avalanche") == 0);
@@ -188,7 +188,7 @@ int main(void)
 		{ "string_push", string_push_test, NULL },
 		{ "string_clear", string_clear_test, NULL },
 		{ "string_erase", string_erase_test, NULL },
-		{ "string_new_from_string", string_new_from_string_test,
+		{ "string_new_from_str", string_new_from_str_test,
 			"Super test string" },
 		{ "string_sort", string_sort_test, NULL },
 		{ "string_prepend", string_prepend_test, NULL },
