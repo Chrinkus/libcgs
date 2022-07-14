@@ -25,6 +25,7 @@ struct cgs_string {
 |`cgs_string_data`|Provides read-only access to the inner data through a `const char*`.|
 |`cgs_string_data_mutable`|Provides writable access to the inner data through a `char*`.|
 |`cgs_string_get`|Gets a read-only pointer to an index within the string. No bounds checking.|
+|`cgs_string_get_mutable`|Gets a writable pointer to an index within the string. No bounds checking.|
 |`cgs_string_char`|Gets the character at an index within a string. No bounds checking.|
 |`cgs_string_push`|Append a character to a string.|
 |`cgs_string_prepend`|Insert the contents of a dynamic string to the front of another.|
@@ -35,7 +36,7 @@ struct cgs_string {
 |`cgs_string_erase`|Reset a string to empty and set length to 0. All previous string characters are overwritten with '\0'. Allocated memory capacity is unchanged.|
 |`cgs_string_sort`|Sorts the characters of the string in-place.|
 
-### A Word About Regular C-Strings
+#### A Word About Regular C-Strings
 
 I actually like C-strings. Whether we're talking `char*` or `char[]` I prefer to use the standard strings whenever I can. However, there are times when I'm assembling a string from unknown input one character at a time or by concatenating several strings together. This dynamic string implementation is meant to aid in those circumstances by handling all of the allocation and growth management.
 
@@ -54,7 +55,7 @@ cgs_string_new(&s);
 cgs_string_free(&s);
 ```
 
-Strings can also be initialized from another regular string with `cgs_string_new_from_str`: 
+Strings can also be initialized from a standard string with `cgs_string_new_from_str`: 
 
 ```C
 struct cgs_string s = { 0 };
@@ -92,16 +93,16 @@ Strings can be combined using the `cgs_string_append` and `cgs_string_prepend` g
 
 ```C
 struct cgs_string s1 = { 0 };
-cgs_string_new_from_str(&s1, "Peanut butter");
+cgs_string_new_from_str(&s1, "Peanut butter and");
 struct cgs_string s2 = { 0 };
-cgs_string_new_from_str(&s2, " and jelly");
+cgs_string_new_from_str(&s2, " jelly");
 
 cgs_string_append(&s1, &s2);	// s1 == "Peanut butter and jelly"
 
 struct cgs_string s3 = { 0 };
-cgs_string_new_from_str(&s3, "Jam");
+cgs_string_new_from_str(&s3, "I don't think you're ready for this");
 
-cgs_string_prepend(&s2, &s3);	// s2 == "Jam and jelly"
+cgs_string_prepend(&s2, &s3);   // !!
 ```
 
 These functions can take standard strings as their second argument by calling them with a `_str` suffix. Here both are used to construct a quote from K&R:
@@ -138,3 +139,39 @@ const char* p = cgs_string_data(&s);	// p[0] == 'R', p[1] == 'e', etc
 ```
 
 In the cases of `_get` and `_data` we are accessing the characters through the const-by-default interface. For modifiable equivalents use `cgs_string_get_mutable` and `cgs_string_data_mutable`.
+
+## Load Up and Transfer
+
+As mentioned earlier, an intended use for this dynamic string is to build up a long string of unknown content then transfer ownership out and use it like a standard allocated string:
+
+```C
+struct cgs_string s = { 0 };
+cgs_string_new(&s);
+
+/*
+ * build string from input or assemble with append and prepend
+ */
+
+char* p = cgs_string_xfer(&s);
+
+/*
+ * use string as you normally would
+ */
+
+free(p);        // all good!
+```
+
+Two additional points when transferring:
+- The data and capacity of the string struct are set to NULL and 0 but length is still available with `cgs_string_length`.
+- The memory footprint of the string is most likely larger than its length due to reallocation growth. If necessary, you can call `cgs_string_shrink` before the transfer to reallocate down to length + 1.
+
+## Example Program
+
+An example of the more common uses of the cgs_string struct can be found in the file `string_example.c`.
+
+Compilation and test (static library install):
+
+```
+$ gcc string_example.c -lcgs
+$ echo "libcgs" | ./a.out
+```

@@ -150,18 +150,48 @@ cgs_string_length(const struct cgs_string* s)
         return s->length;
 }
 
+/**
+ * cgs_string_get
+ *
+ * Get a read-only pointer to a given index in the string.
+ *
+ * @param s     The string struct.
+ * @param i     The index of the pointer to get.
+ *
+ * @return      A read-only pointer to the character at the given index.
+ */
 inline const char*
 cgs_string_get(const struct cgs_string* s, size_t i)
 {
         return &s->data[i];
 }
 
+/**
+ * cgs_string_get_mutable
+ *
+ * Get a writable pointer to a given index in the string.
+ *
+ * @param s     The string struct.
+ * @param i     The index of the pointer to get.
+ *
+ * @return      A writable pointer to the character at the given index.
+ */
 inline char*
 cgs_string_get_mutable(struct cgs_string* s, size_t i)
 {
         return &s->data[i];
 }
 
+/**
+ * cgs_string_char
+ *
+ * Get the character at a given index in the string.
+ *
+ * @param s     The string struct.
+ * @param i     The index of the character to get.
+ *
+ * @return      The character at the given index.
+ */
 inline char
 cgs_string_char(const struct cgs_string* s, size_t i)
 {
