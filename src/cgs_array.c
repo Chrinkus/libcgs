@@ -88,6 +88,22 @@ cgs_array_new(struct cgs_array* a, size_t size)
 }
 
 void*
+cgs_array_copy(struct cgs_array* dst, const struct cgs_array* src)
+{
+        char* p = malloc(src->length * src->element_size);
+        if (!p)
+                return NULL;
+
+        memcpy(p, src->data, src->length * src->element_size);
+        dst->length = src->length;
+        dst->capacity = src->capacity;
+        dst->element_size = src->element_size;
+        dst->data = p;
+
+        return dst;
+}
+
+void*
 cgs_array_new_from_array(struct cgs_array* a, size_t size,
                 const void* src, size_t len)
 {

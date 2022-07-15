@@ -184,6 +184,38 @@ static void array_xfer_test(void** state)
 	free(out);
 }
 
+static void array_copy_test(void** state)
+{
+	const int* ints = *(const int**)state;
+
+        struct cgs_array a1 = { 0 };
+        cgs_array_new(&a1, sizeof(int));
+
+	for (int i = 0; i < NUM_RANDOMS; ++i)
+		cgs_array_push(&a1, &ints[i]);
+
+        struct cgs_array a2 = { 0 };
+        assert_non_null(cgs_array_copy(&a2, &a1));
+        assert_int_not_equal(a2.length, 0);
+        assert_int_not_equal(a2.capacity, 0);
+        assert_int_not_equal(a2.element_size, 0);
+        assert_non_null(a2.data);
+
+        assert_int_equal(a2.length, a1.length);
+        assert_int_equal(a2.capacity, a1.capacity);
+        assert_int_equal(a2.element_size, a1.element_size);
+        assert_ptr_not_equal(a2.data, a1.data);
+
+        for (size_t i = 0; i < cgs_array_length(&a1); ++i) {
+                const int* p1 = cgs_array_get(&a1, i);
+                const int* p2 = cgs_array_get(&a2, i);
+                assert_int_equal(*p1, *p2);
+        }
+
+        cgs_array_free(&a1);
+        cgs_array_free(&a2);
+}
+
 static void array_new_from_array_test(void** state)
 {
 	const int* ints = *(const int**)state;
@@ -331,6 +363,7 @@ int main(void)
 		cmocka_unit_test(array_sort_test),
 		cmocka_unit_test(array_find_test),
 		cmocka_unit_test(array_xfer_test),
+		cmocka_unit_test(array_copy_test),
 		cmocka_unit_test(array_new_from_array_test),
 		cmocka_unit_test_setup_teardown(array_iter_test, setup_iota,
 				teardown_ptr),

@@ -66,6 +66,20 @@ void*
 cgs_array_new(struct cgs_array* a, size_t size);
 
 /**
+ * cgs_array_copy
+ *
+ * Copy an existing array into a new one. The 'dst' array should not own any
+ * allocated memory.
+ *
+ * @param dst   The destination cgs_array to copy to.
+ * @param src   The source cgs_array to copy from.
+ *
+ * @return      A pointer to the 'dst' array on success, NULL on failure.
+ */
+void*
+cgs_array_copy(struct cgs_array* dst, const struct cgs_array* src);
+
+/**
  * cgs_array_new_from_array
  *
  * Allocates a new array and fills it with the elements in src.
