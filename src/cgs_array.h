@@ -268,6 +268,30 @@ cgs_array_end(const struct cgs_array* a)
 void*
 cgs_array_push(struct cgs_array* a, const void* src);
 
+/**
+ * cgs_array_remove
+ *
+ * Remove an element at the given index in an array. Preserves order. No
+ * bounds checking.
+ *
+ * @param a     The array.
+ * @param i     The index of the element in the array to remove.
+ */
+void
+cgs_array_remove(struct cgs_array* a, size_t i);
+
+/**
+ * cgs_array_remove_fast
+ *
+ * Remove an element at the given index in an array. Affects order by moving
+ * last element to given index. No bounds checking.
+ *
+ * @param a     The array.
+ * @param i     The index of the element in the array to remove.
+ */
+void
+cgs_array_remove_fast(struct cgs_array* a, size_t i);
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Array Standard Algorithms
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 

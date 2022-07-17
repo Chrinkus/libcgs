@@ -188,6 +188,24 @@ cgs_array_push(struct cgs_array* a, const void* src)
 	return dst;
 }
 
+void
+cgs_array_remove(struct cgs_array* a, size_t i)
+{
+        const size_t sz = a->element_size;
+
+        --a->length;
+        memmove(&a->data[i * sz], &a->data[(i+1) * sz], (a->length - i) * sz);
+}
+
+void
+cgs_array_remove_fast(struct cgs_array* a, size_t i)
+{
+        const size_t sz = a->element_size;
+
+        --a->length;
+        memcpy(&a->data[i * sz], &a->data[a->length * sz], sz);
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Array Standard Algorithms
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 

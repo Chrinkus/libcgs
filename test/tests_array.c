@@ -120,6 +120,74 @@ static void array_push_test(void** state)
 	cgs_array_free(&ai);
 }
 
+static void array_remove_test(void** state)
+{
+        (void)state;
+
+        struct cgs_array a = { 0 };
+        cgs_array_new(&a, sizeof(int));
+
+        for (int i = 1; i <= 10; ++i)
+                cgs_array_push(&a, &i);
+
+        assert_int_equal(cgs_array_length(&a), 10);
+
+        const int* pi = cgs_array_get(&a, 5);
+        assert_int_equal(*pi, 6);
+
+        cgs_array_remove(&a, 5);
+        assert_int_equal(cgs_array_length(&a), 9);
+        pi = cgs_array_get(&a, 5);
+        assert_int_equal(*pi, 7);
+
+        cgs_array_remove(&a, 0);
+        assert_int_equal(cgs_array_length(&a), 8);
+        pi = cgs_array_get(&a, 5);
+        assert_int_equal(*pi, 8);
+        pi = cgs_array_get(&a, 0);
+        assert_int_equal(*pi, 2);
+
+        cgs_array_remove(&a, 7);
+        assert_int_equal(cgs_array_length(&a), 7);
+        pi = cgs_array_get(&a, 5);
+        assert_int_equal(*pi, 8);
+
+        cgs_array_free(&a);
+}
+
+static void array_remove_fast_test(void** state)
+{
+        (void)state;
+
+        struct cgs_array a = { 0 };
+        cgs_array_new(&a, sizeof(int));
+
+        for (int i = 1; i <= 10; ++i)
+                cgs_array_push(&a, &i);
+
+        assert_int_equal(cgs_array_length(&a), 10);
+
+        const int* pi = cgs_array_get(&a, 4);
+        assert_int_equal(*pi, 5);
+
+        cgs_array_remove_fast(&a, 4);
+        assert_int_equal(cgs_array_length(&a), 9);
+        pi = cgs_array_get(&a, 4);
+        assert_int_equal(*pi, 10);
+
+        cgs_array_remove_fast(&a, 4);
+        assert_int_equal(cgs_array_length(&a), 8);
+        pi = cgs_array_get(&a, 4);
+        assert_int_equal(*pi, 9);
+
+        cgs_array_remove_fast(&a, 7);
+        assert_int_equal(cgs_array_length(&a), 7);
+        pi = cgs_array_get(&a, 4);
+        assert_int_equal(*pi, 9);
+
+        cgs_array_free(&a);
+}
+
 static void array_sort_test(void** state)
 {
 	const int* ints = *(const int**)state;
@@ -360,6 +428,8 @@ int main(void)
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(array_new_test),
 		cmocka_unit_test(array_push_test),
+		cmocka_unit_test(array_remove_test),
+		cmocka_unit_test(array_remove_fast_test),
 		cmocka_unit_test(array_sort_test),
 		cmocka_unit_test(array_find_test),
 		cmocka_unit_test(array_xfer_test),
