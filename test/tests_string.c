@@ -180,6 +180,21 @@ int string_append_test(void* data)
         return TEST_SUCCESS;
 }
 
+int string_end_test(void* data)
+{
+        (void)data;
+
+        struct cgs_string s1 = { 0 };
+        cgs_string_new_from_str(&s1, "Hello World");
+
+        const char* p = cgs_string_end(&s1);
+        assert(*p == 'd');
+
+        cgs_string_free(&s1);
+
+        return TEST_SUCCESS;
+}
+
 int main(void)
 {
 	struct test tests[] = {
@@ -193,6 +208,7 @@ int main(void)
 		{ "string_sort", string_sort_test, NULL },
 		{ "string_prepend", string_prepend_test, NULL },
 		{ "string_append", string_append_test, NULL },
+		{ "string_end", string_end_test, NULL },
 	};
 
 	return cgs_run_tests(tests);

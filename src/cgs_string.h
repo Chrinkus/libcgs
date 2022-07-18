@@ -198,6 +198,21 @@ cgs_string_char(const struct cgs_string* s, size_t i)
         return s->data[i];
 }
 
+/**
+ * cgs_string_end
+ *
+ * Get a read-only pointer to the last character in the string.
+ *
+ * @param s     The string.
+ *
+ * @return      A read-only pointer to the last character in the string.
+ */
+inline const char*
+cgs_string_end(const struct cgs_string* s)
+{
+        return &s->data[s->length - 1];
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * String Standard Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 

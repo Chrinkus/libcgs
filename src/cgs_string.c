@@ -116,6 +116,9 @@ cgs_string_get_mutable(struct cgs_string* s, size_t i);
 char
 cgs_string_char(const struct cgs_string* s, size_t i);
 
+const char*
+cgs_string_end(const struct cgs_string* s);
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * String Static Helper Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
