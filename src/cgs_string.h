@@ -201,16 +201,67 @@ cgs_string_char(const struct cgs_string* s, size_t i)
 /**
  * cgs_string_end
  *
- * Get a read-only pointer to the last character in the string.
+ * Get a read-only pointer to the character past the last character in the
+ * string. Should be a null byte '\0'.
  *
  * @param s     The string.
  *
- * @return      A read-only pointer to the last character in the string.
+ * @return      A read-only pointer to the character past the last character
+ *              in the string.
  */
 inline const char*
 cgs_string_end(const struct cgs_string* s)
 {
-        return &s->data[s->length - 1];
+        return &s->data[s->length];
+}
+
+/**
+ * cgs_string_end_mutable
+ *
+ * Get a writable pointer to the character past the last character in the
+ * string. Should be a null byte '\0'.
+ *
+ * @param s     The string.
+ *
+ * @return      A writable pointer to the character past the last character
+ *              in the string.
+ */
+inline char*
+cgs_string_end_mutable(struct cgs_string* s)
+{
+        return &s->data[s->length];
+}
+
+/**
+ * cgs_string_begin
+ *
+ * Get a read-only pointer to the first character in the string. Identical to
+ * `cgs_string_data`. Added for symmetry with `cgs_string_end`.
+ *
+ * @param s     The string.
+ *
+ * @return      A read-only pointer to the first character in the string.
+ */
+inline const char*
+cgs_string_begin(const struct cgs_string* s)
+{
+        return s->data;
+}
+
+/**
+ * cgs_string_begin_mutable
+ *
+ * Get a writable pointer to the first character in the string. Identical to
+ * `cgs_string_data_mutable`. Added for symmetry with `cgs_string_end_mutable`.
+ *
+ * @param s     The string.
+ *
+ * @return      A writable pointer to the first character in the string.
+ */
+inline char*
+cgs_string_begin_mutable(struct cgs_string* s)
+{
+        return s->data;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

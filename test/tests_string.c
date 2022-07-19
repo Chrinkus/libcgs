@@ -188,7 +188,11 @@ int string_end_test(void* data)
         cgs_string_new_from_str(&s1, "Hello World");
 
         const char* p = cgs_string_end(&s1);
+        assert(*p == '\0');
+        --p;
         assert(*p == 'd');
+        --p;
+        assert(*p == 'l');
 
         cgs_string_free(&s1);
 
