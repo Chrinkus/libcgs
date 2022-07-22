@@ -48,6 +48,16 @@ cgs_error_print(const char* format, va_list ap)
         fflush(stderr);
 }
 
+void
+cgs_error_msg(const char* format, ...)
+{
+        va_list ap;
+
+        va_start(ap, format);
+        cgs_error_print(format, ap);
+        va_end(ap);
+}
+
 int
 cgs_error_retfail(const char* format, ...)
 {

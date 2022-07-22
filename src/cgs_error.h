@@ -25,6 +25,17 @@
 #pragma once
 
 /**
+ * cgs_error_msg
+ *
+ * Prints an error message to stderr.
+ *
+ * @param format        Printf-style format string.
+ * @param ...           Additional arguments to format string.
+ */
+void
+cgs_error_msg(const char* format, ...);
+
+/**
  * cgs_error_retfail
  *
  * Prints the error message to stderr and returns EXIT_FAILURE.
