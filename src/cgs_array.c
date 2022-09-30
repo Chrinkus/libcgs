@@ -172,6 +172,9 @@ cgs_array_begin(const struct cgs_array* a);
 const void*
 cgs_array_end(const struct cgs_array* a);
 
+void
+cgs_array_clear(struct cgs_array* a);
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Array Standard Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 

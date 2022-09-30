@@ -250,6 +250,24 @@ cgs_array_end(const struct cgs_array* a)
 	return a->data + a->length * a->element_size;
 }
 
+/**
+ * cgs_array_clear
+ *
+ * Prepare an existing array for re-use by setting length to zero. Does not
+ * deallocate memory.
+ *
+ * **SECURITY WARNING**
+ * - Does not erase the old contents of the array!
+ * - To completely erase the old contents of the array call cgs_array_erase.
+ *
+ * @param a     The array.
+ */
+inline void
+cgs_array_clear(struct cgs_array* a)
+{
+        a->length = 0;
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Array Standard Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 

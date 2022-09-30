@@ -188,6 +188,30 @@ static void array_remove_fast_test(void** state)
         cgs_array_free(&a);
 }
 
+static void array_clear_test(void** state)
+{
+        (void)state;
+
+        struct cgs_array ai = { 0 };
+        cgs_array_new(&ai, sizeof(int));
+        
+        for (int i = 1; i <= 10; ++i)
+                cgs_array_push(&ai, &i);
+
+        const int* data1 = cgs_array_data(&ai);
+        size_t cap1 = ai.capacity;
+
+        assert_int_equal(cgs_array_length(&ai), 10);
+        cgs_array_clear(&ai);
+        assert_int_equal(cgs_array_length(&ai), 0);
+
+        const int* data2 = cgs_array_data(&ai);
+        size_t cap2 = ai.capacity;
+
+        assert_ptr_equal(data1, data2);
+        assert_int_equal(cap1, cap2);
+}
+
 static void array_sort_test(void** state)
 {
 	const int* ints = *(const int**)state;
@@ -430,6 +454,7 @@ int main(void)
 		cmocka_unit_test(array_push_test),
 		cmocka_unit_test(array_remove_test),
 		cmocka_unit_test(array_remove_fast_test),
+                cmocka_unit_test(array_clear_test),
 		cmocka_unit_test(array_sort_test),
 		cmocka_unit_test(array_find_test),
 		cmocka_unit_test(array_xfer_test),
