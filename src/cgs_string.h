@@ -27,7 +27,7 @@
 #include <stddef.h>	/* size_t */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * String Types
+ * String Type
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 struct cgs_string {
@@ -377,4 +377,30 @@ cgs_string_erase(struct cgs_string* s);
  */
 void
 cgs_string_sort(struct cgs_string* s);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Strsub Type
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+struct cgs_strsub {
+        const char* data;
+        size_t length;
+};
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Strsub Management
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+inline struct cgs_strsub
+cgs_strsub_new(const char* s, size_t len)
+{
+        return (struct cgs_strsub){ .data = s, .length = len };
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Strsub Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+int
+cgs_strsub_cmp(const void* a, const void* b);
 

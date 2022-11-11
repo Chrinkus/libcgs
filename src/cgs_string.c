@@ -250,3 +250,33 @@ cgs_string_sort(struct cgs_string* s)
 	qsort(s->data, s->length, sizeof(char), cgs_char_cmp);
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Strsub Inline Symbols
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+struct cgs_strsub
+cgs_strsub_new(const char* s, size_t len);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Strsub Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+int
+cgs_strsub_cmp(const void* a, const void* b)
+{
+        const struct cgs_strsub* ss1 = a;
+        const struct cgs_strsub* ss2 = b;
+
+        // same length --> memcmp
+        if (ss1->length == ss2->length) {
+                return memcmp(ss1->data, ss2->data, ss1->length);
+        }
+
+        // diff lengths --> memcmp up to shortest length,
+        // shortest strsub is less if both are equal.
+        if (ss1->length < ss2->length) {
+                return memcmp(ss1->data, ss2->data, ss1->length) <= 0 ? -1 : 1;
+        } else {
+                return memcmp(ss1->data, ss2->data, ss2->length) >= 0 ? 1 : -1;
+        }
+}
