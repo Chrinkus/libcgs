@@ -273,10 +273,36 @@ cgs_strsub_cmp(const void* a, const void* b)
         }
 
         // diff lengths --> memcmp up to shortest length,
-        // shortest strsub is less if both are equal.
+        // shorter strsub is less if both are equal.
         if (ss1->length < ss2->length) {
                 return memcmp(ss1->data, ss2->data, ss1->length) <= 0 ? -1 : 1;
         } else {
                 return memcmp(ss1->data, ss2->data, ss2->length) >= 0 ? 1 : -1;
         }
+}
+
+char*
+cgs_strsub_to_str(const struct cgs_strsub* ss)
+{
+        char* p = malloc(ss->length + 1);
+        if (!p)
+                return NULL;
+
+        strncpy(p, ss->data, ss->length);
+        p[ss->length] = '\0';
+        return p;
+}
+
+void*
+cgs_strsub_to_string(const struct cgs_strsub* ss, struct cgs_string* dst)
+{
+        char* p = cgs_strsub_to_str(ss);
+        if (!p)
+                return NULL;
+
+        dst->data = p;
+        dst->length = ss->length;
+        dst->capacity = ss->length + 1;
+
+        return dst;
 }

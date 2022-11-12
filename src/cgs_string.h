@@ -404,3 +404,8 @@ cgs_strsub_new(const char* s, size_t len)
 int
 cgs_strsub_cmp(const void* a, const void* b);
 
+char*
+cgs_strsub_to_str(const struct cgs_strsub* ss);
+
+void*
+cgs_strsub_to_string(const struct cgs_strsub* ss, struct cgs_string* dst);
