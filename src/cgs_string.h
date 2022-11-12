@@ -30,6 +30,16 @@
  * String Type
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
+/**
+ * struct cgs_string
+ *
+ * A dynamic string.
+ *
+ * @member length       The number of characters in the string.
+ * @member capacity     The number of characters that the string has room for
+ *                      plus 1 for the terminating '\0'.
+ * @member data         A pointer to the allocation.
+ */
 struct cgs_string {
         size_t length;
         size_t capacity;
@@ -382,6 +392,17 @@ cgs_string_sort(struct cgs_string* s);
  * Strsub Type
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
+/**
+ * struct cgs_strsub
+ *
+ * A read-only sub-string view into another string.
+ *
+ * WARNING: Does not own the target string, any changes to the target string
+ * may invalidate the data pointer.
+ *
+ * @member data         A pointer to the start of the sub-string.
+ * @member length       The number of characters in the sub-string.
+ */
 struct cgs_strsub {
         const char* data;
         size_t length;
@@ -391,6 +412,17 @@ struct cgs_strsub {
  * Strsub Management
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
+/**
+ * cgs_strsub_new
+ *
+ * Creates a new sub-string using the pointer and length given.
+ *
+ * @param s     A pointer into a string that will be the start of the
+ *              sub-string.
+ * @param len   The length of the sub-string.
+ *
+ * @return      A sub-string object.
+ */
 inline struct cgs_strsub
 cgs_strsub_new(const char* s, size_t len)
 {
@@ -401,11 +433,41 @@ cgs_strsub_new(const char* s, size_t len)
  * Strsub Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
+/**
+ * cgs_strsub_cmp
+ *
+ * A three-way comparison function for cgs_strsub's.
+ *
+ * @param a     A pointer to the target strsub.
+ * @param b     A pointer to the compare strsub.
+ *
+ * @return      An integer indicating equality(0), lesser(<0) or greater(>0).
+ */
 int
 cgs_strsub_cmp(const void* a, const void* b);
 
+/**
+ * cgs_strsub_to_str
+ *
+ * Allocate a duplicate of the provided sub-string.
+ *
+ * @param ss    The sub-string to duplicate.
+ *
+ * @return      An allocated copy of the sub-string on success, NULL on
+ *              failure. Caller is responsible for freeing.
+ */
 char*
 cgs_strsub_to_str(const struct cgs_strsub* ss);
 
+/**
+ * cgs_strsub_to_string
+ *
+ * Duplicate a sub-string in the provided cgs_string.
+ *
+ * @param ss    The sub-string to duplicate.
+ * @param dst   The cgs_string struct to duplicate into.
+ *
+ * @return      A pointer back to 'dst' on success, NULL on failure.
+ */
 void*
 cgs_strsub_to_string(const struct cgs_strsub* ss, struct cgs_string* dst);
