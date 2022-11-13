@@ -281,6 +281,13 @@ cgs_strsub_cmp(const void* a, const void* b)
         }
 }
 
+int
+cgs_strsub_eq_str(const struct cgs_strsub* ss, const char* s)
+{
+        return strlen(s) == ss->length
+                && strncmp(ss->data, s, ss->length) == 0;
+}
+
 char*
 cgs_strsub_to_str(const struct cgs_strsub* ss)
 {
@@ -305,4 +312,27 @@ cgs_strsub_to_string(const struct cgs_strsub* ss, struct cgs_string* dst)
         dst->capacity = ss->length + 1;
 
         return dst;
+}
+
+void*
+cgs_str_split(const char* s, char delim, struct cgs_array* arr)
+{
+        if (arr->element_size != sizeof(struct cgs_strsub))
+                return NULL;
+
+        for (const char* p = s; ; ++s, p = s) {
+                size_t count = 0;
+                while (*s && *s != delim) {
+                        ++s;
+                        ++count;
+                }
+                if (count != 0) {
+                        struct cgs_strsub ss = cgs_strsub_new(p, count);
+                        if (!cgs_array_push(arr, &ss))
+                                return NULL;
+                }
+                if (!*s)
+                        break;
+        }
+        return arr;
 }

@@ -26,6 +26,8 @@
 
 #include <stddef.h>	/* size_t */
 
+#include "cgs_array.h"  /* array for str_split */
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * String Type
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
@@ -447,6 +449,19 @@ int
 cgs_strsub_cmp(const void* a, const void* b);
 
 /**
+ * cgs_strsub_eq_str
+ *
+ * An equality test for comparing a cgs_strsub to a C-string.
+ *
+ * @param a     A pointer to a strsub.
+ * @param b     A pointer to a C-string (const char*, const char[]).
+ *
+ * @return      A boolean integer indicating true(1) or false(0).
+ */
+int
+cgs_strsub_eq_str(const struct cgs_strsub* ss, const char* s);
+
+/**
  * cgs_strsub_to_str
  *
  * Allocate a duplicate of the provided sub-string.
@@ -471,3 +486,22 @@ cgs_strsub_to_str(const struct cgs_strsub* ss);
  */
 void*
 cgs_strsub_to_string(const struct cgs_strsub* ss, struct cgs_string* dst);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * String splitting functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/**
+ * cgs_str_split
+ *
+ * Split the provided string into strsub's and store them in the provided
+ * array.
+ *
+ * @param s     The string to split.
+ * @param delim The character to split the string on.
+ * @param arr   The array to store the strsub elements into.
+ *
+ * @return      A pointer back to the array on success, NULL on failure.
+ */
+void*
+cgs_str_split(const char* s, char delim, struct cgs_array* arr);
