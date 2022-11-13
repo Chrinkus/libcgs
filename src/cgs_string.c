@@ -250,3 +250,117 @@ cgs_string_sort(struct cgs_string* s)
 	qsort(s->data, s->length, sizeof(char), cgs_char_cmp);
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Strsub Inline Symbols
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+struct cgs_strsub
+cgs_strsub_new(const char* s, size_t len);
+
+struct cgs_strsub
+cgs_strsub_from_str(const char* s);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Strsub Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+int
+cgs_strsub_cmp(const void* a, const void* b)
+{
+        const struct cgs_strsub* ss1 = a;
+        const struct cgs_strsub* ss2 = b;
+
+        // same length --> memcmp
+        if (ss1->length == ss2->length) {
+                return memcmp(ss1->data, ss2->data, ss1->length);
+        }
+
+        // diff lengths --> memcmp up to shortest length,
+        // shorter strsub is less if both are equal.
+        if (ss1->length < ss2->length) {
+                return memcmp(ss1->data, ss2->data, ss1->length) <= 0 ? -1 : 1;
+        } else {
+                return memcmp(ss1->data, ss2->data, ss2->length) >= 0 ? 1 : -1;
+        }
+}
+
+int
+cgs_strsub_eq_str(const struct cgs_strsub* ss, const char* s)
+{
+        return strlen(s) == ss->length
+                && strncmp(ss->data, s, ss->length) == 0;
+}
+
+char*
+cgs_strsub_to_str(const struct cgs_strsub* ss)
+{
+        char* p = malloc(ss->length + 1);
+        if (!p)
+                return NULL;
+
+        strncpy(p, ss->data, ss->length);
+        p[ss->length] = '\0';
+        return p;
+}
+
+void*
+cgs_strsub_to_string(const struct cgs_strsub* ss, struct cgs_string* dst)
+{
+        char* p = cgs_strsub_to_str(ss);
+        if (!p)
+                return NULL;
+
+        dst->data = p;
+        dst->length = ss->length;
+        dst->capacity = ss->length + 1;
+
+        return dst;
+}
+
+void*
+cgs_str_split(const char* s, char delim, struct cgs_array* arr)
+{
+        if (arr->element_size != sizeof(struct cgs_strsub))
+                return NULL;
+
+        for (const char* p = s; ; ++s, p = s) {
+                size_t count = 0;
+                while (*s && *s != delim) {
+                        ++s;
+                        ++count;
+                }
+                if (count != 0) {
+                        struct cgs_strsub ss = cgs_strsub_new(p, count);
+                        if (!cgs_array_push(arr, &ss))
+                                return NULL;
+                }
+                if (!*s)
+                        break;
+        }
+        return arr;
+}
+
+void*
+cgs_strsub_split(const struct cgs_strsub* ss, char delim,
+                struct cgs_array* arr)
+{
+        if (arr->element_size != sizeof(struct cgs_strsub))
+                return NULL;
+
+        const char* beg = ss->data;
+        const char* end = beg + ss->length;
+        for ( ; beg < end; ++beg) {
+                const char* start = beg;
+                size_t count = 0;
+                while (beg < end && *beg != delim) {
+                        ++beg;
+                        ++count;
+                }
+                if (count != 0) {
+                        struct cgs_strsub ss = cgs_strsub_new(start, count);
+                        if (!cgs_array_push(arr, &ss))
+                                return NULL;
+                }
+        }
+        return arr;
+}

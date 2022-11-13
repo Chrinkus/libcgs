@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(libcgs VERSION 0.3 LANGUAGES C)
+project(libcgs VERSION 0.4 LANGUAGES C)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED YES)

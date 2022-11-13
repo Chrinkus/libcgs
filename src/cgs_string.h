@@ -25,11 +25,24 @@
 #pragma once
 
 #include <stddef.h>	/* size_t */
+#include <string.h>     /* strlen */
+
+#include "cgs_array.h"  /* array for str_split */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * String Types
+ * String Type
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
+/**
+ * struct cgs_string
+ *
+ * A dynamic string.
+ *
+ * @member length       The number of characters in the string.
+ * @member capacity     The number of characters that the string has room for
+ *                      plus 1 for the terminating '\0'.
+ * @member data         A pointer to the allocation.
+ */
 struct cgs_string {
         size_t length;
         size_t capacity;
@@ -378,3 +391,149 @@ cgs_string_erase(struct cgs_string* s);
 void
 cgs_string_sort(struct cgs_string* s);
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Strsub Type
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+/**
+ * struct cgs_strsub
+ *
+ * A read-only sub-string view into another string.
+ *
+ * WARNING: Does not own the target string, any changes to the target string
+ * may invalidate the data pointer.
+ *
+ * @member data         A pointer to the start of the sub-string.
+ * @member length       The number of characters in the sub-string.
+ */
+struct cgs_strsub {
+        const char* data;
+        size_t length;
+};
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Strsub Creation
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+/**
+ * cgs_strsub_new
+ *
+ * Creates a new sub-string using the pointer and length given.
+ *
+ * @param s     A pointer into a string that will be the start of the
+ *              sub-string.
+ * @param len   The length of the sub-string.
+ *
+ * @return      A sub-string object.
+ */
+inline struct cgs_strsub
+cgs_strsub_new(const char* s, size_t len)
+{
+        return (struct cgs_strsub){ .data = s, .length = len };
+}
+
+/**
+ * cgs_strsub_from_str
+ *
+ * Create a cgs_strsub from a C-string.
+ *
+ * @param s     The C-string to map from.
+ *
+ * @return      A cgs_strsub of the whole C-string.
+ */
+inline struct cgs_strsub
+cgs_strsub_from_str(const char* s)
+{
+        return (struct cgs_strsub){ .data = s, .length = strlen(s) };
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Strsub Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+/**
+ * cgs_strsub_cmp
+ *
+ * A three-way comparison function for cgs_strsub's.
+ *
+ * @param a     A pointer to the target strsub.
+ * @param b     A pointer to the compare strsub.
+ *
+ * @return      An integer indicating equality(0), lesser(<0) or greater(>0).
+ */
+int
+cgs_strsub_cmp(const void* a, const void* b);
+
+/**
+ * cgs_strsub_eq_str
+ *
+ * An equality test for comparing a cgs_strsub to a C-string.
+ *
+ * @param a     A pointer to a strsub.
+ * @param b     A pointer to a C-string (const char*, const char[]).
+ *
+ * @return      A boolean integer indicating true(1) or false(0).
+ */
+int
+cgs_strsub_eq_str(const struct cgs_strsub* ss, const char* s);
+
+/**
+ * cgs_strsub_to_str
+ *
+ * Allocate a duplicate of the provided sub-string.
+ *
+ * @param ss    The sub-string to duplicate.
+ *
+ * @return      An allocated copy of the sub-string on success, NULL on
+ *              failure. Caller is responsible for freeing.
+ */
+char*
+cgs_strsub_to_str(const struct cgs_strsub* ss);
+
+/**
+ * cgs_strsub_to_string
+ *
+ * Duplicate a sub-string in the provided cgs_string.
+ *
+ * @param ss    The sub-string to duplicate.
+ * @param dst   The cgs_string struct to duplicate into.
+ *
+ * @return      A pointer back to 'dst' on success, NULL on failure.
+ */
+void*
+cgs_strsub_to_string(const struct cgs_strsub* ss, struct cgs_string* dst);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * String splitting functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/**
+ * cgs_str_split
+ *
+ * Split the provided string into strsub's and store them in the provided
+ * array.
+ *
+ * @param s     The string to split.
+ * @param delim The character to split the string on.
+ * @param arr   The array to store the strsub elements into.
+ *
+ * @return      A pointer back to the array on success, NULL on failure.
+ */
+void*
+cgs_str_split(const char* s, char delim, struct cgs_array* arr);
+
+/**
+ * cgs_strsub_split
+ *
+ * Split the provided sub-string further into strsub's and store them in the
+ * provided array.
+ *
+ * @param ss    The sub-string to split.
+ * @param delim The character to split the string on.
+ * @param arr   The array to store the strsub elements into.
+ *
+ * @return      A pointer back to the array on success, NULL on failure.
+ */
+void*
+cgs_strsub_split(const struct cgs_strsub* ss, char delim,
+                struct cgs_array* arr);
