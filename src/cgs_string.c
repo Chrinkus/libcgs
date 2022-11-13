@@ -257,6 +257,9 @@ cgs_string_sort(struct cgs_string* s)
 struct cgs_strsub
 cgs_strsub_new(const char* s, size_t len);
 
+struct cgs_strsub
+cgs_strsub_from_str(const char* s);
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Strsub Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
@@ -333,6 +336,31 @@ cgs_str_split(const char* s, char delim, struct cgs_array* arr)
                 }
                 if (!*s)
                         break;
+        }
+        return arr;
+}
+
+void*
+cgs_strsub_split(const struct cgs_strsub* ss, char delim,
+                struct cgs_array* arr)
+{
+        if (arr->element_size != sizeof(struct cgs_strsub))
+                return NULL;
+
+        const char* beg = ss->data;
+        const char* end = beg + ss->length;
+        for ( ; beg < end; ++beg) {
+                const char* start = beg;
+                size_t count = 0;
+                while (beg < end && *beg != delim) {
+                        ++beg;
+                        ++count;
+                }
+                if (count != 0) {
+                        struct cgs_strsub ss = cgs_strsub_new(start, count);
+                        if (!cgs_array_push(arr, &ss))
+                                return NULL;
+                }
         }
         return arr;
 }

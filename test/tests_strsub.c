@@ -25,6 +25,17 @@ strsub_new(void** state)
 }
 
 static void
+strsub_from_str(void** state)
+{
+        (void)state;
+
+        const char* s1 = "coffee";
+        struct cgs_strsub ss1 = cgs_strsub_from_str(s1);
+        assert_int_equal(ss1.length, 6);
+        assert_memory_equal(ss1.data, "coffee", 6);
+}
+
+static void
 strsub_cmp(void** state)
 {
         (void)state;
@@ -118,6 +129,7 @@ int main(void)
 {
         const struct CMUnitTest tests[] = {
                 cmocka_unit_test(strsub_new),
+                cmocka_unit_test(strsub_from_str),
                 cmocka_unit_test(strsub_cmp),
                 cmocka_unit_test(strsub_to_str),
                 cmocka_unit_test(strsub_to_string),

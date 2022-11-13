@@ -25,6 +25,7 @@
 #pragma once
 
 #include <stddef.h>	/* size_t */
+#include <string.h>     /* strlen */
 
 #include "cgs_array.h"  /* array for str_split */
 
@@ -411,7 +412,7 @@ struct cgs_strsub {
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Strsub Management
+ * Strsub Creation
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
@@ -429,6 +430,21 @@ inline struct cgs_strsub
 cgs_strsub_new(const char* s, size_t len)
 {
         return (struct cgs_strsub){ .data = s, .length = len };
+}
+
+/**
+ * cgs_strsub_from_str
+ *
+ * Create a cgs_strsub from a C-string.
+ *
+ * @param s     The C-string to map from.
+ *
+ * @return      A cgs_strsub of the whole C-string.
+ */
+inline struct cgs_strsub
+cgs_strsub_from_str(const char* s)
+{
+        return (struct cgs_strsub){ .data = s, .length = strlen(s) };
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -505,3 +521,19 @@ cgs_strsub_to_string(const struct cgs_strsub* ss, struct cgs_string* dst);
  */
 void*
 cgs_str_split(const char* s, char delim, struct cgs_array* arr);
+
+/**
+ * cgs_strsub_split
+ *
+ * Split the provided sub-string further into strsub's and store them in the
+ * provided array.
+ *
+ * @param ss    The sub-string to split.
+ * @param delim The character to split the string on.
+ * @param arr   The array to store the strsub elements into.
+ *
+ * @return      A pointer back to the array on success, NULL on failure.
+ */
+void*
+cgs_strsub_split(const struct cgs_strsub* ss, char delim,
+                struct cgs_array* arr);
