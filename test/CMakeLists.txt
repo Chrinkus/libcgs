@@ -9,7 +9,6 @@ add_custom_target(tests)
 
 # List of tests
 set(test_sources
-	"tests_array.c"
 	"tests_bst.c"
 	"tests_compare.c"
 	"tests_defs.c"
@@ -27,6 +26,7 @@ set(test_sources
 	"tests_string_utils.c"
         "tests_strsub.c"
         "tests_str_split.c"
+	"tests_vector.c"
 )
 
 # For stripping prefix.

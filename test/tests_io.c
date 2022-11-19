@@ -111,16 +111,16 @@ static void io_readlines_test(void** state)
 
         void* res = NULL;
 
-        struct cgs_array lines = { 0 };
-        res = cgs_array_new(&lines, sizeof(char*));
+        struct cgs_vector lines = { 0 };
+        res = cgs_vector_new(&lines, sizeof(char*));
         assert_non_null(res);
 
         res = cgs_io_readlines(file, &lines);
         assert_non_null(res);
-	assert_int_equal(cgs_array_length(&lines), 4);
+	assert_int_equal(cgs_vector_length(&lines), 4);
 
-	CgsStrIter b = cgs_array_begin(&lines);
-	CgsStrIter e = cgs_array_end(&lines);
+	CgsStrIter b = cgs_vector_begin(&lines);
+	CgsStrIter e = cgs_vector_end(&lines);
 	assert_ptr_not_equal(b, e);
 
 	assert_string_equal(*b++, "Birthday");
@@ -129,7 +129,7 @@ static void io_readlines_test(void** state)
 	assert_string_equal(*b++, "Books for reading");
 	assert_ptr_equal(b, e);
 
-	cgs_array_free_all(&lines);
+	cgs_vector_free_all(&lines);
 }
 
 int main(void)

@@ -55,7 +55,7 @@ cgs_io_readline(FILE* file)
 }
 
 void*
-cgs_io_readlines(FILE* file, struct cgs_array* lines)
+cgs_io_readlines(FILE* file, struct cgs_vector* lines)
 {
         struct cgs_string buffer = { 0 };
         if (!cgs_string_new(&buffer))
@@ -66,7 +66,7 @@ cgs_io_readlines(FILE* file, struct cgs_array* lines)
                 line = cgs_strdup(cgs_string_data(&buffer));
                 if (!line)
                         goto error_cleanup;
-                if (!cgs_array_push(lines, &line))
+                if (!cgs_vector_push(lines, &line))
                         goto push_error_cleanup;
 
                 cgs_string_clear(&buffer);

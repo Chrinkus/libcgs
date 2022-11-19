@@ -1,4 +1,4 @@
-/* cgs_array.c
+/* cgs_vector.c
  *
  * MIT License
  * 
@@ -25,70 +25,70 @@
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  *
- * cgs_array.c
+ * cgs_vector.c
  *
  * This file contains the source code of the libcgs implementation of a
  * generic dynamic array.
  *
- * After experimenting with an all-macro array implementation I decided to
- * go with a char-counting array.
+ * After experimenting with an all-macro vector implementation I decided to
+ * go with a char-counting vector.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-#include "cgs_array.h"
+#include "cgs_vector.h"
 
 #include <stdlib.h>
 #include <string.h>
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Array Types
+ * Vector Types
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-enum cgs_array_constants {
-	CGS_ARRAY_INITIAL_CAPACITY = 8,
-	CGS_ARRAY_GROWTH_RATE = 2,
+enum cgs_vector_constants {
+	CGS_VECTOR_INITIAL_CAPACITY = 8,
+	CGS_VECTOR_GROWTH_RATE = 2,
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Array Static Helpers - move to private header?
+ * Vector Static Helpers - move to private header?
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 static const void*
-cgs_array_grow(struct cgs_array* a)
+cgs_vector_grow(struct cgs_vector* v)
 {
-	size_t new_capacity = a->capacity == 0 ? CGS_ARRAY_INITIAL_CAPACITY
-		: a->capacity * CGS_ARRAY_GROWTH_RATE;
+	size_t new_capacity = v->capacity == 0 ? CGS_VECTOR_INITIAL_CAPACITY
+		: v->capacity * CGS_VECTOR_GROWTH_RATE;
 	
-	char* p = realloc(a->data, a->element_size * new_capacity);
+	char* p = realloc(v->data, v->element_size * new_capacity);
         if (!p)
                 return NULL;
 
-        a->data = p;
-        a->capacity = new_capacity;
+        v->data = p;
+        v->capacity = new_capacity;
 	return p;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Array Management Functions
+ * Vector Management Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 void*
-cgs_array_new(struct cgs_array* a, size_t size)
+cgs_vector_new(struct cgs_vector* v, size_t size)
 {
-        char* p = malloc(size * CGS_ARRAY_INITIAL_CAPACITY);
+        char* p = malloc(size * CGS_VECTOR_INITIAL_CAPACITY);
         if (!p)
                 return NULL;
 
-        a->length = 0;
-        a->capacity = CGS_ARRAY_INITIAL_CAPACITY;
-        a->element_size = size;
-        a->data = p;
+        v->length = 0;
+        v->capacity = CGS_VECTOR_INITIAL_CAPACITY;
+        v->element_size = size;
+        v->data = p;
 
-        return a;
+        return v;
 }
 
 void*
-cgs_array_copy(struct cgs_array* dst, const struct cgs_array* src)
+cgs_vector_copy(struct cgs_vector* dst, const struct cgs_vector* src)
 {
         char* p = malloc(src->length * src->element_size);
         if (!p)
@@ -104,7 +104,7 @@ cgs_array_copy(struct cgs_array* dst, const struct cgs_array* src)
 }
 
 void*
-cgs_array_new_from_array(struct cgs_array* a, size_t size,
+cgs_vector_new_from_array(struct cgs_vector* v, size_t size,
                 const void* src, size_t len)
 {
         char* p = malloc(len * size);
@@ -112,133 +112,133 @@ cgs_array_new_from_array(struct cgs_array* a, size_t size,
                 return NULL;
 
         memcpy(p, src, len * size);
-        a->length = len;
-        a->capacity = len;
-        a->element_size = size;
-        a->data = p;
+        v->length = len;
+        v->capacity = len;
+        v->element_size = size;
+        v->data = p;
 
-        return a;
+        return v;
 }
 
 void
-cgs_array_free(struct cgs_array* a)
+cgs_vector_free(struct cgs_vector* v)
 {
-        free(a->data);
+        free(v->data);
 }
 
 void
-cgs_array_free_all(struct cgs_array* a)
+cgs_vector_free_all(struct cgs_vector* v)
 {
-	if (a->data) {
-		for (size_t i = 0, l = a->length; i < l; ++i)
-			free(*(void**)cgs_array_get(a, i));
-		free(a->data);
+	if (v->data) {
+		for (size_t i = 0, l = v->length; i < l; ++i)
+			free(*(void**)cgs_vector_get(v, i));
+		free(v->data);
 	}
 }
 
 void*
-cgs_array_xfer(struct cgs_array* a, size_t* len)
+cgs_vector_xfer(struct cgs_vector* v, size_t* len)
 {
-	void* p = a->data;
+	void* p = v->data;
 	if (len)
-		*len = a->length;
+		*len = v->length;
 
-        memset(a, 0, sizeof(struct cgs_array));
+        memset(v, 0, sizeof(struct cgs_vector));
 	return p;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Array Inline Getter Symbols
+ * Vector Inline Getter Symbols
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 size_t
-cgs_array_length(const struct cgs_array* a);
+cgs_vector_length(const struct cgs_vector* v);
 
 const void*
-cgs_array_data(const struct cgs_array* a);
+cgs_vector_data(const struct cgs_vector* v);
 
 void*
-cgs_array_data_mutable(struct cgs_array* a);
+cgs_vector_data_mutable(struct cgs_vector* v);
 
 const void*
-cgs_array_get(const struct cgs_array* a, size_t index);
+cgs_vector_get(const struct cgs_vector* v, size_t index);
 
 void*
-cgs_array_get_mutable(struct cgs_array* a, size_t index);
+cgs_vector_get_mutable(struct cgs_vector* v, size_t index);
 
 const void*
-cgs_array_begin(const struct cgs_array* a);
+cgs_vector_begin(const struct cgs_vector* v);
 
 const void*
-cgs_array_end(const struct cgs_array* a);
+cgs_vector_end(const struct cgs_vector* v);
 
 void
-cgs_array_clear(struct cgs_array* a);
+cgs_vector_clear(struct cgs_vector* v);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Array Standard Operations
+ * Vector Standard Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 void*
-cgs_array_push(struct cgs_array* a, const void* src)
+cgs_vector_push(struct cgs_vector* v, const void* src)
 {
-	if (a->length == a->capacity && !cgs_array_grow(a))
+	if (v->length == v->capacity && !cgs_vector_grow(v))
 		return NULL;
 
-	char* dst = cgs_array_get_mutable(a, a->length);
-	memcpy(dst, src, a->element_size);
-	++a->length;
+	char* dst = cgs_vector_get_mutable(v, v->length);
+	memcpy(dst, src, v->element_size);
+	++v->length;
 	return dst;
 }
 
 void
-cgs_array_remove(struct cgs_array* a, size_t i)
+cgs_vector_remove(struct cgs_vector* v, size_t i)
 {
-        const size_t sz = a->element_size;
+        const size_t sz = v->element_size;
 
-        --a->length;
-        memmove(&a->data[i * sz], &a->data[(i+1) * sz], (a->length - i) * sz);
+        --v->length;
+        memmove(&v->data[i * sz], &v->data[(i+1) * sz], (v->length - i) * sz);
 }
 
 void
-cgs_array_remove_fast(struct cgs_array* a, size_t i)
+cgs_vector_remove_fast(struct cgs_vector* v, size_t i)
 {
-        const size_t sz = a->element_size;
+        const size_t sz = v->element_size;
 
-        --a->length;
-        memcpy(&a->data[i * sz], &a->data[a->length * sz], sz);
+        --v->length;
+        memcpy(&v->data[i * sz], &v->data[v->length * sz], sz);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Array Standard Algorithms
+ * Vector Standard Algorithms
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 void
-cgs_array_sort(struct cgs_array* a, CgsCmp3Way cmp)
+cgs_vector_sort(struct cgs_vector* v, CgsCmp3Way cmp)
 {
-	qsort(a->data, a->length, a->element_size, cmp);
+	qsort(v->data, v->length, v->element_size, cmp);
 }
 
 void*
-cgs_array_find(struct cgs_array* a, CgsPredicate pred, const void* data)
+cgs_vector_find(struct cgs_vector* v, CgsPredicate pred, const void* data)
 {
-	for (size_t i = 0; i < a->length; ++i)
-		if (pred(cgs_array_get(a, i), data))
-			return cgs_array_get_mutable(a, i);
+	for (size_t i = 0; i < v->length; ++i)
+		if (pred(cgs_vector_get(v, i), data))
+			return cgs_vector_get_mutable(v, i);
 	return NULL;
 }
 
 void
-cgs_array_foreach(const struct cgs_array* a, CgsUnaryOp f, void* data)
+cgs_vector_foreach(const struct cgs_vector* v, CgsUnaryOp f, void* data)
 {
-        for (size_t i = 0, l = a->length; i < l; ++i)
-                f(cgs_array_get(a, i), i, data);
+        for (size_t i = 0, l = v->length; i < l; ++i)
+                f(cgs_vector_get(v, i), i, data);
 }
 
 void
-cgs_array_transform(struct cgs_array* a, CgsUnaryOpMut f, void* data)
+cgs_vector_transform(struct cgs_vector* v, CgsUnaryOpMut f, void* data)
 {
-        for (size_t i = 0, l = a->length; i < l; ++i)
-                f(cgs_array_get_mutable(a, i), i, data);
+        for (size_t i = 0, l = v->length; i < l; ++i)
+                f(cgs_vector_get_mutable(v, i), i, data);
 }
 

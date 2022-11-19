@@ -318,9 +318,9 @@ cgs_strsub_to_string(const struct cgs_strsub* ss, struct cgs_string* dst)
 }
 
 void*
-cgs_str_split(const char* s, char delim, struct cgs_array* arr)
+cgs_str_split(const char* s, char delim, struct cgs_vector* vec)
 {
-        if (arr->element_size != sizeof(struct cgs_strsub))
+        if (vec->element_size != sizeof(struct cgs_strsub))
                 return NULL;
 
         for (const char* p = s; ; ++s, p = s) {
@@ -331,20 +331,20 @@ cgs_str_split(const char* s, char delim, struct cgs_array* arr)
                 }
                 if (count != 0) {
                         struct cgs_strsub ss = cgs_strsub_new(p, count);
-                        if (!cgs_array_push(arr, &ss))
+                        if (!cgs_vector_push(vec, &ss))
                                 return NULL;
                 }
                 if (!*s)
                         break;
         }
-        return arr;
+        return vec;
 }
 
 void*
 cgs_strsub_split(const struct cgs_strsub* ss, char delim,
-                struct cgs_array* arr)
+                struct cgs_vector* vec)
 {
-        if (arr->element_size != sizeof(struct cgs_strsub))
+        if (vec->element_size != sizeof(struct cgs_strsub))
                 return NULL;
 
         const char* beg = ss->data;
@@ -358,9 +358,9 @@ cgs_strsub_split(const struct cgs_strsub* ss, char delim,
                 }
                 if (count != 0) {
                         struct cgs_strsub ss = cgs_strsub_new(start, count);
-                        if (!cgs_array_push(arr, &ss))
+                        if (!cgs_vector_push(vec, &ss))
                                 return NULL;
                 }
         }
-        return arr;
+        return vec;
 }

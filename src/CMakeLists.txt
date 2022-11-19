@@ -1,5 +1,4 @@
 set(sources
-	"cgs_array.c"
 	"cgs_bst.c"
 	"cgs_compare.c"
         "cgs_error.c"
@@ -12,11 +11,11 @@ set(sources
 	"cgs_string.c"
 	"cgs_string_utils.c"
 	"cgs_variant.c"
+	"cgs_vector.c"
 )
 
 set(headers
 	"cgs.h"
-	"cgs_array.h"
 	"cgs_bst.h"
 	"cgs_compare.h"
 	"cgs_defs.h"
@@ -31,6 +30,7 @@ set(headers
 	"cgs_string_utils.h"
 	"cgs_test.h"
 	"cgs_variant.h"
+	"cgs_vector.h"
 )
 
 add_library(${LIB_NAME} "${sources}")

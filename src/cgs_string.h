@@ -27,7 +27,7 @@
 #include <stddef.h>	/* size_t */
 #include <string.h>     /* strlen */
 
-#include "cgs_array.h"  /* array for str_split */
+#include "cgs_vector.h"  /* vector for str_split */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * String Type
@@ -511,29 +511,29 @@ cgs_strsub_to_string(const struct cgs_strsub* ss, struct cgs_string* dst);
  * cgs_str_split
  *
  * Split the provided string into strsub's and store them in the provided
- * array.
+ * vector.
  *
  * @param s     The string to split.
  * @param delim The character to split the string on.
- * @param arr   The array to store the strsub elements into.
+ * @param vec   The vector to store the strsub elements into.
  *
- * @return      A pointer back to the array on success, NULL on failure.
+ * @return      A pointer back to the vector on success, NULL on failure.
  */
 void*
-cgs_str_split(const char* s, char delim, struct cgs_array* arr);
+cgs_str_split(const char* s, char delim, struct cgs_vector* vec);
 
 /**
  * cgs_strsub_split
  *
  * Split the provided sub-string further into strsub's and store them in the
- * provided array.
+ * provided vector.
  *
  * @param ss    The sub-string to split.
  * @param delim The character to split the string on.
- * @param arr   The array to store the strsub elements into.
+ * @param vec   The vector to store the strsub elements into.
  *
- * @return      A pointer back to the array on success, NULL on failure.
+ * @return      A pointer back to the vector on success, NULL on failure.
  */
 void*
 cgs_strsub_split(const struct cgs_strsub* ss, char delim,
-                struct cgs_array* arr);
+                struct cgs_vector* vec);
