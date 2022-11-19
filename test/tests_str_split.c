@@ -9,8 +9,9 @@ static int
 su_sub_vec(void** state)
 {
         struct cgs_vector* vec = malloc(sizeof(struct cgs_vector));
-        if (!vec || !cgs_vector_new(vec, sizeof(struct cgs_strsub)))
+        if (!vec)
                 return -1;
+        *vec = cgs_vector_new(sizeof(struct cgs_strsub));
 
         *state = vec;
         return 0;

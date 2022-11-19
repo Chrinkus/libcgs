@@ -56,14 +56,13 @@ struct cgs_vector {
 /**
  * cgs_vector_new
  *
- * @param v     A pointer to an vector object to initialize.
  * @param size  The size of the elements to be contained in the vector.
  *
- * @return      A pointer to the vector on successful allocation or NULL on
- *              failure.
+ * @return      An empty vector object initialized for elements of the
+ *              given size.
  */
-void*
-cgs_vector_new(struct cgs_vector* v, size_t size);
+struct cgs_vector
+cgs_vector_new(size_t size);
 
 /**
  * cgs_vector_copy

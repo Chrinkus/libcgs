@@ -72,19 +72,15 @@ cgs_vector_grow(struct cgs_vector* v)
  * Vector Management Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-void*
-cgs_vector_new(struct cgs_vector* v, size_t size)
+struct cgs_vector
+cgs_vector_new(size_t size)
 {
-        char* p = malloc(size * CGS_VECTOR_INITIAL_CAPACITY);
-        if (!p)
-                return NULL;
-
-        v->length = 0;
-        v->capacity = CGS_VECTOR_INITIAL_CAPACITY;
-        v->element_size = size;
-        v->data = p;
-
-        return v;
+        return (struct cgs_vector){
+                .length = 0,
+                .capacity = 0,
+                .element_size = size,
+                .data = NULL,
+        };
 }
 
 void*

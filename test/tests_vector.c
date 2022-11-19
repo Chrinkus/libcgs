@@ -79,37 +79,32 @@ static void vector_new_test(void** state)
 {
 	(void)state;
 
-        struct cgs_vector vi = { 0 };
-        void* res = cgs_vector_new(&vi, sizeof(int));
+        struct cgs_vector vi = cgs_vector_new(sizeof(int));
+	assert_int_equal(vi.length, 0);
+	assert_int_equal(vi.capacity, 0);
+	assert_int_equal(vi.element_size, sizeof(int));
+	assert_null(vi.data);
 
-	assert_non_null(res);
-	assert_int_equal(cgs_vector_length(&vi), 0);
+        struct cgs_vector vd = cgs_vector_new(sizeof(double));
+	assert_int_equal(vd.length, 0);
+	assert_int_equal(vd.capacity, 0);
+	assert_int_equal(vd.element_size, sizeof(double));
+	assert_null(vd.data);
 
-	cgs_vector_free(&vi);
-
-        struct cgs_vector vd = { 0 };
-        res = cgs_vector_new(&vd, sizeof(double));
-	assert_non_null(res);
-	assert_int_equal(cgs_vector_length(&vd), 0);
-
-	cgs_vector_free(&vd);
-
-        struct cgs_vector vs = { 0 };
-        res = cgs_vector_new(&vs, sizeof(char*));
-	assert_non_null(res);
-	assert_int_equal(cgs_vector_length(&vs), 0);
-
-	cgs_vector_free(&vs);
+        struct cgs_vector vs = cgs_vector_new(sizeof(char*));
+	assert_int_equal(vs.length, 0);
+	assert_int_equal(vs.capacity, 0);
+	assert_int_equal(vs.element_size, sizeof(char*));
+	assert_null(vs.data);
 }
 
 static void vector_push_test(void** state)
 {
 	const int* ints = *(const int**)state;
 
-        struct cgs_vector vi = { 0 };
-        cgs_vector_new(&vi, sizeof(int));
+        struct cgs_vector vi = cgs_vector_new(sizeof(int));
 	for (int i = 0; i < NUM_RANDOMS; ++i)
-		cgs_vector_push(&vi, &ints[i]);
+		assert_non_null(cgs_vector_push(&vi, &ints[i]));
 
 	assert_int_equal(cgs_vector_length(&vi), NUM_RANDOMS);
 
@@ -120,44 +115,40 @@ static void vector_remove_test(void** state)
 {
         (void)state;
 
-        struct cgs_vector v = { 0 };
-        cgs_vector_new(&v, sizeof(int));
-
+        struct cgs_vector vi = cgs_vector_new(sizeof(int));
         for (int i = 1; i <= 10; ++i)
-                cgs_vector_push(&v, &i);
+                cgs_vector_push(&vi, &i);
 
-        assert_int_equal(cgs_vector_length(&v), 10);
+        assert_int_equal(cgs_vector_length(&vi), 10);
 
-        const int* pi = cgs_vector_get(&v, 5);
+        const int* pi = cgs_vector_get(&vi, 5);
         assert_int_equal(*pi, 6);
 
-        cgs_vector_remove(&v, 5);
-        assert_int_equal(cgs_vector_length(&v), 9);
-        pi = cgs_vector_get(&v, 5);
+        cgs_vector_remove(&vi, 5);
+        assert_int_equal(cgs_vector_length(&vi), 9);
+        pi = cgs_vector_get(&vi, 5);
         assert_int_equal(*pi, 7);
 
-        cgs_vector_remove(&v, 0);
-        assert_int_equal(cgs_vector_length(&v), 8);
-        pi = cgs_vector_get(&v, 5);
+        cgs_vector_remove(&vi, 0);
+        assert_int_equal(cgs_vector_length(&vi), 8);
+        pi = cgs_vector_get(&vi, 5);
         assert_int_equal(*pi, 8);
-        pi = cgs_vector_get(&v, 0);
+        pi = cgs_vector_get(&vi, 0);
         assert_int_equal(*pi, 2);
 
-        cgs_vector_remove(&v, 7);
-        assert_int_equal(cgs_vector_length(&v), 7);
-        pi = cgs_vector_get(&v, 5);
+        cgs_vector_remove(&vi, 7);
+        assert_int_equal(cgs_vector_length(&vi), 7);
+        pi = cgs_vector_get(&vi, 5);
         assert_int_equal(*pi, 8);
 
-        cgs_vector_free(&v);
+        cgs_vector_free(&vi);
 }
 
 static void vector_remove_fast_test(void** state)
 {
         (void)state;
 
-        struct cgs_vector v = { 0 };
-        cgs_vector_new(&v, sizeof(int));
-
+        struct cgs_vector v = cgs_vector_new(sizeof(int));
         for (int i = 1; i <= 10; ++i)
                 cgs_vector_push(&v, &i);
 
@@ -188,9 +179,7 @@ static void vector_clear_test(void** state)
 {
         (void)state;
 
-        struct cgs_vector vi = { 0 };
-        cgs_vector_new(&vi, sizeof(int));
-        
+        struct cgs_vector vi = cgs_vector_new(sizeof(int));
         for (int i = 1; i <= 10; ++i)
                 cgs_vector_push(&vi, &i);
 
@@ -270,13 +259,11 @@ static void vector_copy_test(void** state)
 {
 	const int* ints = *(const int**)state;
 
-        struct cgs_vector v1 = { 0 };
-        cgs_vector_new(&v1, sizeof(int));
-
+        struct cgs_vector v1 = cgs_vector_new(sizeof(int));
 	for (int i = 0; i < NUM_RANDOMS; ++i)
 		cgs_vector_push(&v1, &ints[i]);
 
-        struct cgs_vector v2 = { 0 };
+        struct cgs_vector v2 = { 0 };           // copy idom?
         assert_non_null(cgs_vector_copy(&v2, &v1));
         assert_int_not_equal(v2.length, 0);
         assert_int_not_equal(v2.capacity, 0);
@@ -341,10 +328,7 @@ static void vector_strings_test(void** state)
 {
 	const char** strs = *(const char***)state;
 
-	// New
-        struct cgs_vector vs = { 0 };
-        cgs_vector_new(&vs, sizeof(char*));
-	// Push
+        struct cgs_vector vs = cgs_vector_new(sizeof(char*));
 	for (int i = 0; i < NUM_TOWNS; ++i) {
 		char* p = cgs_strdup(strs[i]);
 		cgs_vector_push(&vs, &p);
@@ -378,9 +362,7 @@ static void vector_foreach_test(void** state)
 {
         (void)state;
 
-        struct cgs_vector vi = { 0 };
-        cgs_vector_new(&vi, sizeof(int));
-
+        struct cgs_vector vi = cgs_vector_new(sizeof(int));
         for (int i = 0; i < 10; ++i)
                 cgs_vector_push(&vi, &i);
 
@@ -405,9 +387,7 @@ static void vector_transform_test(void** state)
 {
         (void)state;
 
-        struct cgs_vector vi = { 0 };
-        cgs_vector_new(&vi, sizeof(int));
-
+        struct cgs_vector vi = cgs_vector_new(sizeof(int));
         for (int i = 0; i < 10; ++i)
                 cgs_vector_push(&vi, &i);
 
