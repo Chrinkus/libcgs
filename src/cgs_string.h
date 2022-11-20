@@ -56,15 +56,12 @@ struct cgs_string {
 /**
  * cgs_string_new
  *
- * Initialize and allocate a new cgs_string struct. Length will be 0, capacity
- * will be set to a reasonable default and the first character will be '\0'.
+ * Create and return a new cgs_string struct. All fields will be set to 0.
  *
- * @param s     The string struct to initialize.
- *
- * @return      A valid pointer on successful allocation or NULL on failure.
+ * @return      A new cgs_string struct.
  */
-void*
-cgs_string_new(struct cgs_string* s);
+struct cgs_string
+cgs_string_new();
 
 /**
  * cgs_string_new_from_str
@@ -290,10 +287,10 @@ cgs_string_begin_mutable(struct cgs_string* s)
  * @param s	The string to append to.
  * @param c	The character to append.
  *
- * @return	A read-only pointer to the inner string on success, NULL on
+ * @return	A pointer back to the provided string on success, NULL on
  * 		failure.
  */
-const char*
+struct cgs_string*
 cgs_string_push(struct cgs_string* s, int c);
 
 /**

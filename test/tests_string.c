@@ -1,23 +1,20 @@
+#include "cmocka_headers.h"
+
 #include "cgs_string.h"
-#include "cgs_test.h"
 
-#include <string.h>
-
-int string_new_test(void* data)
+static void
+string_new_test(void** state)
 {
-	(void)data;
+	(void)state;
 
-        struct cgs_string s = { 0 };
-        assert(cgs_string_new(&s) != NULL);
+        struct cgs_string s = cgs_string_new();
 
-	assert(cgs_string_length(&s) == 0);
-	assert(strcmp(cgs_string_data(&s), "") == 0);
-
-	cgs_string_free(&s);
-
-	return TEST_SUCCESS;
+	assert_int_equal(s.length, 0);
+        assert_int_equal(s.capacity, 0);
+        assert_null(s.data);
 }
 
+/*
 int string_new_from_str_test(void* data)
 {
 	const char* test = (const char*)data;
@@ -53,27 +50,26 @@ int string_xfer_test(void* data)
 
 	return TEST_SUCCESS;
 }
+*/
 
-int string_push_test(void* data)
+static void
+string_push_test(void** state)
 {
-	(void)data;
+	(void)state;
 
-        struct cgs_string s = { 0 };
-        cgs_string_new(&s);
+        struct cgs_string s = cgs_string_new();
+	assert_non_null(cgs_string_push(&s, 'p'));
+	assert_non_null(cgs_string_push(&s, 'u'));
+	assert_non_null(cgs_string_push(&s, 's'));
+	assert_non_null(cgs_string_push(&s, 'h'));
 
-	cgs_string_push(&s, 'p');
-	cgs_string_push(&s, 'u');
-	cgs_string_push(&s, 's');
-	cgs_string_push(&s, 'h');
-
-	assert(cgs_string_length(&s) == 4);
-	assert(strcmp(cgs_string_data(&s), "push") == 0);
+	assert_int_equal(s.length, 4);
+	assert_string_equal(s.data, "push");
 
 	cgs_string_free(&s);
-
-	return TEST_SUCCESS;
 }
 
+/*
 int string_clear_test(void* data)
 {
 	(void)data;
@@ -198,23 +194,29 @@ int string_end_test(void* data)
 
         return TEST_SUCCESS;
 }
+*/
 
 int main(void)
 {
-	struct test tests[] = {
-		{ "string_new", string_new_test, NULL },
-		{ "string_xfer", string_xfer_test, "Transfer me!" },
-		{ "string_push", string_push_test, NULL },
-		{ "string_clear", string_clear_test, NULL },
-		{ "string_erase", string_erase_test, NULL },
-		{ "string_new_from_str", string_new_from_str_test,
-			"Super test string" },
-		{ "string_sort", string_sort_test, NULL },
-		{ "string_prepend", string_prepend_test, NULL },
-		{ "string_append", string_append_test, NULL },
-		{ "string_end", string_end_test, NULL },
-	};
+	// struct test tests[] = {
+	// 	{ "string_new", string_new_test, NULL },
+	// 	{ "string_xfer", string_xfer_test, "Transfer me!" },
+	// 	{ "string_push", string_push_test, NULL },
+	// 	{ "string_clear", string_clear_test, NULL },
+	// 	{ "string_erase", string_erase_test, NULL },
+	// 	{ "string_new_from_str", string_new_from_str_test,
+	// 		"Super test string" },
+	// 	{ "string_sort", string_sort_test, NULL },
+	// 	{ "string_prepend", string_prepend_test, NULL },
+	// 	{ "string_append", string_append_test, NULL },
+	// 	{ "string_end", string_end_test, NULL },
+	// };
 
-	return cgs_run_tests(tests);
+	// return cgs_run_tests(tests);
+        const struct CMUnitTest tests[] = {
+                cmocka_unit_test(string_new_test),
+                cmocka_unit_test(string_push_test),
+        };
+
+        return cmocka_run_group_tests(tests, NULL, NULL);
 }
-

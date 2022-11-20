@@ -35,19 +35,14 @@ enum cgs_string_defaults {
         CGS_STRING_GROWTH_RATE = 2,
 };
 
-void*
-cgs_string_new(struct cgs_string* s)
+struct cgs_string
+cgs_string_new(void)
 {
-        char* p = malloc(sizeof(char) * CGS_STRING_INITIAL_CAPACITY);
-        if (!p)
-                return NULL;
-
-        p[0] = '\0';
-        s->length = 0;
-        s->capacity = CGS_STRING_INITIAL_CAPACITY;
-        s->data = p;
-
-        return s;
+        return (struct cgs_string){
+                .length = 0,
+                .capacity = 0,
+                .data = NULL,
+        };
 }
 
 void*
@@ -181,14 +176,17 @@ cgs_string_grow_len(struct cgs_string* s, size_t len)
  * String Standard Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-const char*
+struct cgs_string*
 cgs_string_push(struct cgs_string* s, int c)
 {
-	if (s->length == s->capacity - 1 && !cgs_string_grow(s))
-		return NULL;
+        if (s->capacity == 0 || s->length == s->capacity - 1) {
+                if (!cgs_string_grow(s))
+                        return NULL;
+        }
+
 	s->data[s->length++] = c;
 	s->data[s->length] = '\0';
-	return s->data;
+	return s;
 }
 
 struct cgs_string*

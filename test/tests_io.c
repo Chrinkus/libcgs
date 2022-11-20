@@ -48,9 +48,7 @@ static void io_getline_test(void** state)
 {
 	FILE* file = *(FILE**)state;
 
-        struct cgs_string buff = { 0 };
-        assert_non_null(cgs_string_new(&buff));
-
+        struct cgs_string buff = cgs_string_new();
 	int n = cgs_io_getline(file, &buff);
 
 	assert_int_equal(n, 8);

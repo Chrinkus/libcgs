@@ -42,9 +42,7 @@ cgs_io_getline(FILE* file, struct cgs_string* buff)
 char*
 cgs_io_readline(FILE* file)
 {
-        struct cgs_string buffer = { 0 };
-        if (!cgs_string_new(&buffer))
-                return NULL;
+        struct cgs_string buffer = cgs_string_new();
 
 	if (cgs_io_getline(file, &buffer) > 0)
                 return cgs_string_xfer(&buffer);
@@ -57,9 +55,7 @@ cgs_io_readline(FILE* file)
 void*
 cgs_io_readlines(FILE* file, struct cgs_vector* lines)
 {
-        struct cgs_string buffer = { 0 };
-        if (!cgs_string_new(&buffer))
-                return NULL;
+        struct cgs_string buffer = cgs_string_new();
 
         char* line = NULL;
         while (cgs_io_getline(file, &buffer) > 0) {
