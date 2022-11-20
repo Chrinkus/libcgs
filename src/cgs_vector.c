@@ -36,27 +36,20 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 #include "cgs_vector.h"
+#include "cgs_vector_private.h"
 
 #include <stdlib.h>
 #include <string.h>
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Vector Types
+ * Private Vector Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-enum cgs_vector_constants {
-	CGS_VECTOR_INITIAL_CAPACITY = 8,
-	CGS_VECTOR_GROWTH_RATE = 2,
-};
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Vector Static Helpers - move to private header?
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-
-static const void*
+void*
 cgs_vector_grow(struct cgs_vector* v)
 {
-	size_t new_capacity = v->capacity == 0 ? CGS_VECTOR_INITIAL_CAPACITY
+	size_t new_capacity = v->capacity == 0
+                ? CGS_VECTOR_INITIAL_CAPACITY
 		: v->capacity * CGS_VECTOR_GROWTH_RATE;
 	
 	char* p = realloc(v->data, v->element_size * new_capacity);
@@ -65,7 +58,7 @@ cgs_vector_grow(struct cgs_vector* v)
 
         v->data = p;
         v->capacity = new_capacity;
-	return p;
+	return v;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
