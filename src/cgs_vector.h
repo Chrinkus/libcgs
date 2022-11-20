@@ -170,7 +170,7 @@ cgs_vector_data(const struct cgs_vector* v)
 }
 
 /**
- * cgs_vector_data_mutable
+ * cgs_vector_data_mut
  *
  * Get a writable pointer to the vector object.
  *
@@ -182,7 +182,7 @@ cgs_vector_data(const struct cgs_vector* v)
  * @return      A void-pointer to the data object.
  */
 inline void*
-cgs_vector_data_mutable(struct cgs_vector* v)
+cgs_vector_data_mut(struct cgs_vector* v)
 {
         return (void*)v->data;
 }
@@ -204,7 +204,7 @@ cgs_vector_get(const struct cgs_vector* v, size_t index)
 }
 
 /**
- * cgs_vector_get_mutable
+ * cgs_vector_get_mut
  *
  * Get a mutable pointer to an element in the vector. No bounds checking.
  *
@@ -214,7 +214,7 @@ cgs_vector_get(const struct cgs_vector* v, size_t index)
  * @return	A mutable pointer to the element.
  */
 inline void*
-cgs_vector_get_mutable(struct cgs_vector* v, size_t index)
+cgs_vector_get_mut(struct cgs_vector* v, size_t index)
 {
 	return &v->data[v->element_size * index];
 }

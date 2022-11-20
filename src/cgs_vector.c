@@ -154,13 +154,13 @@ const void*
 cgs_vector_data(const struct cgs_vector* v);
 
 void*
-cgs_vector_data_mutable(struct cgs_vector* v);
+cgs_vector_data_mut(struct cgs_vector* v);
 
 const void*
 cgs_vector_get(const struct cgs_vector* v, size_t index);
 
 void*
-cgs_vector_get_mutable(struct cgs_vector* v, size_t index);
+cgs_vector_get_mut(struct cgs_vector* v, size_t index);
 
 const void*
 cgs_vector_begin(const struct cgs_vector* v);
@@ -181,7 +181,7 @@ cgs_vector_push(struct cgs_vector* v, const void* src)
 	if (v->length == v->capacity && !cgs_vector_grow(v))
 		return NULL;
 
-	char* dst = cgs_vector_get_mutable(v, v->length);
+	char* dst = cgs_vector_get_mut(v, v->length);
 	memcpy(dst, src, v->element_size);
 	++v->length;
 	return dst;
@@ -220,7 +220,7 @@ cgs_vector_find(struct cgs_vector* v, CgsPredicate pred, const void* data)
 {
 	for (size_t i = 0; i < v->length; ++i)
 		if (pred(cgs_vector_get(v, i), data))
-			return cgs_vector_get_mutable(v, i);
+			return cgs_vector_get_mut(v, i);
 	return NULL;
 }
 
@@ -235,6 +235,6 @@ void
 cgs_vector_transform(struct cgs_vector* v, CgsUnaryOpMut f, void* data)
 {
         for (size_t i = 0, l = v->length; i < l; ++i)
-                f(cgs_vector_get_mutable(v, i), i, data);
+                f(cgs_vector_get_mut(v, i), i, data);
 }
 
