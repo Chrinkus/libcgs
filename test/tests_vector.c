@@ -204,7 +204,7 @@ static void vector_sort_test(void** state)
 	const int* ints = *(const int**)state;
 
         struct cgs_vector vi = { 0 };
-        cgs_vector_new_from_array(&vi, sizeof(ints[0]), ints, NUM_RANDOMS);
+        cgs_vector_from_array(ints, NUM_RANDOMS, sizeof(ints[0]), &vi);
 
 	cgs_vector_sort(&vi, cgs_int_cmp);
 
@@ -221,7 +221,7 @@ static void vector_find_test(void** state)
 	const int* ints = *(const int**)state;
 
         struct cgs_vector vi = { 0 };
-        cgs_vector_new_from_array(&vi, sizeof(ints[0]), ints, NUM_RANDOMS);
+        cgs_vector_from_array(ints, NUM_RANDOMS, sizeof(ints[0]), &vi);
 
 	int x = 99;
 	int* found = cgs_vector_find(&vi, cgs_int_pred, &x);
@@ -240,7 +240,7 @@ static void vector_xfer_test(void** state)
 	const int* ints = *(const int**)state;
 
         struct cgs_vector vi = { 0 };
-        cgs_vector_new_from_array(&vi, sizeof(ints[0]), ints, NUM_RANDOMS);
+        cgs_vector_from_array(ints, NUM_RANDOMS, sizeof(ints[0]), &vi);
 
 	size_t len = 0;
 	int* out = cgs_vector_xfer(&vi, &len);
@@ -285,13 +285,13 @@ static void vector_copy_test(void** state)
         cgs_vector_free(&v2);
 }
 
-static void vector_new_from_array_test(void** state)
+static void vector_from_array_test(void** state)
 {
 	const int* ints = *(const int**)state;
 
         struct cgs_vector vi = { 0 };
-        void* res = cgs_vector_new_from_array(&vi, sizeof(ints[0]), ints,
-                        NUM_RANDOMS);
+        void* res = cgs_vector_from_array(ints, NUM_RANDOMS, sizeof(ints[0]),
+                        &vi);
         assert_non_null(res);
 
 	assert_int_equal(cgs_vector_length(&vi), NUM_RANDOMS);
@@ -307,7 +307,7 @@ static void vector_iter_test(void** state)
 	const int* ints = *(const int**)state;
 
         struct cgs_vector vi = { 0 };
-        cgs_vector_new_from_array(&vi, sizeof(ints[0]), ints, NUM_IOTAS);
+        cgs_vector_from_array(ints, NUM_IOTAS, sizeof(ints[0]), &vi);
 
 	const int* b = cgs_vector_begin(&vi);
 	assert_non_null(b);
@@ -418,7 +418,7 @@ int main(void)
 		cmocka_unit_test(vector_find_test),
 		cmocka_unit_test(vector_xfer_test),
 		cmocka_unit_test(vector_copy_test),
-		cmocka_unit_test(vector_new_from_array_test),
+		cmocka_unit_test(vector_from_array_test),
 		cmocka_unit_test_setup_teardown(vector_iter_test, setup_iota,
 				teardown_ptr),
 		cmocka_unit_test_setup_teardown(vector_strings_test,

@@ -100,14 +100,14 @@ cgs_vector_copy(const struct cgs_vector* src, struct cgs_vector* dst)
 }
 
 void*
-cgs_vector_new_from_array(struct cgs_vector* v, size_t size,
-                const void* src, size_t len)
+cgs_vector_from_array(const void* arr, size_t len, size_t size,
+                struct cgs_vector* v)
 {
         char* p = malloc(len * size);
         if (!p)
                 return NULL;
 
-        memcpy(p, src, len * size);
+        memcpy(p, arr, len * size);
         v->length = len;
         v->capacity = len;
         v->element_size = size;

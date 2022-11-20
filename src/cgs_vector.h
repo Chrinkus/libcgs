@@ -79,21 +79,21 @@ void*
 cgs_vector_copy(const struct cgs_vector* src, struct cgs_vector* dst);
 
 /**
- * cgs_vector_new_from_array
+ * cgs_vector_from_array
  *
  * Allocates a new vector and fills it with the elements in src.
  *
- * @param v     A pointer to the vector structure to create a copy to.
- * @param size	The size in bytes of the elements in the vector.
- * @param src	A read-only pointer to the source array.
+ * @param arr	A read-only pointer to the source array.
  * @param len	The length of the source array.
+ * @param size	The size in bytes of the elements in the vector.
+ * @param v     A pointer to the vector structure to create a copy to.
  *
  * @return      A pointer to the vector on successful allocation or NULL on
  *              failure.
  */
 void*
-cgs_vector_new_from_array(struct cgs_vector* v, size_t size,
-                const void* src, size_t len);
+cgs_vector_from_array(const void* arr, size_t len, size_t size,
+                struct cgs_vector* v);
 
 /**
  * cgs_vector_free
