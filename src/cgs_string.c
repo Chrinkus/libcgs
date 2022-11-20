@@ -97,7 +97,7 @@ const char*
 cgs_string_data(const struct cgs_string* s);
 
 char*
-cgs_string_data_mutable(struct cgs_string* s);
+cgs_string_data_mut(struct cgs_string* s);
 
 size_t
 cgs_string_length(const struct cgs_string* s);
@@ -106,7 +106,7 @@ const char*
 cgs_string_get(const struct cgs_string* s, size_t i);
 
 char*
-cgs_string_get_mutable(struct cgs_string* s, size_t i);
+cgs_string_get_mut(struct cgs_string* s, size_t i);
 
 char
 cgs_string_char(const struct cgs_string* s, size_t i);
@@ -115,13 +115,13 @@ const char*
 cgs_string_end(const struct cgs_string* s);
 
 char*
-cgs_string_end_mutable(struct cgs_string* s);
+cgs_string_end_mut(struct cgs_string* s);
 
 const char*
 cgs_string_begin(const struct cgs_string* s);
 
 char*
-cgs_string_begin_mutable(struct cgs_string* s);
+cgs_string_begin_mut(struct cgs_string* s);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * String Static Helper Functions

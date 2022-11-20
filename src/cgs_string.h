@@ -131,16 +131,16 @@ cgs_string_data(const struct cgs_string* s)
 }
 
 /**
- * cgs_string_data
+ * cgs_string_data_mut
  *
- * Get writable access to the string.
+ * Get mutable access to the string.
  *
  * @param s     The string to read.
  *
  * @return      A writable pointer to the data member of the string.
  */
 inline char*
-cgs_string_data_mutable(struct cgs_string* s)
+cgs_string_data_mut(struct cgs_string* s)
 {
         return s->data;
 }
@@ -177,9 +177,9 @@ cgs_string_get(const struct cgs_string* s, size_t i)
 }
 
 /**
- * cgs_string_get_mutable
+ * cgs_string_get_mut
  *
- * Get a writable pointer to a given index in the string.
+ * Get a mutable pointer to a given index in the string.
  *
  * @param s     The string struct.
  * @param i     The index of the pointer to get.
@@ -187,7 +187,7 @@ cgs_string_get(const struct cgs_string* s, size_t i)
  * @return      A writable pointer to the character at the given index.
  */
 inline char*
-cgs_string_get_mutable(struct cgs_string* s, size_t i)
+cgs_string_get_mut(struct cgs_string* s, size_t i)
 {
         return &s->data[i];
 }
@@ -226,7 +226,7 @@ cgs_string_end(const struct cgs_string* s)
 }
 
 /**
- * cgs_string_end_mutable
+ * cgs_string_end_mut
  *
  * Get a writable pointer to the character past the last character in the
  * string. Should be a null byte '\0'.
@@ -237,7 +237,7 @@ cgs_string_end(const struct cgs_string* s)
  *              in the string.
  */
 inline char*
-cgs_string_end_mutable(struct cgs_string* s)
+cgs_string_end_mut(struct cgs_string* s)
 {
         return &s->data[s->length];
 }
@@ -259,7 +259,7 @@ cgs_string_begin(const struct cgs_string* s)
 }
 
 /**
- * cgs_string_begin_mutable
+ * cgs_string_begin_mut
  *
  * Get a writable pointer to the first character in the string. Identical to
  * `cgs_string_data_mutable`. Added for symmetry with `cgs_string_end_mutable`.
@@ -269,7 +269,7 @@ cgs_string_begin(const struct cgs_string* s)
  * @return      A writable pointer to the first character in the string.
  */
 inline char*
-cgs_string_begin_mutable(struct cgs_string* s)
+cgs_string_begin_mut(struct cgs_string* s)
 {
         return s->data;
 }
