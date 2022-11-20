@@ -263,8 +263,8 @@ static void vector_copy_test(void** state)
 	for (int i = 0; i < NUM_RANDOMS; ++i)
 		cgs_vector_push(&v1, &ints[i]);
 
-        struct cgs_vector v2 = { 0 };           // copy idom?
-        assert_non_null(cgs_vector_copy(&v2, &v1));
+        struct cgs_vector v2 = cgs_vector_new(0);
+        assert_non_null(cgs_vector_copy(&v1, &v2));
         assert_int_not_equal(v2.length, 0);
         assert_int_not_equal(v2.capacity, 0);
         assert_int_not_equal(v2.element_size, 0);

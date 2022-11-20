@@ -84,7 +84,7 @@ cgs_vector_new(size_t size)
 }
 
 void*
-cgs_vector_copy(struct cgs_vector* dst, const struct cgs_vector* src)
+cgs_vector_copy(const struct cgs_vector* src, struct cgs_vector* dst)
 {
         char* p = malloc(src->length * src->element_size);
         if (!p)

@@ -68,15 +68,15 @@ cgs_vector_new(size_t size);
  * cgs_vector_copy
  *
  * Copy an existing vector into a new one. The 'dst' vector should not own any
- * allocated memory.
+ * allocated memory, ideally being created by the call `cgs_vector_new(0)`.
  *
- * @param dst   The destination cgs_vector to copy to.
  * @param src   The source cgs_vector to copy from.
+ * @param dst   The destination cgs_vector to copy to.
  *
  * @return      A pointer to the 'dst' vector on success, NULL on failure.
  */
 void*
-cgs_vector_copy(struct cgs_vector* dst, const struct cgs_vector* src);
+cgs_vector_copy(const struct cgs_vector* src, struct cgs_vector* dst);
 
 /**
  * cgs_vector_new_from_array
