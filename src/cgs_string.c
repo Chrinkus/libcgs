@@ -46,9 +46,9 @@ cgs_string_new(void)
 }
 
 void*
-cgs_string_new_from_str(struct cgs_string* s, const char* src)
+cgs_string_from(const char* src, struct cgs_string* s)
 {
-        int len = strlen(src);
+        size_t len = strlen(src);
         char* p = malloc(len + 1);
         if (!p)
                 return NULL;

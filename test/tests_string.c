@@ -14,26 +14,26 @@ string_new_test(void** state)
         assert_null(s.data);
 }
 
-/*
-int string_new_from_str_test(void* data)
+static void
+string_from_test(void** state)
 {
-	const char* test = (const char*)data;
+        (void)state;
+	const char* test = "Super test string";
 
-        struct cgs_string s = { 0 };
-        assert(cgs_string_new_from_str(&s, test) != NULL);
+        struct cgs_string s1 = cgs_string_new();
+        assert_non_null(cgs_string_from(test, &s1));
 
-	assert(cgs_string_length(&s) == strlen(test));
-	assert(strcmp(cgs_string_data(&s), test) == 0);
-	assert(cgs_string_data(&s) != test);
+	assert_int_equal(cgs_string_length(&s1), strlen(test));
+	assert_string_equal(cgs_string_data(&s1), test);
+	assert_ptr_not_equal(cgs_string_data(&s1), test);
 
-	cgs_string_push(&s, '!');
-	assert(strcmp(cgs_string_data(&s), test) != 0);
+	cgs_string_push(&s1, '!');
+	assert_string_not_equal(cgs_string_data(&s1), test);
 
-	cgs_string_free(&s);
-
-	return TEST_SUCCESS;
+	cgs_string_free(&s1);
 }
 
+/*
 int string_xfer_test(void* data)
 {
 	const char* test = (const char*)data;
@@ -215,6 +215,7 @@ int main(void)
 	// return cgs_run_tests(tests);
         const struct CMUnitTest tests[] = {
                 cmocka_unit_test(string_new_test),
+                cmocka_unit_test(string_from_test),
                 cmocka_unit_test(string_push_test),
         };
 

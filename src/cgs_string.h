@@ -64,17 +64,17 @@ struct cgs_string
 cgs_string_new();
 
 /**
- * cgs_string_new_from_str
+ * cgs_string_from
  *
  * Create a new string by copying the contents of a standard string.
  *
- * @param s     The destination string struct to allocate and copy to.
  * @param src   A read-only pointer to the source string to copy from.
+ * @param s     The destination string struct to allocate and copy to.
  *
- * @return      A valid pointer on successful allocation or NULL on failure.
+ * @return      A pointer to s on successful allocation or NULL on failure.
  */
 void*
-cgs_string_new_from_str(struct cgs_string* s, const char* src);
+cgs_string_from(const char* src, struct cgs_string* s);
 
 /**
  * cgs_string_free
