@@ -46,6 +46,33 @@ cgs_string_new(void)
 }
 
 void*
+cgs_string_copy(const struct cgs_string* src, struct cgs_string* dst)
+{
+        if (dst->capacity < src->capacity) {
+                char* p = realloc(dst->data, src->length + 1);
+                if (!p)
+                        return NULL;
+                dst->data = p;
+                dst->capacity = src->length + 1;
+        }
+        strcpy(dst->data, src->data);
+        return dst;
+}
+
+void
+cgs_string_move(struct cgs_string* src, struct cgs_string* dst)
+{
+        if (dst->capacity != 0)
+                cgs_string_free(dst);
+
+        dst->length = src->length;
+        dst->capacity = src->capacity;
+        dst->data = src->data;
+
+        memset(src, 0, sizeof(*src));
+}
+
+void*
 cgs_string_from(const char* src, struct cgs_string* s)
 {
         size_t len = strlen(src);

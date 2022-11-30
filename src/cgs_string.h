@@ -64,11 +64,36 @@ struct cgs_string
 cgs_string_new();
 
 /**
+ * cgs_string_copy
+ *
+ * Copy a source string to a destination string.
+ *
+ * @param src   A read-only pointer to the string to copy from.
+ * @param dst   A mutable pointer to the string to copy to.
+ *
+ * @return      A pointer to dst on successful allocation or NULL on failure.
+ */
+void*
+cgs_string_copy(const struct cgs_string* src, struct cgs_string* dst);
+
+/**
+ * cgs_string_move
+ *
+ * Move the members of one string to another and set the source string's data
+ * to NULL.
+ *
+ * @param src   The string to move from.
+ * @param dst   The string to move to.
+ */
+void
+cgs_string_move(struct cgs_string* src, struct cgs_string* dst);
+
+/**
  * cgs_string_from
  *
- * Create a new string by copying the contents of a standard string.
+ * Create a new string by copying the contents of a standard C-string.
  *
- * @param src   A read-only pointer to the source string to copy from.
+ * @param src   A read-only pointer to the source C-string to copy from.
  * @param s     The destination string struct to allocate and copy to.
  *
  * @return      A pointer to s on successful allocation or NULL on failure.

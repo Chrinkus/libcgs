@@ -15,6 +15,43 @@ string_new_test(void** state)
 }
 
 static void
+string_copy_test(void** state)
+{
+        (void)state;
+        const char* s0 = "Ubuntu";
+
+        struct cgs_string s1 = cgs_string_new();
+        cgs_string_from(s0, &s1);
+
+        struct cgs_string s2 = cgs_string_new();
+        assert_non_null(cgs_string_copy(&s1, &s2));
+        assert_string_equal(s2.data, s0);
+
+        cgs_string_free(&s1);
+        cgs_string_free(&s2);
+}
+
+static void
+string_move_test(void** state)
+{
+        (void)state;
+        const char* s0 = "Lofi hip hop radio";
+
+        struct cgs_string s1 = cgs_string_new();
+        cgs_string_from(s0, &s1);
+
+        struct cgs_string s2 = cgs_string_new();
+        cgs_string_move(&s1, &s2);
+
+        assert_string_equal(s2.data, s0);
+        assert_int_equal(s2.length, 18);
+        
+        assert_null(s1.data);
+        assert_int_equal(s1.length, 0);
+        assert_int_equal(s1.capacity, 0);
+}
+
+static void
 string_from_test(void** state)
 {
         (void)state;
@@ -215,6 +252,8 @@ int main(void)
 	// return cgs_run_tests(tests);
         const struct CMUnitTest tests[] = {
                 cmocka_unit_test(string_new_test),
+                cmocka_unit_test(string_copy_test),
+                cmocka_unit_test(string_move_test),
                 cmocka_unit_test(string_from_test),
                 cmocka_unit_test(string_push_test),
         };
