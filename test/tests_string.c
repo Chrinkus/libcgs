@@ -11,7 +11,7 @@ string_new_test(void** state)
 
 	assert_int_equal(s.length, 0);
         assert_int_equal(s.capacity, 0);
-        assert_null(s.data);
+        assert_string_equal(s.data, "");
 }
 
 static void
@@ -46,7 +46,7 @@ string_move_test(void** state)
         assert_string_equal(s2.data, s0);
         assert_int_equal(s2.length, 18);
         
-        assert_null(s1.data);
+        assert_string_equal(s1.data, "");
         assert_int_equal(s1.length, 0);
         assert_int_equal(s1.capacity, 0);
 }
