@@ -32,6 +32,35 @@ static void compare_int_test(void** state)
 	assert_true(cgs_int_cmp(&j, &i) > 0);
 }
 
+static void
+compare_int_rev_test(void** state)
+{
+        (void)state;
+
+	int a = 2;
+	int b = 2;
+	int c = -27;
+	int d = 16;
+	int e = 200;
+	int f = 32;
+
+	assert_true(cgs_int_cmp_rev(&a, &b) == 0);
+	assert_true(cgs_int_cmp_rev(&c, &d) > 0);
+	assert_true(cgs_int_cmp_rev(&e, &f) < 0);
+
+	int g = -2000000000;
+	int h = 2000000000;
+
+	assert_true(cgs_int_cmp_rev(&g, &h) > 0);
+	assert_true(cgs_int_cmp_rev(&h, &g) < 0);
+
+	int i = INT_MIN;
+	int j = INT_MAX;
+
+	assert_true(cgs_int_cmp_rev(&i, &j) > 0);
+	assert_true(cgs_int_cmp_rev(&j, &i) < 0);
+}
+
 static void compare_char_test(void** state)
 {
 	(void)state;
@@ -68,6 +97,7 @@ int main(void)
 {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(compare_int_test),
+		cmocka_unit_test(compare_int_rev_test),
 		cmocka_unit_test(compare_char_test),
 		cmocka_unit_test(compare_str_test),
 	};

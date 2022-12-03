@@ -27,7 +27,7 @@
 /**
  * cgs_int_cmp
  *
- * Three-way comparison function for integers.
+ * Three-way comparison function for integers. Sorts from smallest to largest.
  *
  * @param a	A pointer to the target integer.
  * @param b	A pointer to the compare integer.
@@ -35,6 +35,18 @@
  * @return	An integer indicating the result of the comparison.
  */
 int cgs_int_cmp(const void* a, const void* b);
+
+/**
+ * cgs_int_cmp_rev
+ *
+ * Three-wat comparison function for integers. Sorts from largest to smallest.
+ *
+ * @param a	A pointer to the target integer.
+ * @param b	A pointer to the compare integer.
+ *
+ * @return	An integer indicating the result of the comparison.
+ */
+int cgs_int_cmp_rev(const void* a, const void* b);
 
 /**
  * cgs_str_cmp
