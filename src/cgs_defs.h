@@ -131,3 +131,11 @@ typedef void (*CgsUnaryOp)(const void*, size_t, void*);
  */
 typedef void (*CgsUnaryOpMut)(void*, size_t, void*);
 
+/**
+ * CgsFreeFunc
+ *
+ * The signature that a custom free function needs to interact with
+ * `cgs_vector_free_all_with()`.
+ */
+typedef void (*CgsFreeFunc)(void*);
+

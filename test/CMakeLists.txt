@@ -27,6 +27,7 @@ set(test_sources
         "tests_strsub.c"
         "tests_str_split.c"
 	"tests_vector.c"
+        "tests_vector_string.c"
 )
 
 # For stripping prefix.

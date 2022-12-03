@@ -52,16 +52,9 @@ void*
 cgs_string_copy(const struct cgs_string* src, struct cgs_string* dst)
 {
         if (dst->capacity < src->capacity &&
-                        !cgs_string_alloc(dst, src->length + 1)) {
+                        !cgs_string_alloc(dst, src->length + 1))
                 return NULL;
-                /*
-                char* p = realloc(dst->data, src->length + 1);
-                if (!p)
-                        return NULL;
-                dst->data = p;
-                dst->capacity = src->length + 1;
-                */
-        }
+
         strcpy(dst->data, src->data);
         return dst;
 }
@@ -69,9 +62,6 @@ cgs_string_copy(const struct cgs_string* src, struct cgs_string* dst)
 void
 cgs_string_move(struct cgs_string* src, struct cgs_string* dst)
 {
-        if (dst->capacity != 0)
-                cgs_string_free(dst);
-
         dst->length = src->length;
         dst->capacity = src->capacity;
         dst->data = src->data;
@@ -87,14 +77,6 @@ cgs_string_from(const char* src, struct cgs_string* s)
         size_t len = strlen(src);
         if (!cgs_string_alloc(s, len + 1))
                 return NULL;
-        /*
-        char* p = malloc(len + 1);
-        if (!p)
-                return NULL;
-
-        s->capacity = len + 1;
-        s->data = p;
-        */
 
         strcpy(s->data, src);
         s->length = len;
@@ -102,8 +84,9 @@ cgs_string_from(const char* src, struct cgs_string* s)
 }
 
 void
-cgs_string_free(struct cgs_string* s)
+cgs_string_free(void* p)
 {
+        struct cgs_string* s = p;
 	if (s && s->data != CGS_EMPTY_STRING)
 		free(s->data);
 }
@@ -113,14 +96,6 @@ cgs_string_shrink(struct cgs_string* s)
 {
         if (!cgs_string_alloc(s, s->length + 1))
                 return NULL;
-        /*
-        char* p = realloc(s->data, s->length + 1);
-        if (!p)
-                return NULL;
-
-        s->data = p;
-        s->capacity = s->length + 1;
-        */
         return s;
 }
 
@@ -217,14 +192,7 @@ cgs_string_grow(struct cgs_string* s)
 
         if (!cgs_string_alloc(s, new_cap))
                 return NULL;
-        /*
-	char* p = realloc(s->data, new_cap);
-        if (!p)
-                return NULL;
 
-        s->data = p;
-        s->capacity = new_cap;
-        */
 	return s;
 }
 
@@ -236,14 +204,6 @@ cgs_string_grow_len(struct cgs_string* s, size_t len)
 
         if (!cgs_string_alloc(s, new_cap))
                 return NULL;
-        /*
-        char* p = realloc(s->data, new_cap);
-        if (!p)
-                return NULL;
-
-        s->data = p;
-        s->capacity = new_cap;
-        */
         return s;
 }
 

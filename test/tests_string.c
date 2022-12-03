@@ -49,6 +49,8 @@ string_move_test(void** state)
         assert_string_equal(s1.data, "");
         assert_int_equal(s1.length, 0);
         assert_int_equal(s1.capacity, 0);
+
+        cgs_string_free(&s2);
 }
 
 static void

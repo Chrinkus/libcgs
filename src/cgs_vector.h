@@ -119,6 +119,18 @@ void
 cgs_vector_free_all(struct cgs_vector* v);
 
 /**
+ * cgs_vector_free_all_with
+ *
+ * Deallocates the elements of a vector using the provided function, then 
+ * frees the vector itself.
+ *
+ * @param v     The vector of allocated elements to free.
+ * @param ff    The custom free-ing function.
+ */
+void
+cgs_vector_free_all_with(struct cgs_vector* v, CgsFreeFunc ff);
+
+/**
  * cgs_vector_xfer
  *
  * Releases ownership of vector memory.

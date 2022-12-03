@@ -125,6 +125,16 @@ cgs_vector_free_all(struct cgs_vector* v)
 	}
 }
 
+void
+cgs_vector_free_all_with(struct cgs_vector* v, CgsFreeFunc ff)
+{
+        if (v->data) {
+                for (size_t i = 0, l = v->length; i < l; ++i)
+                        ff(cgs_vector_get_mut(v, i));
+                free(v->data);
+        }
+}
+
 void*
 cgs_vector_xfer(struct cgs_vector* v, size_t* len)
 {

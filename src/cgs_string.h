@@ -80,7 +80,7 @@ cgs_string_copy(const struct cgs_string* src, struct cgs_string* dst);
  * cgs_string_move
  *
  * Move the members of one string to another and set the source string's data
- * to NULL.
+ * to an empty string.
  *
  * @param src   The string to move from.
  * @param dst   The string to move to.
@@ -106,10 +106,11 @@ cgs_string_from(const char* src, struct cgs_string* s);
  *
  * Deallocate a string.
  *
- * @param s     The string to be freed.
+ * @param p     The string to be freed. Passed as `void*` to match free()
+ *              signature.
  */
 void
-cgs_string_free(struct cgs_string* s);
+cgs_string_free(void* p);
 
 /**
  * cgs_string_shrink
