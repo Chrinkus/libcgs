@@ -298,6 +298,21 @@ void*
 cgs_vector_push(struct cgs_vector* v, const void* src);
 
 /**
+ * cgs_vector_pop
+ *
+ * Remove the last element of the vector, copying it into the provided
+ * memory location.
+ *
+ * @param v     The vector.
+ * @param p     A pointer to the copy destination.
+ *
+ * @return      A pointer back to p on successful pop, NULL when length is
+ *              zero.
+ */
+void*
+cgs_vector_pop(struct cgs_vector* v, void* p);
+
+/**
  * cgs_vector_remove
  *
  * Remove an element at the given index in an vector. Preserves order. No

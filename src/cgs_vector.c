@@ -190,6 +190,17 @@ cgs_vector_push(struct cgs_vector* v, const void* src)
 	return dst;
 }
 
+void*
+cgs_vector_pop(struct cgs_vector* v, void* p)
+{
+        if (v->length == 0)
+                return NULL;
+
+        --v->length;
+        memcpy(p, &v->data[v->element_size * v->length], v->element_size);
+        return p;
+}
+
 void
 cgs_vector_remove(struct cgs_vector* v, size_t i)
 {

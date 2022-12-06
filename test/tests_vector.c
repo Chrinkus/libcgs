@@ -111,6 +111,40 @@ static void vector_push_test(void** state)
 	cgs_vector_free(&vi);
 }
 
+static void vector_pop_test(void** state)
+{
+        (void)state;
+        struct cgs_vector v1 = cgs_vector_new(sizeof(int));
+
+        int x = 10;
+        cgs_vector_push(&v1, &x);
+        x = 37;
+        cgs_vector_push(&v1, &x);
+        x = 3000;
+        cgs_vector_push(&v1, &x);
+
+        x = 0;
+        assert_int_equal(x, 0);
+        assert_int_equal(v1.length, 3);
+
+        assert_non_null(cgs_vector_pop(&v1, &x));
+        assert_int_equal(x, 3000);
+        assert_int_equal(v1.length, 2);
+
+        assert_non_null(cgs_vector_pop(&v1, &x));
+        assert_int_equal(x, 37);
+        assert_int_equal(v1.length, 1);
+
+        assert_non_null(cgs_vector_pop(&v1, &x));
+        assert_int_equal(x, 10);
+        assert_int_equal(v1.length, 0);
+
+        assert_null(cgs_vector_pop(&v1, &x));
+        assert_int_equal(x, 10);
+        
+        cgs_vector_free(&v1);
+}
+
 static void vector_remove_test(void** state)
 {
         (void)state;
@@ -411,6 +445,7 @@ int main(void)
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(vector_new_test),
 		cmocka_unit_test(vector_push_test),
+		cmocka_unit_test(vector_pop_test),
 		cmocka_unit_test(vector_remove_test),
 		cmocka_unit_test(vector_remove_fast_test),
                 cmocka_unit_test(vector_clear_test),
