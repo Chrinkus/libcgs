@@ -320,62 +320,18 @@ void*
 cgs_string_push(struct cgs_string* s, int c);
 
 /**
- * cgs_string_prepend_str
+ * cgs_string_cat
  *
- * Insert a standard C-string to the beginning of a string struct. May result
- * in a reallocation.
+ * Concatenate the contents of a string struct to the end of another string
+ * struct.
  *
- * @param s     The string to prepend to.
- * @param add   The standard string to add to the front of s.
- * @param len   The length of the add string.
+ * @param src   The string struct to add to the end of dst.
+ * @param dst   The string struct to add to.
  *
- * @return	A pointer back to s on success, NULL on failure.
+ * @return      A pointer back to dst on success, NULL on failure.
  */
 void*
-cgs_string_prepend_str(struct cgs_string* s, const char* add, size_t len);
-
-/**
- * cgs_string_append_str
- *
- * Insert a standard C-string to the end of a string struct. May result in a
- * reallocation.
- *
- * @param s     The string to append to.
- * @param add   The standard string to add to the end of s.
- * @param len   The length of the add string.
- *
- * @return	A pointer back to s on success, NULL on failure.
- */
-void*
-cgs_string_append_str(struct cgs_string* s, const char* add, size_t len);
-
-/**
- * cgs_string_prepend
- *
- * Insert the contents of a string struct to the beginning of another string
- * struct. May result in an reallocation.
- *
- * @param s     The string struct to add to.
- * @param add   The string struct to add to the front of s.
- *
- * @return      A pointer back to s on success, NULL on failure.
- */
-void*
-cgs_string_prepend(struct cgs_string* s, const struct cgs_string* add);
-
-/**
- * cgs_string_prepend
- *
- * Insert the contents of a string struct to the end of another string struct.
- * May result in an reallocation.
- *
- * @param s     The string struct to add to.
- * @param add   The string struct to add to the end of s.
- *
- * @return      A pointer back to s on success, NULL on failure.
- */
-void*
-cgs_string_append(struct cgs_string* s, const struct cgs_string* add);
+cgs_string_cat(const struct cgs_string* src, struct cgs_string* dst);
 
 /**
  * cgs_string_clear
@@ -560,3 +516,38 @@ cgs_str_split(const char* s, char delim, struct cgs_vector* vec);
 void*
 cgs_strsub_split(const struct cgs_strsub* ss, char delim,
                 struct cgs_vector* vec);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * C-String Utility Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/**
+ * cgs_string_prepend_str
+ *
+ * Insert a standard C-string to the beginning of a string struct. May result
+ * in a reallocation.
+ *
+ * @param s     The string to prepend to.
+ * @param add   The standard string to add to the front of s.
+ * @param len   The length of the add string.
+ *
+ * @return	A pointer back to s on success, NULL on failure.
+ */
+void*
+cgs_string_prepend_str(struct cgs_string* s, const char* add, size_t len);
+
+/**
+ * cgs_string_append_str
+ *
+ * Insert a standard C-string to the end of a string struct. May result in a
+ * reallocation.
+ *
+ * @param s     The string to append to.
+ * @param add   The standard string to add to the end of s.
+ * @param len   The length of the add string.
+ *
+ * @return	A pointer back to s on success, NULL on failure.
+ */
+void*
+cgs_string_append_str(struct cgs_string* s, const char* add, size_t len);
+

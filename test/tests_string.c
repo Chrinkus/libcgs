@@ -108,6 +108,25 @@ string_push_test(void** state)
 	cgs_string_free(&s);
 }
 
+static void
+string_cat_test(void** state)
+{
+        (void)state;
+        struct cgs_string s1 = cgs_string_new();
+        cgs_string_from("One could do worse ", &s1);
+        struct cgs_string s2 = cgs_string_new();
+        cgs_string_from("than be a swinger of birches", &s2);
+
+        assert_non_null(cgs_string_cat(&s2, &s1));
+        assert_string_equal(cgs_string_data(&s1),
+                        "One could do worse than be a swinger of birches");
+        assert_string_equal(cgs_string_data(&s2),
+                        "than be a swinger of birches");
+
+        cgs_string_free(&s1);
+        cgs_string_free(&s2);
+}
+
 /*
 int string_clear_test(void* data)
 {
@@ -238,9 +257,7 @@ int string_end_test(void* data)
 int main(void)
 {
 	// struct test tests[] = {
-	// 	{ "string_new", string_new_test, NULL },
 	// 	{ "string_xfer", string_xfer_test, "Transfer me!" },
-	// 	{ "string_push", string_push_test, NULL },
 	// 	{ "string_clear", string_clear_test, NULL },
 	// 	{ "string_erase", string_erase_test, NULL },
 	// 	{ "string_new_from_str", string_new_from_str_test,
@@ -258,6 +275,7 @@ int main(void)
                 cmocka_unit_test(string_move_test),
                 cmocka_unit_test(string_from_test),
                 cmocka_unit_test(string_push_test),
+                cmocka_unit_test(string_cat_test),
         };
 
         return cmocka_run_group_tests(tests, NULL, NULL);

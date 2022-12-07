@@ -225,41 +225,14 @@ cgs_string_push(struct cgs_string* s, int c)
 }
 
 void*
-cgs_string_prepend_str(struct cgs_string* s, const char* add, size_t len)
+cgs_string_cat(const struct cgs_string* src, struct cgs_string* dst)
 {
-        size_t new_len = s->length + len;
-        if (new_len >= s->capacity - 1 && !cgs_string_grow_len(s, new_len))
+        size_t new_cap = dst->length + src->length + 1;
+        if (dst->capacity < new_cap && !cgs_string_grow_len(dst, new_cap))
                 return NULL;
-
-        cgs_strprepend(s->data, add, len);
-
-        s->length = new_len;
-        return s;
-}
-
-void*
-cgs_string_append_str(struct cgs_string* s, const char* add, size_t len)
-{
-        size_t new_len = s->length + len;
-        if (new_len >= s->capacity - 1 && !cgs_string_grow_len(s, new_len))
-                return NULL;
-
-        strncat(s->data, add, len);
-
-        s->length = new_len;
-        return s;
-}
-
-void*
-cgs_string_prepend(struct cgs_string* s, const struct cgs_string* add)
-{
-        return cgs_string_prepend_str(s, add->data, add->length);
-}
-
-void*
-cgs_string_append(struct cgs_string* s, const struct cgs_string* add)
-{
-        return cgs_string_append_str(s, add->data, add->length);
+        strcat(dst->data, src->data);
+        dst->length = new_cap - 1;
+        return dst;
 }
 
 void
@@ -397,3 +370,34 @@ cgs_strsub_split(const struct cgs_strsub* ss, char delim,
         }
         return vec;
 }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * C-String Utility Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+void*
+cgs_string_prepend_str(struct cgs_string* s, const char* add, size_t len)
+{
+        size_t new_len = s->length + len;
+        if (new_len >= s->capacity - 1 && !cgs_string_grow_len(s, new_len))
+                return NULL;
+
+        cgs_strprepend(s->data, add, len);
+
+        s->length = new_len;
+        return s;
+}
+
+void*
+cgs_string_append_str(struct cgs_string* s, const char* add, size_t len)
+{
+        size_t new_len = s->length + len;
+        if (new_len >= s->capacity - 1 && !cgs_string_grow_len(s, new_len))
+                return NULL;
+
+        strncat(s->data, add, len);
+
+        s->length = new_len;
+        return s;
+}
+
