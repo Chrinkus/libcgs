@@ -24,7 +24,7 @@ $ cd libcgs
 
 ### Simple Build and Install
 
-The following set of commands builds a generic-configured static library using the default generator (make on Linux). This also assumes you have administrator privledges on the machine.
+The following set of commands builds a Release-configured static library using the default generator (make on Linux). This also assumes you have administrator privledges on the machine.
 
 ```
 $ mkdir build && cd build
@@ -47,12 +47,12 @@ $ cmake --install . --prefix "$HOME/.local"
 
 ### Advanced Build and Install
 
-This set of commands will configure the project for a release build and use Ninja to generate the project files. This also builds the project as a shared library.
+This set of commands will configure the project for a profile build and use Ninja to generate the project files. This also builds the project as a shared library.
 
 ```
 $ mkdir build-release
 $ cd build-release
-$ cmake -G Ninja -DBUILD_SHARED_LIBS=YES -DCMAKE_BUILD_TYPE=Release ..
+$ cmake -G Ninja -DBUILD_SHARED_LIBS=YES -DCMAKE_BUILD_TYPE=Profile ..
 $ cmake --build .
 $ sudo cmake --install .
 ```
