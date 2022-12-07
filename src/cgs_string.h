@@ -305,6 +305,21 @@ cgs_string_begin_mut(struct cgs_string* s)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
+ * cgs_string_cmp
+ *
+ * A three-way comparison function for string structs. Strings passed as
+ * void-pointers to mirror standard library signatures.
+ *
+ * @param a     A pointer to the target string.
+ * @param b     A pointer to the compare string.
+ *
+ * @return      An integer indicating the result of the comparison with 0
+ *              indicating equality.
+ */
+int
+cgs_string_cmp(const void* a, const void* b);
+
+/**
  * cgs_string_push
  *
  * Append a character to a string. Character is passed as an 'int' to match

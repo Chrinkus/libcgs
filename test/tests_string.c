@@ -92,6 +92,42 @@ int string_xfer_test(void* data)
 */
 
 static void
+string_cmp_test(void** state)
+{
+        (void)state;
+
+        struct cgs_string s1 = cgs_string_new();
+        cgs_string_from("John Coltrane", &s1);
+        struct cgs_string s2 = cgs_string_new();
+        cgs_string_from("Thelonious Monk", &s2);
+        struct cgs_string s3 = cgs_string_new();
+        cgs_string_from("Miles Davis", &s3);
+        struct cgs_string s4 = cgs_string_new();
+        cgs_string_from("Miles Davis", &s4);
+
+
+        struct cgs_string s0 = cgs_string_new();        // empty
+
+        assert_true(cgs_string_cmp(&s1, &s2) < 0);
+        assert_true(cgs_string_cmp(&s2, &s1) > 0);
+
+        assert_true(cgs_string_cmp(&s2, &s3) > 0);
+        assert_true(cgs_string_cmp(&s3, &s2) < 0);
+
+        assert_true(cgs_string_cmp(&s1, &s1) == 0);
+        assert_true(cgs_string_cmp(&s3, &s4) == 0);
+        assert_true(cgs_string_cmp(&s0, &s0) == 0);
+
+        assert_true(cgs_string_cmp(&s0, &s3) < 0);
+        assert_true(cgs_string_cmp(&s3, &s0) > 0);
+
+        cgs_string_free(&s1);
+        cgs_string_free(&s2);
+        cgs_string_free(&s3);
+        cgs_string_free(&s4);
+}
+
+static void
 string_push_test(void** state)
 {
 	(void)state;
@@ -260,20 +296,18 @@ int main(void)
 	// 	{ "string_xfer", string_xfer_test, "Transfer me!" },
 	// 	{ "string_clear", string_clear_test, NULL },
 	// 	{ "string_erase", string_erase_test, NULL },
-	// 	{ "string_new_from_str", string_new_from_str_test,
-	// 		"Super test string" },
 	// 	{ "string_sort", string_sort_test, NULL },
 	// 	{ "string_prepend", string_prepend_test, NULL },
 	// 	{ "string_append", string_append_test, NULL },
 	// 	{ "string_end", string_end_test, NULL },
 	// };
 
-	// return cgs_run_tests(tests);
         const struct CMUnitTest tests[] = {
                 cmocka_unit_test(string_new_test),
                 cmocka_unit_test(string_copy_test),
                 cmocka_unit_test(string_move_test),
                 cmocka_unit_test(string_from_test),
+                cmocka_unit_test(string_cmp_test),
                 cmocka_unit_test(string_push_test),
                 cmocka_unit_test(string_cat_test),
         };

@@ -211,6 +211,15 @@ cgs_string_grow_len(struct cgs_string* s, size_t len)
  * String Standard Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
+int
+cgs_string_cmp(const void* a, const void* b)
+{
+        const struct cgs_string* s1 = a;
+        const struct cgs_string* s2 = b;
+
+        return strcmp(cgs_string_data(s1), cgs_string_data(s2));
+}
+
 void*
 cgs_string_push(struct cgs_string* s, int c)
 {
