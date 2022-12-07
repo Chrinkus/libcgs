@@ -355,6 +355,10 @@ cgs_str_split(const char* s, char delim, struct cgs_vector* vec)
         return vec;
 }
 
+// Inline symbol
+void*
+cgs_string_split(const struct cgs_string* s, char delim, struct cgs_vector* v);
+
 void*
 cgs_strsub_split(const struct cgs_strsub* ss, char delim,
                 struct cgs_vector* vec)

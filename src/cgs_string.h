@@ -517,6 +517,24 @@ void*
 cgs_str_split(const char* s, char delim, struct cgs_vector* vec);
 
 /**
+ * cgs_string_split
+ *
+ * Split the provided `struct cgs_string` into strsub's and store them in the
+ * provided vector.
+ *
+ * @param s     The cgs_string to split.
+ * @param delim The character to split the string on.
+ * @param vec   The vector to store the strsub elements into.
+ *
+ * @return      A pointer back to the vector on success, NULL on failure.
+ */
+inline void*
+cgs_string_split(const struct cgs_string* s, char delim, struct cgs_vector* v)
+{
+        return cgs_str_split(cgs_string_data(s), delim, v);
+}
+
+/**
  * cgs_strsub_split
  *
  * Split the provided sub-string further into strsub's and store them in the
