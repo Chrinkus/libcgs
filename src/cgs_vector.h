@@ -231,6 +231,18 @@ cgs_vector_get_mut(struct cgs_vector* v, size_t index)
 	return &v->data[v->element_size * index];
 }
 
+inline const void*
+cgs_vector_first(const struct cgs_vector* v)
+{
+        return v->data;
+}
+
+inline const void*
+cgs_vector_last(const struct cgs_vector* v)
+{
+        return &v->data[v->element_size * (v->length - 1)];
+}
+
 /**
  * cgs_vector_begin
  *

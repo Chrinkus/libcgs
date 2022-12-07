@@ -166,6 +166,12 @@ void*
 cgs_vector_get_mut(struct cgs_vector* v, size_t index);
 
 const void*
+cgs_vector_first(const struct cgs_vector* v);
+
+const void*
+cgs_vector_last(const struct cgs_vector* v);
+
+const void*
 cgs_vector_begin(const struct cgs_vector* v);
 
 const void*

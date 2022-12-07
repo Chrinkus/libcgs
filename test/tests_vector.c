@@ -145,6 +145,24 @@ static void vector_pop_test(void** state)
         cgs_vector_free(&v1);
 }
 
+static void vector_first_last_test(void** state)
+{
+        (void)state;
+        struct cgs_vector v1 = cgs_vector_new(sizeof(int));
+        for (int i = 100; i < 1000; i += 100)
+                cgs_vector_push(&v1, &i);
+
+        const int* first = cgs_vector_first(&v1);
+        assert_non_null(first);
+        assert_int_equal(*first, 100);
+
+        const int* last = cgs_vector_last(&v1);
+        assert_non_null(last);
+        assert_int_equal(*last, 900);
+
+        cgs_vector_free(&v1);
+}
+
 static void vector_remove_test(void** state)
 {
         (void)state;
@@ -446,6 +464,7 @@ int main(void)
 		cmocka_unit_test(vector_new_test),
 		cmocka_unit_test(vector_push_test),
 		cmocka_unit_test(vector_pop_test),
+		cmocka_unit_test(vector_first_last_test),
 		cmocka_unit_test(vector_remove_test),
 		cmocka_unit_test(vector_remove_fast_test),
                 cmocka_unit_test(vector_clear_test),
