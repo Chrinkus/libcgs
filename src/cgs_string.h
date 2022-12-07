@@ -61,7 +61,7 @@ struct cgs_string {
  * @return      A new cgs_string struct.
  */
 struct cgs_string
-cgs_string_new();
+cgs_string_new(void);
 
 /**
  * cgs_string_copy
@@ -316,7 +316,7 @@ cgs_string_begin_mut(struct cgs_string* s)
  * @return	A pointer back to the provided string on success, NULL on
  * 		failure.
  */
-struct cgs_string*
+void*
 cgs_string_push(struct cgs_string* s, int c);
 
 /**
@@ -331,7 +331,7 @@ cgs_string_push(struct cgs_string* s, int c);
  *
  * @return	A pointer back to s on success, NULL on failure.
  */
-struct cgs_string*
+void*
 cgs_string_prepend_str(struct cgs_string* s, const char* add, size_t len);
 
 /**
@@ -346,7 +346,7 @@ cgs_string_prepend_str(struct cgs_string* s, const char* add, size_t len);
  *
  * @return	A pointer back to s on success, NULL on failure.
  */
-struct cgs_string*
+void*
 cgs_string_append_str(struct cgs_string* s, const char* add, size_t len);
 
 /**
@@ -360,7 +360,7 @@ cgs_string_append_str(struct cgs_string* s, const char* add, size_t len);
  *
  * @return      A pointer back to s on success, NULL on failure.
  */
-struct cgs_string*
+void*
 cgs_string_prepend(struct cgs_string* s, const struct cgs_string* add);
 
 /**
@@ -374,7 +374,7 @@ cgs_string_prepend(struct cgs_string* s, const struct cgs_string* add);
  *
  * @return      A pointer back to s on success, NULL on failure.
  */
-struct cgs_string*
+void*
 cgs_string_append(struct cgs_string* s, const struct cgs_string* add);
 
 /**

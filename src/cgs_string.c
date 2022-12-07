@@ -103,7 +103,7 @@ char*
 cgs_string_xfer(struct cgs_string* s)
 {
 	char* p = s->data;
-	s->data = NULL;
+	s->data = CGS_EMPTY_STRING;
         s->capacity = 0;
 	return p;
 }
@@ -211,7 +211,7 @@ cgs_string_grow_len(struct cgs_string* s, size_t len)
  * String Standard Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-struct cgs_string*
+void*
 cgs_string_push(struct cgs_string* s, int c)
 {
         if (s->capacity == 0 || s->length == s->capacity - 1) {
@@ -224,7 +224,7 @@ cgs_string_push(struct cgs_string* s, int c)
 	return s;
 }
 
-struct cgs_string*
+void*
 cgs_string_prepend_str(struct cgs_string* s, const char* add, size_t len)
 {
         size_t new_len = s->length + len;
@@ -237,7 +237,7 @@ cgs_string_prepend_str(struct cgs_string* s, const char* add, size_t len)
         return s;
 }
 
-struct cgs_string*
+void*
 cgs_string_append_str(struct cgs_string* s, const char* add, size_t len)
 {
         size_t new_len = s->length + len;
@@ -250,13 +250,13 @@ cgs_string_append_str(struct cgs_string* s, const char* add, size_t len)
         return s;
 }
 
-struct cgs_string*
+void*
 cgs_string_prepend(struct cgs_string* s, const struct cgs_string* add)
 {
         return cgs_string_prepend_str(s, add->data, add->length);
 }
 
-struct cgs_string*
+void*
 cgs_string_append(struct cgs_string* s, const struct cgs_string* add)
 {
         return cgs_string_append_str(s, add->data, add->length);
