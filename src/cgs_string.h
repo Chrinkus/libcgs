@@ -472,6 +472,19 @@ int
 cgs_strsub_eq_str(const struct cgs_strsub* ss, const char* s);
 
 /**
+ * cgs_strsub_to_int
+ *
+ * Attempt to parse a sub-string as an integer.
+ *
+ * @param ss    The sub-string to parse.
+ * @param out   A pointer to an integer to store the output in.
+ *
+ * @return      The 'out' pointer on successful parse, NULL on failure.
+ */
+void*
+cgs_strsub_to_int(const struct cgs_strsub* ss, int* out);
+
+/**
  * cgs_strsub_to_str
  *
  * Allocate a duplicate of the provided sub-string.

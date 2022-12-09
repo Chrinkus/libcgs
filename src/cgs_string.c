@@ -30,6 +30,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 /**
  * CGS_EMPTY_STRING
@@ -304,6 +305,31 @@ cgs_strsub_eq_str(const struct cgs_strsub* ss, const char* s)
 {
         return strlen(s) == ss->length
                 && strncmp(ss->data, s, ss->length) == 0;
+}
+
+void*
+cgs_strsub_to_int(const struct cgs_strsub* ss, int* out)
+{
+        const char* s = ss->data;
+        size_t i = 0;
+        while (i < ss->length && isspace(s[i]))
+                ++i;
+
+        int sign = 1;
+        if (s[i] == '-' || s[i] == '+')
+                sign = s[i++] == '-' ? -1 : 1;
+
+        if (i >= ss->length || !isdigit(s[i]))
+                return NULL;
+
+        *out = 0;
+        for ( ; i < ss->length && isdigit(ss->data[i]); ++i) {
+                *out *= 10;
+                *out += ss->data[i] - '0';
+        }
+
+        *out *= sign;
+        return out;
 }
 
 char*

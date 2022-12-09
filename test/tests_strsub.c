@@ -66,6 +66,44 @@ strsub_cmp(void** state)
 }
 
 static void
+strsub_to_int(void** state)
+{
+        (void)state;
+        const char* p1 = "531";
+        struct cgs_strsub ss1 = cgs_strsub_new(p1, 3);
+        struct cgs_strsub ss2 = cgs_strsub_new(p1, 2);
+
+        int n = 0;
+        assert_non_null(cgs_strsub_to_int(&ss1, &n));
+        assert_int_equal(n, 531);
+
+        assert_non_null(cgs_strsub_to_int(&ss2, &n));
+        assert_int_equal(n, 53);
+
+        const char* p2 = "-298310";
+        struct cgs_strsub ss3 = cgs_strsub_new(p2, 7);
+        assert_non_null(cgs_strsub_to_int(&ss3, &n));
+        assert_int_equal(n, -298310);
+
+        const char* p3 = "Not a number";
+        struct cgs_strsub ss4 = cgs_strsub_new(p3, 12);
+        assert_null(cgs_strsub_to_int(&ss4, &n));
+
+        const char* p4 = "";
+        struct cgs_strsub ss5 = cgs_strsub_new(p4, 0);
+        assert_null(cgs_strsub_to_int(&ss5, &n));
+
+        const char* p5 = "+-76";
+        struct cgs_strsub ss6 = cgs_strsub_new(p5, 4);
+        assert_null(cgs_strsub_to_int(&ss6, &n));
+
+        const char* p6 = "+9000";
+        struct cgs_strsub ss7 = cgs_strsub_new(p6, 5);
+        assert_non_null(cgs_strsub_to_int(&ss7, &n));
+        assert_int_equal(n, 9000);
+}
+
+static void
 strsub_to_str(void** state)
 {
         (void)state;
@@ -131,6 +169,7 @@ int main(void)
                 cmocka_unit_test(strsub_new),
                 cmocka_unit_test(strsub_from_str),
                 cmocka_unit_test(strsub_cmp),
+                cmocka_unit_test(strsub_to_int),
                 cmocka_unit_test(strsub_to_str),
                 cmocka_unit_test(strsub_to_string),
         };
