@@ -117,6 +117,29 @@ strsub_split_normal(void** state)
         assert_int_equal(cgs_strsub_eq_str(ss5, "Larionov"), 1);
 }
 
+static void
+string_split_normal(void** state)
+{
+        struct cgs_vector* v1 = *state;
+        struct cgs_string s1 = cgs_string_new();
+        cgs_string_from("So say we all", &s1);
+
+        void* res = cgs_string_split(&s1, ' ', v1);
+        assert_non_null(res);
+        assert_int_equal(cgs_vector_length(v1), 4);
+
+        const struct cgs_strsub* ss = cgs_vector_get(v1, 0);
+        assert_true(cgs_strsub_eq_str(ss, "So"));
+        ss = cgs_vector_get(v1, 1);
+        assert_true(cgs_strsub_eq_str(ss, "say"));
+        ss = cgs_vector_get(v1, 2);
+        assert_true(cgs_strsub_eq_str(ss, "we"));
+        ss = cgs_vector_get(v1, 3);
+        assert_true(cgs_strsub_eq_str(ss, "all"));
+
+        cgs_string_free(&s1);
+}
+
 int main(void)
 {
         const struct CMUnitTest tests[] = {
@@ -131,6 +154,9 @@ int main(void)
                                 su_sub_vec, td_sub_vec),
                 // strsub_split
                 cmocka_unit_test_setup_teardown(strsub_split_normal,
+                                su_sub_vec, td_sub_vec),
+                // string_split
+                cmocka_unit_test_setup_teardown(string_split_normal,
                                 su_sub_vec, td_sub_vec),
         };
 
