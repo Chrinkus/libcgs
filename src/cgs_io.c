@@ -57,22 +57,17 @@ cgs_io_readlines(FILE* file, struct cgs_vector* lines)
 {
         struct cgs_string buffer = cgs_string_new();
 
-        char* line = NULL;
         while (cgs_io_getline(file, &buffer) > 0) {
-                line = cgs_strdup(cgs_string_data(&buffer));
-                if (!line)
+                struct cgs_string line = cgs_string_new();
+                if (!cgs_string_copy(&buffer, &line))
                         goto error_cleanup;
                 if (!cgs_vector_push(lines, &line))
-                        goto push_error_cleanup;
+                        goto error_cleanup;
 
                 cgs_string_clear(&buffer);
         }
-
 	cgs_string_free(&buffer);
 	return lines;
-
-push_error_cleanup:
-        free(line);
 
 error_cleanup:
         cgs_string_free(&buffer);

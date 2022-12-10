@@ -63,10 +63,10 @@ cgs_io_readline(FILE* file);
 /**
  * cgs_io_readlines
  *
- * Read all lines from a file and store them in a cgs_vector sized for char*'s.
+ * Read all lines from a file and store them in a cgs_vector of cgs_string's.
  * 
  * @param file	The file or stream to read from.
- * @param lines A cgs_vector allocated for char*'s to store the lines in.
+ * @param lines A cgs_vector allocated for cgs_string's to store the lines in.
  *
  * @return	A valid pointer on success or NULL on failure.
  */

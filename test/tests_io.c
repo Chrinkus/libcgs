@@ -6,7 +6,8 @@
 
 const char* const data_path = "io_test_data.txt";
 
-static int setup_file_content(void** state)
+static int
+setup_file_content(void** state)
 {
 	(void)state;
 
@@ -25,7 +26,8 @@ static int setup_file_content(void** state)
 	return 0;
 }
 
-static int setup_file_read(void** state)
+static int
+setup_file_read(void** state)
 {
 	FILE* file = fopen(data_path, "r");
 
@@ -37,14 +39,16 @@ static int setup_file_read(void** state)
 	return 0;
 }
 
-static int teardown_file_read(void** state)
+static int
+teardown_file_read(void** state)
 {
 	FILE* file = *(FILE**)state;
 	fclose(file);
 	return 0;
 }
 
-static void io_getline_test(void** state)
+static void
+io_getline_test(void** state)
 {
 	FILE* file = *(FILE**)state;
 
@@ -77,7 +81,8 @@ static void io_getline_test(void** state)
 	cgs_string_free(&buff);
 }
 
-static void io_readline_test(void** state)
+static void
+io_readline_test(void** state)
 {
 	FILE* file = *(FILE**)state;
 
@@ -103,29 +108,29 @@ static void io_readline_test(void** state)
 	assert_null(line);
 }
 
-static void io_readlines_test(void** state)
+static void
+io_readlines_test(void** state)
 {
 	FILE* file = *(FILE**)state;
 
         void* res = NULL;
 
-        struct cgs_vector lines = cgs_vector_new(sizeof(char*));
+        struct cgs_vector lines = cgs_vector_new(sizeof(struct cgs_string));
 
-        res = cgs_io_readlines(file, &lines);
-        assert_non_null(res);
+        assert_non_null(cgs_io_readlines(file, &lines));
 	assert_int_equal(cgs_vector_length(&lines), 4);
 
-	CgsStrIter b = cgs_vector_begin(&lines);
-	CgsStrIter e = cgs_vector_end(&lines);
+	const struct cgs_string* b = cgs_vector_begin(&lines);
+	const struct cgs_string* e = cgs_vector_end(&lines);
 	assert_ptr_not_equal(b, e);
 
-	assert_string_equal(*b++, "Birthday");
-	assert_string_equal(*b++, "Christmas");
-	assert_string_equal(*b++, "Tuesday");
-	assert_string_equal(*b++, "Books for reading");
+	assert_true(cgs_string_eq_str(b++, "Birthday"));
+	assert_true(cgs_string_eq_str(b++, "Christmas"));
+	assert_true(cgs_string_eq_str(b++, "Tuesday"));
+	assert_true(cgs_string_eq_str(b++, "Books for reading"));
 	assert_ptr_equal(b, e);
 
-	cgs_vector_free_all(&lines);
+	cgs_vector_free_all_with(&lines, cgs_string_free);
 }
 
 int main(void)
@@ -141,4 +146,3 @@ int main(void)
 
 	return cmocka_run_group_tests(tests, setup_file_content, NULL);
 }
-
