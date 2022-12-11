@@ -27,9 +27,16 @@ static void bst_int_insert_test(void** state)
 
 	struct cgs_variant var = { 0 };
 	cgs_variant_set_int(&var, 5);
-
 	assert_non_null(cgs_bst_insert(&tree, &var));
 	assert_int_equal(cgs_bst_length(&tree), 1);
+
+        cgs_variant_set_int(&var, 10);
+        assert_non_null(cgs_bst_insert(&tree, &var));
+        assert_int_equal(cgs_bst_length(&tree), 2);
+
+	cgs_variant_set_int(&var, 5);
+	assert_non_null(cgs_bst_insert(&tree, &var));
+	assert_int_equal(cgs_bst_length(&tree), 2);     // no duplicate inserts
 
 	cgs_bst_free(&tree);
 }

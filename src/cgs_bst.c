@@ -91,21 +91,16 @@ cgs_bst_length(const struct cgs_bst* tree);
 const void*
 cgs_bst_insert(struct cgs_bst* tree, struct cgs_variant* data)
 {
-        struct cgs_bst_node* node = cgs_bst_node_new(data);
         struct cgs_bst_node* parent = NULL;
-
         int cmp = 0;
-        for (struct cgs_bst_node* temp = tree->root; temp; ) {
-                parent = temp;
-                const void* a = cgs_variant_get(&node->data);
-                const void* b = cgs_variant_get(&temp->data);
-                cmp = tree->cmp(a, b);
-                if (cmp == 0) {
-                        cgs_bst_node_free(node);
+        for (struct cgs_bst_node* temp = tree->root; temp; parent = temp,
+                        temp = cmp < 0 ? temp->left : temp->right) {
+                cmp = tree->cmp(data, cgs_variant_get(&temp->data));
+                if (cmp == 0)
                         return tree;
-                }
-                temp = cmp < 0 ? temp->left : temp->right;
         }
+
+        struct cgs_bst_node* node = cgs_bst_node_new(data);
         node->parent = parent;
         if (!parent)
                 tree->root = node;
