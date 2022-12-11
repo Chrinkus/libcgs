@@ -95,7 +95,8 @@ cgs_bst_insert(struct cgs_bst* tree, struct cgs_variant* data)
         int cmp = 0;
         for (struct cgs_bst_node* temp = tree->root; temp; parent = temp,
                         temp = cmp < 0 ? temp->left : temp->right) {
-                cmp = tree->cmp(data, cgs_variant_get(&temp->data));
+                cmp = tree->cmp(cgs_variant_get(data),
+                                cgs_variant_get(&temp->data));
                 if (cmp == 0)
                         return tree;
         }
