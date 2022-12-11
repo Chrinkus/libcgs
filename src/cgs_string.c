@@ -52,11 +52,13 @@ cgs_string_new(void)
 void*
 cgs_string_copy(const struct cgs_string* src, struct cgs_string* dst)
 {
-        if (dst->capacity < src->capacity &&
-                        !cgs_string_alloc(dst, src->length + 1))
+        const size_t new_cap = src->length + 1;
+        if (dst->capacity < src->capacity && !cgs_string_alloc(dst, new_cap))
                 return NULL;
 
         strcpy(dst->data, src->data);
+        dst->length = src->length;
+        dst->capacity = new_cap;
         return dst;
 }
 

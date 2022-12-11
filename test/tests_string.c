@@ -26,6 +26,7 @@ string_copy_test(void** state)
         struct cgs_string s2 = cgs_string_new();
         assert_non_null(cgs_string_copy(&s1, &s2));
         assert_string_equal(s2.data, s0);
+        assert_int_equal(s1.length, s2.length);
 
         cgs_string_free(&s1);
         cgs_string_free(&s2);
