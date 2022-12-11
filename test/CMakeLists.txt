@@ -5,7 +5,7 @@ find_package(cmocka)
 include_directories("${PROJECT_SOURCE_DIR}/src")
 
 # Test build target
-add_custom_target(tests)
+add_custom_target(tests_cgs)
 
 # List of tests
 set(test_sources
@@ -46,7 +46,7 @@ foreach(file IN LISTS test_sources)
 	add_executable("${command_name}" EXCLUDE_FROM_ALL "${file}")
 	target_link_libraries("${command_name}" PRIVATE "${LIB_NAME}" cmocka)
 	add_test(NAME "${func}" COMMAND "${command_name}")
-	add_dependencies(tests "${command_name}")
+	add_dependencies(tests_cgs "${command_name}")
 endforeach()
 
 # Move data files to test binary

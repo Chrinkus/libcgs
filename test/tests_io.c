@@ -113,8 +113,6 @@ io_readlines_test(void** state)
 {
 	FILE* file = *(FILE**)state;
 
-        void* res = NULL;
-
         struct cgs_vector lines = cgs_vector_new(sizeof(struct cgs_string));
 
         assert_non_null(cgs_io_readlines(file, &lines));
