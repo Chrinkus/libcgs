@@ -99,7 +99,12 @@ cgs_bst_insert(struct cgs_bst* tree, struct cgs_variant* data)
                 parent = temp;
                 const void* a = cgs_variant_get(&node->data);
                 const void* b = cgs_variant_get(&temp->data);
-                temp = (cmp = tree->cmp(a, b)) < 0 ? temp->left : temp->right;
+                cmp = tree->cmp(a, b);
+                if (cmp == 0) {
+                        cgs_bst_node_free(node);
+                        return tree;
+                }
+                temp = cmp < 0 ? temp->left : temp->right;
         }
         node->parent = parent;
         if (!parent)

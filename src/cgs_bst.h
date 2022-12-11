@@ -124,7 +124,8 @@ cgs_bst_length(const struct cgs_bst* tree)
 /**
  * cgs_bst_insert
  *
- * Allocate a new node and insert it into the tree.
+ * Allocate a new node and insert it into the tree. If equivalent node already
+ * exists do nothing.
  *
  * @param tree	Tree to insert node into.
  * @param val	Value to insert into tree.
