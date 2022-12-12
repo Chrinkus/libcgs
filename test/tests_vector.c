@@ -323,7 +323,7 @@ static void vector_copy_test(void** state)
         assert_non_null(v2.data);
 
         assert_int_equal(v2.length, v1.length);
-        assert_int_equal(v2.capacity, v1.capacity);
+        assert_int_equal(v2.capacity, v1.length);
         assert_int_equal(v2.element_size, v1.element_size);
         assert_ptr_not_equal(v2.data, v1.data);
 

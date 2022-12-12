@@ -85,7 +85,7 @@ cgs_vector_copy(const struct cgs_vector* src, struct cgs_vector* dst)
 
         memcpy(p, src->data, src->length * src->element_size);
         dst->length = src->length;
-        dst->capacity = src->capacity;
+        dst->capacity = src->length;
         dst->element_size = src->element_size;
         dst->data = p;
 
