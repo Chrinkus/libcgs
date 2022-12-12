@@ -24,15 +24,14 @@
  */
 #pragma once
 
-#include <cgs/cgs_vector.h>
-#include <cgs/cgs_bst.h>
-#include <cgs/cgs_compare.h>
-#include <cgs/cgs_defs.h>
-#include <cgs/cgs_error.h>
-#include <cgs/cgs_heap.h>
-#include <cgs/cgs_io.h>
-#include <cgs/cgs_rbt.h>
-#include <cgs/cgs_variant.h>
-#include <cgs/cgs_string.h>
-#include <cgs/cgs_string_utils.h>
-
+#include "cgs_vector.h"
+#include "cgs_bst.h"
+#include "cgs_compare.h"
+#include "cgs_defs.h"
+#include "cgs_error.h"
+#include "cgs_heap.h"
+#include "cgs_io.h"
+#include "cgs_rbt.h"
+#include "cgs_variant.h"
+#include "cgs_string.h"
+#include "cgs_string_utils.h"
