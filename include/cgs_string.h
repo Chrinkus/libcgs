@@ -66,15 +66,16 @@ cgs_string_new(void);
 /**
  * cgs_string_copy
  *
- * Copy a source string to a destination string.
+ * Copy a source string to a destination string. Signature consists of
+ * `void*`'s to match CgsCopyFunc.
  *
- * @param src   A read-only pointer to the string to copy from.
- * @param dst   A mutable pointer to the string to copy to.
+ * @param s     A read-only pointer to the string to copy from.
+ * @param d     A mutable pointer to the string to copy to.
  *
  * @return      A pointer to dst on successful allocation or NULL on failure.
  */
 void*
-cgs_string_copy(const struct cgs_string* src, struct cgs_string* dst);
+cgs_string_copy(const void* s, void* d);
 
 /**
  * cgs_string_move

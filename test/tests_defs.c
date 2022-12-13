@@ -2,7 +2,8 @@
 
 #include "cgs_defs.h"
 
-static void defs_min_test(void** state)
+static void
+defs_min_test(void** state)
 {
 	(void)state;
 
@@ -17,7 +18,8 @@ static void defs_min_test(void** state)
 	assert_int_equal(CGS_MIN('7', '2'), '2');
 }
 
-static void defs_max_test(void** state)
+static void
+defs_max_test(void** state)
 {
 	(void)state;
 
@@ -32,7 +34,8 @@ static void defs_max_test(void** state)
 	assert_int_equal(CGS_MAX('7', '2'), '7');
 }
 
-static void defs_array_length_test(void** state)
+static void
+defs_array_length_test(void** state)
 {
 	(void)state;
 
@@ -46,12 +49,32 @@ static void defs_array_length_test(void** state)
 	assert_int_equal(CGS_ARRAY_LENGTH(ad), 0);
 }
 
+static void
+defs_swap_test(void** state)
+{
+        (void)state;
+
+        int ai[2] = { 67, 13, };
+        CGS_SWAP(ai[0], ai[1], int);
+
+        assert_int_equal(ai[0], 13);
+        assert_int_equal(ai[1], 67);
+
+        char* s1 = "Hello";
+        char* s2 = "World";
+        CGS_SWAP(s1, s2, char*);
+
+        assert_string_equal(s1, "World");
+        assert_string_equal(s2, "Hello");
+}
+
 int main(void)
 {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(defs_min_test),
 		cmocka_unit_test(defs_max_test),
 		cmocka_unit_test(defs_array_length_test),
+		cmocka_unit_test(defs_swap_test),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

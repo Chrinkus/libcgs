@@ -79,6 +79,22 @@ void*
 cgs_vector_copy(const struct cgs_vector* src, struct cgs_vector* dst);
 
 /**
+ * cgs_vector_copy_with
+ *
+ * Performs a deep copy on a vector using the supplied copy function.
+ *
+ * @param src   The source vector to copy from.
+ * @param dst   The destination vector to copy to.
+ * @param f     The copy function to use. Signature should match:
+ *              `void* (*CgsCopyFunc)(const void*, void*)`
+ *
+ * @return      A pointer to dst on success, NULL on failure.
+ */
+void*
+cgs_vector_copy_with(const struct cgs_vector* src, struct cgs_vector* dst,
+                CgsCopyFunc f);
+
+/**
  * cgs_vector_from_array
  *
  * Allocates a new vector and fills it with the elements in src.

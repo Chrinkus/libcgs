@@ -93,6 +93,28 @@ cgs_vector_copy(const struct cgs_vector* src, struct cgs_vector* dst)
 }
 
 void*
+cgs_vector_copy_with(const struct cgs_vector* src, struct cgs_vector* dst,
+                CgsCopyFunc f)
+{
+        char* p = malloc(src->length * src->element_size);
+        if (!p)
+                return NULL;
+
+        dst->length = src->length;
+        dst->capacity = src->length;
+        dst->element_size = src->element_size;
+        dst->data = p;
+
+        for (size_t i = 0; i < cgs_vector_length(src); ++i) {
+                const void* t1 = cgs_vector_get(src, i);
+                void* t2 = cgs_vector_get_mut(dst, i);
+                if (!f(t1, t2))
+                        return NULL;
+        }
+        return dst;
+}
+
+void*
 cgs_vector_from_array(const void* arr, size_t len, size_t size,
                 struct cgs_vector* v)
 {

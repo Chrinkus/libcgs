@@ -73,6 +73,24 @@ enum cgs_boolean { CGS_FALSE = 0, CGS_TRUE = 1 };
  */
 #define CGS_ARRAY_LENGTH(a) (sizeof(a) / sizeof((a)[0]))
 
+/**
+ * CGS_SWAP
+ *
+ * Performs a shallow swap on two values.
+ *
+ * @param a     Value.
+ * @param b     Value.
+ * @param t     The type.
+ *
+ * @result      The values will be swapped.
+ */
+#define CGS_SWAP(a, b, t)               \
+        do {                            \
+                t tmp = (a);            \
+                (a) = (b);              \
+                (b) = tmp;              \
+        } while (0)
+
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Typedefs
@@ -139,3 +157,10 @@ typedef void (*CgsUnaryOpMut)(void*, size_t, void*);
  */
 typedef void (*CgsFreeFunc)(void*);
 
+/**
+ * CgsCopyFunc
+ *
+ * The signature that a custom copy function needs to interact with
+ * `cgs_vector_copy_with()`.
+ */
+typedef void* (*CgsCopyFunc)(const void*, void*);

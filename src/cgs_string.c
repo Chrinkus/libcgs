@@ -50,8 +50,11 @@ cgs_string_new(void)
 }
 
 void*
-cgs_string_copy(const struct cgs_string* src, struct cgs_string* dst)
+cgs_string_copy(const void* s, void* d)
 {
+        const struct cgs_string* src = s;
+        struct cgs_string* dst = d;
+
         const size_t new_cap = src->length + 1;
         if (dst->capacity < src->capacity && !cgs_string_alloc(dst, new_cap))
                 return NULL;
