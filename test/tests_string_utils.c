@@ -1,29 +1,72 @@
-#include "cgs_string_utils.h"
-#include "cgs_test.h"
+#include "cmocka_headers.h"
 
-int strdup_test(void* data)
+#include "cgs_string_utils.h"
+
+#include <stdlib.h>     // free
+
+static void
+strdup_test(void** state)
 {
-	const char* s1 = data;
+        (void)state;
+
+	const char* s1 = "strdup is not yet standard";
 	char* s2 = cgs_strdup(s1);
 
-	assert(s2 != NULL);
-	assert(s2 != s1);
-	assert(strcmp(s1, s2) == 0);
+	assert_non_null(s2);
+	assert_ptr_not_equal(s2, s1);
+	assert_string_equal(s1, s2);
 
 	free(s2);
 
 	const char* s3 = "";
 	char* s4 = cgs_strdup(s3);
 
-	assert(s3 != NULL);
-	assert(s4 != s3);
-	assert(strcmp(s3, s4) == 0);
+	assert_non_null(s3);
+	assert_ptr_not_equal(s4, s3);
+	assert_string_equal(s3, s4);
 
 	free(s4);
-
-	return TEST_SUCCESS;
 }
 
+static void
+strtoi_test(void** state)
+{
+        (void)state;
+
+        const char* s1 = "756";
+        const char* p1 = NULL;
+        int n1 = cgs_strtoi(s1, &p1);
+
+        assert_int_equal(n1, 756);
+        assert_non_null(p1);
+        assert_ptr_not_equal(s1, p1);
+
+        const char* s2 = "ninety-seven";
+        const char* p2 = NULL;
+        int n2 = cgs_strtoi(s2, &p2);
+
+        assert_int_equal(n2, 0);
+        assert_non_null(p2);
+        assert_ptr_equal(s2, p2);
+
+        const char* s3 = "  3005ad";
+        const char* p3 = NULL;
+        int n3 = cgs_strtoi(s3, &p3);
+
+        assert_int_equal(n3, 3005);
+        assert_non_null(p3);
+        assert_string_equal(p3, "ad");
+
+        const char* s4 = "123456789101112";     // should overflow
+        const char* p4 = NULL;
+        int n4 = cgs_strtoi(s4, &p4);
+
+        (void)n4;
+        assert_non_null(p4);
+        assert_ptr_equal(p4, s4);               // error indication
+}
+
+/*
 int strmove_test(void* data)
 {
         (void)data;
@@ -234,9 +277,11 @@ int strtrimch_test(void* data)
 
 	return TEST_SUCCESS;
 }
+*/
 
 int main(void)
 {
+        /*
 	struct test tests[] = {
 		{ "strdup", strdup_test, "Ninja doesn't like gnu_strdup" },
                 { "strmove", strmove_test, NULL },
@@ -250,5 +295,12 @@ int main(void)
 	};
 
 	return cgs_run_tests(tests);
+        */
+        const struct CMUnitTest tests[] = {
+                cmocka_unit_test(strdup_test),
+                cmocka_unit_test(strtoi_test),
+        };
+
+        return cmocka_run_group_tests(tests, NULL, NULL);
 }
 

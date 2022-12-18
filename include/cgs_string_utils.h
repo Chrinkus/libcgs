@@ -42,7 +42,24 @@
  *
  * @return	An allocated copy of s on success, NULL on failure.
  */
-char* cgs_strdup(const char* s);
+char*
+cgs_strdup(const char* s);
+
+/**
+ * cgs_strtoi
+ *
+ * Attempt to parse a string as an integer.
+ *
+ * @param s     The string to parse.
+ * @param p     A pointer to a const char* to store the location of the next
+ *              non-digit character in. If the entire string was an integer,
+ *              'p' should point to the terminating '\0' at the end of 's'.
+ *
+ * @return      An integer value parsed from the string on success. On failure,
+ *              zero is returned and 'p' is set to equal 's'.
+ */
+int
+cgs_strtoi(const char* s, const char** p);
 
 /**
  * cgs_strmove

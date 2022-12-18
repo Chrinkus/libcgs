@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 
 char* cgs_strdup(const char* src)
 {
@@ -37,6 +38,42 @@ char* cgs_strdup(const char* src)
         strcpy(dst, src);
 
 	return dst;
+}
+
+int
+cgs_strtoi(const char* s, const char** p)
+{
+        int ret = 0;
+        if (p)
+                *p = s;
+
+        while (isspace(*s))
+                ++s;
+
+        int sign = 1;
+        if (*s == '-' || *s == '+') {
+                sign = *s == '-' ? -1 : 1;
+                ++s;
+        }
+
+        if (!isdigit(*s))
+                return ret;
+
+        for (const int max = INT_MAX / 10; isdigit(*s) && ret <= max; ++s) {
+                ret *= 10;
+                int c = *s - '0';
+                if (c > INT_MAX - ret)
+                        break;
+                ret += c;
+        }
+        if (isdigit(*s))
+                goto overflow_detected;
+
+        *p = s;
+        return ret * sign;
+
+overflow_detected:
+        return ret;
 }
 
 void cgs_strmove(char* s, size_t n)
