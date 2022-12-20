@@ -52,26 +52,25 @@ struct cgs_heap {
  *
  * Allocate and initialize a new heap.
  *
- * @param heap  A pointer to the heap to allocate and initialize.
  * @param size  The size of the elements of the heap.
  * @param cmp   A pointer to a 3-way comparison function to use to order the
  *              elements of the heap.
  *
- * @return      A read-only pointer to the allocation to signal success or
- *              NULL on failure.
+ * @return      An empty, default-initialized heap structure.
  */
-const void*
-cgs_heap_new(struct cgs_heap* heap, size_t size, CgsCmp3Way cmp);
+struct cgs_heap
+cgs_heap_new(size_t size, CgsCmp3Way cmp);
 
 /**
  * cgs_heap_free
  *
  * Deallocate a heap.
  *
- * @param heap  The heap to deallocate. Also resets all parameters to 0.
+ * @param ph    A void* to the heap to free. Matches standard library free
+ *              function signature.
  */
 void
-cgs_heap_free(struct cgs_heap* heap);
+cgs_heap_free(void* ph);
 
 /**
  * cgs_heap_length

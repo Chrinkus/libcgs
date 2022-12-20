@@ -56,7 +56,7 @@ const void*
 cgs_heap_get(const struct cgs_heap* h, size_t i);
 
 void*
-cgs_heap_get_mutable(struct cgs_heap* h, size_t i);
+cgs_heap_get_mut(struct cgs_heap* h, size_t i);
 
 void*
 cgs_heap_get_swapper(struct cgs_heap* h);
@@ -81,8 +81,8 @@ void
 cgs_heap_swap(struct cgs_heap* h, size_t i, size_t j)
 {
         void* t = cgs_heap_get_swapper(h);
-        void* a = cgs_heap_get_mutable(h, i);
-        void* b = cgs_heap_get_mutable(h, j);
+        void* a = cgs_heap_get_mut(h, i);
+        void* b = cgs_heap_get_mut(h, j);
 
         memcpy(t, a, h->size);
         memcpy(a, b, h->size);
@@ -105,7 +105,7 @@ cgs_heap_sink(struct cgs_heap* h, size_t i)
         }
 }
 
-const void*
+void*
 cgs_heap_grow(struct cgs_heap* h)
 {
         size_t new_capacity = cgs_heap_new_capacity(h->capacity);
@@ -113,14 +113,16 @@ cgs_heap_grow(struct cgs_heap* h)
         if (!p)
                 return NULL;
 
-        h->data -= h->size;     // backup to catch old pocket
-        memcpy(p, h->data, h->size * (h->length + CGS_HEAP_SWAP));
-        free(h->data);
+        if (h->data) {
+                h->data -= h->size;     // backup to catch old pocket
+                memcpy(p, h->data, h->size * (h->length + CGS_HEAP_SWAP));
+                free(h->data);
+        }
 
-        p += h->size;           // stash new swap pocket
+        p += h->size;                   // stash new swap pocket
         h->data = p;
         h->capacity = new_capacity;
-        return p;
+        return h;
 }
 
 void
@@ -135,26 +137,23 @@ cgs_heap_swim(struct cgs_heap* h, ptrdiff_t i)
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Public API functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-const void*
-cgs_heap_new(struct cgs_heap* heap, size_t size, CgsCmp3Way cmp)
+struct cgs_heap
+cgs_heap_new(size_t size, CgsCmp3Way cmp)
 {
-        char* p = malloc(size * (CGS_HEAP_INITIAL_CAPACITY + CGS_HEAP_SWAP));
-        if (!p)
-                return NULL;
-
-        heap->length = 0;
-        heap->capacity = CGS_HEAP_INITIAL_CAPACITY;
-        heap->size = size;
-        heap->data = p + size;          // -1 index is tmp for swaps
-        heap->cmp = cmp;
-
-        return (const void*)p;
+        return (struct cgs_heap){
+                .length = 0,
+                .capacity = 0,
+                .size = size,
+                .data = NULL,
+                .cmp = cmp,
+        };
 }
 
 void
-cgs_heap_free(struct cgs_heap* heap)
+cgs_heap_free(void* ph)
 {
-        if (!heap)
+        struct cgs_heap* heap = ph;
+        if (!heap || !heap->data)
                 return;
 
         free(heap->data - heap->size);  // free -1 as well

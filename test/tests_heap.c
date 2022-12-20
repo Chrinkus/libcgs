@@ -6,14 +6,16 @@
 const int ai[] = { 4, 1, 3, 2, 16, 9, 10, 14, 8, 7 };
 const int len = sizeof(ai) / sizeof(ai[0]);
 
-static void heap_new_test(void** state)
+static void
+heap_new_test(void** state)
 {
         (void)state;
 
-        struct cgs_heap h1 = { 0 };
+        struct cgs_heap h1 = cgs_heap_new(sizeof(int), cgs_int_cmp);
 
-        const void* res = cgs_heap_new(&h1, sizeof(int), cgs_int_cmp);
-        assert_non_null(res);
+        assert_null(h1.data);
+        assert_int_equal(h1.length, 0);
+        assert_int_equal(h1.capacity, 0);
 
         cgs_heap_free(&h1);
 }
@@ -22,15 +24,13 @@ static void heap_push_test(void** state)
 {
         (void)state;
 
-        struct cgs_heap h = { 0 };
-        const void* res = cgs_heap_new(&h, sizeof(int), cgs_int_cmp);
-        assert_non_null(res);
+        struct cgs_heap h = cgs_heap_new(sizeof(int), cgs_int_cmp);
 
         const int* peek = cgs_heap_peek(&h);
         assert_null(peek);
 
         int n = 16;
-        res = cgs_heap_push(&h, &n);
+        const void* res = cgs_heap_push(&h, &n);
         assert_non_null(res);
 
         peek = cgs_heap_peek(&h);
@@ -70,11 +70,10 @@ static void heap_growth_test(void** state)
 {
         (void)state;
 
-        struct cgs_heap h = { 0 };
-        cgs_heap_new(&h, sizeof(int), cgs_int_cmp);
+        struct cgs_heap h = cgs_heap_new(sizeof(int), cgs_int_cmp);
 
         assert_int_equal(cgs_heap_length(&h), 0);
-        assert_int_equal(h.capacity, 7);
+        assert_int_equal(h.capacity, 0);
 
         for (int i = 0; i < len; ++i)
                 assert_non_null(cgs_heap_push(&h, &ai[i]));
@@ -89,8 +88,7 @@ static void heap_pop_test(void** state)
 {
         (void)state;
 
-        struct cgs_heap h = { 0 };
-        cgs_heap_new(&h, sizeof(int), cgs_int_cmp);
+        struct cgs_heap h = cgs_heap_new(sizeof(int), cgs_int_cmp);
 
         for (int i = 0; i < len; ++i)
                 cgs_heap_push(&h, &ai[i]);
