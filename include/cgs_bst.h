@@ -80,13 +80,14 @@ struct cgs_bst {
 /**
  * cgs_bst_new
  *
- * Set the initial values for a new binary search tree.
+ * Create a new binary search tree.
  *
- * @param tree  A pointer to a tree struct.
  * @param cmp   The comparison function to order the tree with.
+ *
+ * @return      An empty bst struct.
  */
-void
-cgs_bst_new(struct cgs_bst* tree, CgsCmp3Way cmp);
+struct cgs_bst
+cgs_bst_new(CgsCmp3Way cmp);
 
 /**
  * cgs_bst_free

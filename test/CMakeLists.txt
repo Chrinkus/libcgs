@@ -19,6 +19,7 @@ set(test_sources
 	"tests_io.c"
         "tests_numeric.c"
 	"tests_rbt.c"
+        "tests_rbt_private.c"
 	"tests_sort.c"
 	"tests_variant.c"
 	"tests_variant_usage.c"

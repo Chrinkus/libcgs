@@ -8,8 +8,7 @@ static void rbt_new_test(void** state)
 {
         (void)state;
 
-        struct cgs_rbt tree = { 0 };
-        cgs_rbt_new(&tree, cgs_int_cmp);
+        struct cgs_rbt tree = cgs_rbt_new(cgs_int_cmp);
 
         assert_int_equal(cgs_rbt_length(&tree), 0);
 
@@ -20,8 +19,7 @@ static void rbt_insert_test(void** state)
 {
         (void)state;
 
-        struct cgs_rbt tree = { 0 };
-        cgs_rbt_new(&tree, cgs_int_cmp);
+        struct cgs_rbt tree = cgs_rbt_new(cgs_int_cmp);
 
 	// establish initial size
         assert_int_equal(cgs_rbt_length(&tree), 0);
@@ -45,8 +43,7 @@ static void rbt_minmax_test(void** state)
 {
         (void)state;
 
-        struct cgs_rbt tree = { 0 };
-        cgs_rbt_new(&tree, cgs_int_cmp);
+        struct cgs_rbt tree = cgs_rbt_new(cgs_int_cmp);
 
         // insert single value
         struct cgs_variant v = { 0 };
@@ -79,8 +76,7 @@ static void rbt_search_test(void** state)
 {
         (void)state;
 
-        struct cgs_rbt tree = { 0 };
-        cgs_rbt_new(&tree, cgs_int_cmp);
+        struct cgs_rbt tree = cgs_rbt_new(cgs_int_cmp);
         struct cgs_variant v1 = { 0 };
 
         // insert a bunch of values

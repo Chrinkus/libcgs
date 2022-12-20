@@ -41,34 +41,10 @@
 #include "cgs_compare.h"
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * RBT Private Types
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-
-/**
- * enum cgs_rbt_color
- *
- * Constant values representing the possible colors of tree nodes.
- */
-enum cgs_rbt_color { CGS_RBT_RED, CGS_RBT_BLACK };
-
-/**
- * struct cgs_rbt_node
- *
- * A data structure representing a node in a red-black tree.
- */
-struct cgs_rbt_node {
-        struct cgs_variant data;
-        struct cgs_rbt_node* parent;
-        struct cgs_rbt_node* left;
-        struct cgs_rbt_node* right;
-        enum cgs_rbt_color color;
-};
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * RBT Node Management Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-static struct cgs_rbt_node*
+struct cgs_rbt_node*
 cgs_rbt_node_new(const struct cgs_variant* data)
 {
         struct cgs_rbt_node* node = malloc(sizeof(struct cgs_rbt_node));
@@ -84,7 +60,7 @@ cgs_rbt_node_new(const struct cgs_variant* data)
         return node;
 }
 
-static void
+void
 cgs_rbt_node_free(struct cgs_rbt_node* node)
 {
         if (!node)
@@ -250,12 +226,14 @@ cgs_rbt_rebalance(struct cgs_rbt* tree, struct cgs_rbt_node* node)
  * RBT Management Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-void
-cgs_rbt_new(struct cgs_rbt* tree, CgsCmp3Way cmp)
+struct cgs_rbt
+cgs_rbt_new(CgsCmp3Way cmp)
 {
-        tree->root = NULL;
-        tree->length = 0;
-        tree->cmp = cmp;
+        return (struct cgs_rbt){
+                .root = NULL,
+                .length = 0,
+                .cmp = cmp,
+        };
 }
 
 void

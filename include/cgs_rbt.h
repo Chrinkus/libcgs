@@ -88,13 +88,14 @@ struct cgs_rbt {
 /**
  * cgs_rbt_new
  *
- * Set the initial values for a new red-black tree.
+ * Create a new red-black tree.
  *
- * @param tree  A pointer to an rbt struct to initialize.
  * @param cmp   The comparison function to order the tree with.
+ *
+ * @return      An empty red-black tree.
  */
-void
-cgs_rbt_new(struct cgs_rbt* tree, CgsCmp3Way cmp);
+struct cgs_rbt
+cgs_rbt_new(CgsCmp3Way cmp);
 
 /**
  * cgs_rbt_free

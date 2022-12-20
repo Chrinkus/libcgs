@@ -4,6 +4,8 @@
 #include "cgs_rbt_private.h"
 #include "cgs_compare.h"
 
+#include <stdlib.h>     // malloc, free
+
 /*
  * The procedure for this test group:
  *
@@ -473,7 +475,8 @@ static int fake_tree_bad_rc_setup(void** state)
 
 static int rbt_insert_tree_setup(void** state)
 {
-	struct cgs_rbt* tree = cgs_rbt_new(cgs_int_cmp);
+        struct cgs_rbt* tree = malloc(sizeof(struct cgs_rbt));
+	*tree = cgs_rbt_new(cgs_int_cmp);
 
 	const int arr[] = {
 		2, 17, 16, 1, 8, 14, 15, 5, 6, 10,
@@ -505,6 +508,7 @@ static int tree_teardown(void** state)
 {
 	struct cgs_rbt* tree = *(struct cgs_rbt**)state;
 	cgs_rbt_free(tree);
+        free(tree);
 	return 0;
 }
 
@@ -613,16 +617,16 @@ static void rbt_insert_test(void** state)
 	assert_int_equal(*max, 20);
 
 	// search test
-	struct cgs_variant v = { 0 };
-	const int* found = NULL;
+	struct cgs_variant v1 = { 0 };
+        const struct cgs_variant* found = NULL;
 
-	cgs_variant_set_int(&v, 14);
-	found = cgs_rbt_search(tree, &v);
+	cgs_variant_set_int(&v1, 14);
+	found = cgs_rbt_search(tree, &v1);
 	assert_non_null(found);
-	assert_int_equal(*found, 14);
+	assert_int_equal(*(const int*)cgs_variant_get(found), 14);
 
-	cgs_variant_set_int(&v, 21);
-	found = cgs_rbt_search(tree, &v);
+	cgs_variant_set_int(&v1, 21);
+	found = cgs_rbt_search(tree, &v1);
 	assert_null(found);
 }
 

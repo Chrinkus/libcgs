@@ -62,12 +62,14 @@ cgs_bst_node_free(struct cgs_bst_node* node)
  * BST Tree Management Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-void
-cgs_bst_new(struct cgs_bst* tree, CgsCmp3Way cmp)
+struct cgs_bst
+cgs_bst_new(CgsCmp3Way cmp)
 {
-        tree->root = NULL;
-        tree->length = 0;
-        tree->cmp = cmp;
+        return (struct cgs_bst){
+                .root = NULL,
+                .length = 0,
+                .cmp = cmp,
+        };
 }
 
 void

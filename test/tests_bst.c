@@ -10,8 +10,7 @@ static void bst_int_new_test(void** state)
 {
 	(void)state;
 
-        struct cgs_bst tree = { 0 };
-        cgs_bst_new(&tree, cgs_int_cmp);
+        struct cgs_bst tree = cgs_bst_new(cgs_int_cmp);
 
 	assert_int_equal(cgs_bst_length(&tree), 0);
 
@@ -22,8 +21,7 @@ static void bst_int_insert_test(void** state)
 {
 	(void)state;
 
-        struct cgs_bst tree = { 0 };
-        cgs_bst_new(&tree, cgs_int_cmp);
+        struct cgs_bst tree = cgs_bst_new(cgs_int_cmp);
 
 	struct cgs_variant var = { 0 };
 	cgs_variant_set_int(&var, 5);
@@ -45,8 +43,7 @@ void bst_int_search_test(void** state)
 {
 	(void)state;
 
-        struct cgs_bst tree = { 0 };
-        cgs_bst_new(&tree, cgs_int_cmp);
+        struct cgs_bst tree = cgs_bst_new(cgs_int_cmp);
 
 	struct cgs_variant var = { 0 };
 	for (int i = 0; i < glen; ++i) {
@@ -94,8 +91,7 @@ static void bst_int_minmax_test(void** state)
 {
 	(void)state;
 
-        struct cgs_bst tree = { 0 };
-        cgs_bst_new(&tree, cgs_int_cmp);
+        struct cgs_bst tree = cgs_bst_new(cgs_int_cmp);
 
 	struct cgs_variant var = { 0 };
 
