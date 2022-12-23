@@ -23,10 +23,6 @@
  * SOFTWARE.
  */
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * cgs_heap.c info
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-
 #include "cgs_heap.h"
 #include "cgs_heap_private.h"
 
@@ -34,7 +30,7 @@
 #include <string.h>     // memset, memcpy
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Inline symbols
+ * Heap Public Inline Symbols
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 size_t
@@ -42,6 +38,10 @@ cgs_heap_length(const struct cgs_heap* h);
 
 const void*
 cgs_heap_peek(const struct cgs_heap* h);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Heap Private Inline Symbols
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 ptrdiff_t
 cgs_heap_parent(ptrdiff_t i);
@@ -65,7 +65,7 @@ size_t
 cgs_heap_new_capacity(size_t old_capacity);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Private helper functions
+ * Heap Private Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 int
@@ -105,6 +105,15 @@ cgs_heap_sink(struct cgs_heap* h, size_t i)
         }
 }
 
+void
+cgs_heap_swim(struct cgs_heap* h, ptrdiff_t i)
+{
+        for (ptrdiff_t parent = cgs_heap_parent(i);
+                        i > 0 && cgs_heap_cmp(h, parent, i) > 0;
+                        i = parent, parent = cgs_heap_parent(i))
+                cgs_heap_swap(h, i, parent);
+}
+
 void*
 cgs_heap_grow(struct cgs_heap* h)
 {
@@ -125,18 +134,10 @@ cgs_heap_grow(struct cgs_heap* h)
         return h;
 }
 
-void
-cgs_heap_swim(struct cgs_heap* h, ptrdiff_t i)
-{
-        for (ptrdiff_t parent = cgs_heap_parent(i);
-                        i > 0 && cgs_heap_cmp(h, parent, i) > 0;
-                        i = parent, parent = cgs_heap_parent(i))
-                cgs_heap_swap(h, i, parent);
-}
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Public API functions
+ * Heap Public Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 struct cgs_heap
 cgs_heap_new(size_t size, CgsCmp3Way cmp)
 {
@@ -160,7 +161,7 @@ cgs_heap_free(void* ph)
         memset(heap, 0, sizeof(struct cgs_heap));
 }
 
-const void*
+void*
 cgs_heap_push(struct cgs_heap* h, const void* val)
 {
         if (h->length == h->capacity && !cgs_heap_grow(h))
@@ -171,10 +172,10 @@ cgs_heap_push(struct cgs_heap* h, const void* val)
         cgs_heap_swim(h, h->length);
         ++h->length;
 
-        return h->data;
+        return h;
 }
 
-const void*
+void*
 cgs_heap_pop(struct cgs_heap* h, void* dest)
 {
         if (h->length == 0)
@@ -185,6 +186,5 @@ cgs_heap_pop(struct cgs_heap* h, void* dest)
         memcpy(&h->data[0], &h->data[h->length * h->size], h->size);
         cgs_heap_sink(h, 0);
 
-        return h->data;
+        return h;
 }
-

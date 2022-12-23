@@ -26,6 +26,10 @@
 
 #include "cgs_heap.h"
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Heap Private Constants
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 enum {
         CGS_HEAP_INITIAL_CAPACITY = 7,  // enough for a tree w/height of 3
         CGS_HEAP_DELTA = 2,             // heap growth rate
@@ -34,16 +38,22 @@ enum {
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Private Heap Functions
+ * Heap Private Function Notice
  *
  * All of these functions are for internal use or testing purposes only. A
  * user should only ever be concerned with the "top" element of a heap.
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Heap Private Inline Getters, Etc
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 /**
  * cgs_heap_parent
  *
- * Get the parent index of a given heap element.
+ * FOR INTERNAL USE AND TESTING PURPOSES ONLY
+ *
+ * Get the parent index of a given heap index.
  *
  * @param i     The index to get the parent of.
  *
@@ -55,12 +65,34 @@ cgs_heap_parent(ptrdiff_t i)
         return (i - 1) / 2;
 }
 
+/**
+ * cgs_heap_left
+ *
+ * FOR INTERNAL USE AND TESTING PURPOSES ONLY
+ *
+ * Get the 'left' child index of a given heap index.
+ *
+ * @param i     The index to get the left child index of.
+ *
+ * @return      The index of i's left child.
+ */
 inline size_t
 cgs_heap_left(size_t i)
 {
         return 2 * i + 1;
 }
 
+/**
+ * cgs_heap_right
+ *
+ * FOR INTERNAL USE AND TESTING PURPOSES ONLY
+ *
+ * Get the 'right' child index of a given heap index.
+ *
+ * @param i     The index to get the right child index of.
+ *
+ * @return      The index of i's right child.
+ */
 inline size_t
 cgs_heap_right(size_t i)
 {
@@ -146,12 +178,70 @@ cgs_heap_new_capacity(size_t old_capacity)
                 : old_capacity * CGS_HEAP_DELTA + CGS_HEAP_INC;
 }
 
-void*
-cgs_heap_grow(struct cgs_heap* h);
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Heap Private Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
+/**
+ * cgs_heap_cmp
+ *
+ * Sets up two elements to compare using the heap's 'cmp' ordering function.
+ *
+ * @param h     The heap.
+ * @param i     The index of the 'left' comparison target.
+ * @param j     The index of the 'right' comparison target.
+ *
+ * @return      An integer indicating the three-way result of the comparison.
+ */
+int
+cgs_heap_cmp(const struct cgs_heap* h, size_t i, size_t j);
+
+/**
+ * cgs_heap_swap
+ *
+ * Swaps two elements in the heap. Used by '_sink' and '_swim' to reorder
+ * the heap after '_pop's and '_push's. Utilizes the -1 indexed "swap pocket".
+ *
+ * @param h     The heap.
+ * @param i     The index of an element to swap.
+ * @param j     The index of an element to swap.
+ */
+void
+cgs_heap_swap(struct cgs_heap* h, size_t i, size_t j);
+
+/**
+ * cgs_heap_sink
+ *
+ * Recursive function to sink low-priority elements to the bottom of the heap.
+ * Called after a '_pop' swaps the lowest priority element to the top.
+ *
+ * @param h     The heap.
+ * @param i     The index of the current element.
+ */
 void
 cgs_heap_sink(struct cgs_heap* h, size_t i);
 
+/**
+ * cgs_heap_swim
+ *
+ * Raise a high-priority element towards the top of the heap. After a '_push'
+ * adds a new element to the bottom of the heap, '_swim' is called to place
+ * the element appropriately within the queue.
+ *
+ * @param h     The heap.
+ * @param i     The index of the element that is "swimming".
+ */
 void
 cgs_heap_swim(struct cgs_heap* h, ptrdiff_t i);
 
+/**
+ * cgs_heap_grow
+ *
+ * Grow the heap's allocation.
+ *
+ * @param h     The heap.
+ *
+ * @return      A pointer to the heap on success, NULL on failure.
+ */
+void*
+cgs_heap_grow(struct cgs_heap* h);

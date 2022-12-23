@@ -27,6 +27,10 @@
 #include <stddef.h>
 #include "cgs_defs.h"
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Heap Public Types
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 /**
  * cgs_heap
  *
@@ -46,6 +50,10 @@ struct cgs_heap {
         char* data;
         CgsCmp3Way cmp;
 };
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Heap Management Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
  * cgs_heap_new
@@ -71,6 +79,10 @@ cgs_heap_new(size_t size, CgsCmp3Way cmp);
  */
 void
 cgs_heap_free(void* ph);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Heap Inline Getters, Etc..
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
  * cgs_heap_length
@@ -103,18 +115,21 @@ cgs_heap_peek(const struct cgs_heap* h)
         return h->length > 0 ? &h->data[0] : NULL;
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Heap Standard Operations
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
 /**
  * cgs_heap_push
  *
  * Add a value to a heap.
  *
  * @param h     The heap to add a value to.
- * @param val   A read-only pointer to the value to be inserted.
+ * @param val   A read-only pointer to a value to be copied and inserted.
  *
- * @return      A read-only pointer to the heap data on success or NULL
- *              on failure.
+ * @return      A pointer to the heap on success or NULL on failure.
  */
-const void*
+void*
 cgs_heap_push(struct cgs_heap* h, const void* val);
 
 /**
@@ -126,9 +141,9 @@ cgs_heap_push(struct cgs_heap* h, const void* val);
  * @param h     The heap.
  * @param dst   A destination pointer to copy the priority value to.
  *
- * @return      A read-only pointer to the heap data if a value is available
- *              or NULL if heap is empty.
+ * @return      A pointer to the heap if a value is available or NULL if the
+ *              heap is empty.
  */
-const void*
+void*
 cgs_heap_pop(struct cgs_heap* h, void* dest);
 
