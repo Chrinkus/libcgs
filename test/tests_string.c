@@ -73,6 +73,30 @@ string_from_test(void** state)
 	cgs_string_free(&s1);
 }
 
+static void
+string_from_int_test(void** state)
+{
+        (void)state;
+        // test positive integer
+        struct cgs_string s1 = cgs_string_new();
+        assert_non_null(cgs_string_from_int(1967, &s1));
+        assert_string_equal(s1.data, "1967");
+
+        // test negative integer
+        struct cgs_string s2 = cgs_string_new();
+        assert_non_null(cgs_string_from_int(-837, &s2));
+        assert_string_equal(s2.data, "-837");
+
+        // test zero
+        struct cgs_string s3 = cgs_string_new();
+        assert_non_null(cgs_string_from_int(0, &s3));
+        assert_string_equal(s3.data, "0");
+
+        cgs_string_free(&s1);
+        cgs_string_free(&s2);
+        cgs_string_free(&s3);
+}
+
 /*
 int string_xfer_test(void* data)
 {
@@ -184,6 +208,20 @@ string_trunc_test(void** state)
 
         assert_int_equal(s1.length, 10);                // length is unchanged
         assert_string_equal(s1.data, "Think diff");     // string is unchanged
+
+        cgs_string_free(&s1);
+}
+
+static void
+string_reverse_test(void** state)
+{
+        (void)state;
+        struct cgs_string s1 = cgs_string_new();
+        cgs_string_from("Hello, World!", &s1);
+
+        cgs_string_reverse(&s1);
+
+        assert_string_equal(s1.data, "!dlroW ,olleH");
 
         cgs_string_free(&s1);
 }
@@ -332,10 +370,12 @@ int main(void)
                 cmocka_unit_test(string_copy_test),
                 cmocka_unit_test(string_move_test),
                 cmocka_unit_test(string_from_test),
+                cmocka_unit_test(string_from_int_test),
                 cmocka_unit_test(string_cmp_test),
                 cmocka_unit_test(string_push_test),
                 cmocka_unit_test(string_cat_test),
                 cmocka_unit_test(string_trunc_test),
+                cmocka_unit_test(string_reverse_test),
         };
 
         return cmocka_run_group_tests(tests, NULL, NULL);

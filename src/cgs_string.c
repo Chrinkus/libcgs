@@ -89,6 +89,24 @@ cgs_string_from(const char* src, struct cgs_string* s)
 	return s;
 }
 
+void*
+cgs_string_from_int(int n, struct cgs_string* s)
+{
+        int sign = n < 0 ? -1 : 1;
+        n *= sign;
+
+        do {
+                if (!cgs_string_push(s, '0' + n % 10))
+                        return NULL;
+        } while ((n /= 10) != 0);
+
+        if (sign == -1 && !cgs_string_push(s, '-'))
+                return NULL;
+
+        cgs_string_reverse(s);
+        return s;
+}
+
 void
 cgs_string_free(void* p)
 {
@@ -282,6 +300,13 @@ cgs_string_trunc(struct cgs_string* s, size_t n)
                 return;
         s->data[n] = '\0';
         s->length = n;
+}
+
+void
+cgs_string_reverse(struct cgs_string* s)
+{
+        for (char* b = s->data, *e = &s->data[s->length-1]; b < e; ++b, --e)
+                CGS_SWAP(*b, *e, char);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

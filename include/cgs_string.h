@@ -103,6 +103,19 @@ void*
 cgs_string_from(const char* src, struct cgs_string* s);
 
 /**
+ * cgs_string_from_int
+ *
+ * Create a new string by converting an integer. Target string should be empty.
+ *
+ * @param n     The integer to convert.
+ * @param s     The target string.
+ *
+ * @return      The target string on success, NULL on failure.
+ */
+void*
+cgs_string_from_int(int n, struct cgs_string* s);
+
+/**
  * cgs_string_free
  *
  * Deallocate a string.
@@ -413,6 +426,16 @@ cgs_string_sort(struct cgs_string* s);
  */
 void
 cgs_string_trunc(struct cgs_string* s, size_t n);
+
+/**
+ * cgs_string_reverse
+ *
+ * Reverses the contents of a string in-place.
+ *
+ * @param s     The string to reverse.
+ */
+void
+cgs_string_reverse(struct cgs_string* s);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Strsub Type
