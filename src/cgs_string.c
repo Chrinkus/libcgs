@@ -275,6 +275,15 @@ cgs_string_sort(struct cgs_string* s)
 	qsort(s->data, s->length, sizeof(char), cgs_char_cmp);
 }
 
+void
+cgs_string_trunc(struct cgs_string* s, size_t n)
+{
+        if (s->length <= n)
+                return;
+        s->data[n] = '\0';
+        s->length = n;
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Strsub Inline Symbols
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
@@ -437,7 +446,7 @@ cgs_string_prepend_str(struct cgs_string* s, const char* add, size_t len)
 }
 
 void*
-cgs_string_append_str(struct cgs_string* s, const char* add, size_t len)
+cgs_string_cat_str(struct cgs_string* s, const char* add, size_t len)
 {
         size_t new_len = s->length + len;
         if (new_len >= s->capacity - 1 && !cgs_string_grow_len(s, new_len))

@@ -402,6 +402,18 @@ cgs_string_erase(struct cgs_string* s);
 void
 cgs_string_sort(struct cgs_string* s);
 
+/**
+ * cgs_string_trunc
+ *
+ * Shortens a string to the given length by removing from the end. Does 
+ * nothing if the string's length is already 'n' or less.
+ *
+ * @param s     The string to truncate.
+ * @param n     The position at which the string will be truncated.
+ */
+void
+cgs_string_trunc(struct cgs_string* s, size_t n);
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Strsub Type
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
@@ -600,7 +612,7 @@ void*
 cgs_string_prepend_str(struct cgs_string* s, const char* add, size_t len);
 
 /**
- * cgs_string_append_str
+ * cgs_string_cat_str
  *
  * Insert a standard C-string to the end of a string struct. May result in a
  * reallocation.
@@ -612,5 +624,5 @@ cgs_string_prepend_str(struct cgs_string* s, const char* add, size_t len);
  * @return	A pointer back to s on success, NULL on failure.
  */
 void*
-cgs_string_append_str(struct cgs_string* s, const char* add, size_t len);
+cgs_string_cat_str(struct cgs_string* s, const char* add, size_t len);
 

@@ -164,6 +164,30 @@ string_cat_test(void** state)
         cgs_string_free(&s2);
 }
 
+static void
+string_trunc_test(void** state)
+{
+        (void)state;
+        struct cgs_string s1 = cgs_string_new();
+        cgs_string_from("Think different.", &s1);
+
+        assert_int_equal(s1.length, 16);                // establish length
+
+        // truncate string
+        cgs_string_trunc(&s1, 10);
+
+        assert_int_equal(s1.length, 10);                // length is shortened
+        assert_string_equal(s1.data, "Think diff");     // string is altered
+
+        // truncate to length longer than current string
+        cgs_string_trunc(&s1, 16);
+
+        assert_int_equal(s1.length, 10);                // length is unchanged
+        assert_string_equal(s1.data, "Think diff");     // string is unchanged
+
+        cgs_string_free(&s1);
+}
+
 /*
 int string_clear_test(void* data)
 {
@@ -311,6 +335,7 @@ int main(void)
                 cmocka_unit_test(string_cmp_test),
                 cmocka_unit_test(string_push_test),
                 cmocka_unit_test(string_cat_test),
+                cmocka_unit_test(string_trunc_test),
         };
 
         return cmocka_run_group_tests(tests, NULL, NULL);
