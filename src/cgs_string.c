@@ -262,7 +262,7 @@ cgs_string_push(struct cgs_string* s, int c)
 }
 
 void*
-cgs_string_cat(const struct cgs_string* src, struct cgs_string* dst)
+cgs_string_cat(struct cgs_string* dst, const struct cgs_string* src)
 {
         size_t new_cap = dst->length + src->length + 1;
         if (dst->capacity < new_cap && !cgs_string_grow_len(dst, new_cap))

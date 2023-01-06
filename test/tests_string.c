@@ -178,7 +178,7 @@ string_cat_test(void** state)
         struct cgs_string s2 = cgs_string_new();
         cgs_string_from("than be a swinger of birches", &s2);
 
-        assert_non_null(cgs_string_cat(&s2, &s1));
+        assert_non_null(cgs_string_cat(&s1, &s2));
         assert_string_equal(cgs_string_data(&s1),
                         "One could do worse than be a swinger of birches");
         assert_string_equal(cgs_string_data(&s2),

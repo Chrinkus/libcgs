@@ -370,13 +370,13 @@ cgs_string_push(struct cgs_string* s, int c);
  * Concatenate the contents of a string struct to the end of another string
  * struct.
  *
- * @param src   The string struct to add to the end of dst.
  * @param dst   The string struct to add to.
+ * @param src   The string struct to add to the end of dst.
  *
  * @return      A pointer back to dst on success, NULL on failure.
  */
 void*
-cgs_string_cat(const struct cgs_string* src, struct cgs_string* dst);
+cgs_string_cat(struct cgs_string* dst, const struct cgs_string* src);
 
 /**
  * cgs_string_clear
