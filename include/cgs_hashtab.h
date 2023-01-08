@@ -154,6 +154,24 @@ cgs_hashtab_current_load(const struct cgs_hashtab* h)
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Table Iterator
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+struct cgs_hashtab_iter_mut {
+        struct cgs_bucket** tab;
+        struct cgs_bucket** end;
+        struct cgs_bucket* cur;
+};
+
+struct cgs_hashtab_iter_mut
+cgs_hashtab_begin_mut(struct cgs_hashtab* ht);
+
+void*
+cgs_hashtab_iter_mut_next(struct cgs_hashtab_iter_mut* it);
+
+struct cgs_variant*
+cgs_hashtab_iter_mut_get(struct cgs_hashtab_iter_mut* it);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 

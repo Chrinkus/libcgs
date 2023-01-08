@@ -214,6 +214,52 @@ double
 cgs_hashtab_current_load(const struct cgs_hashtab* h);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Table Iterator
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+struct cgs_hashtab_iter_mut
+cgs_hashtab_begin_mut(struct cgs_hashtab* ht)
+{
+        return (struct cgs_hashtab_iter_mut){
+                .tab = ht->table,
+                .cur = NULL,
+                .end = &ht->table[ht->size],
+        };
+}
+
+void*
+cgs_hashtab_iter_mut_next(struct cgs_hashtab_iter_mut* it)
+{
+        // Ensure it->tab is pointing at an occupied bucket at all times
+        while (!*(it->tab) && it->tab != it->end)
+                ++it->tab;
+
+        if (it->tab == it->end)
+                return NULL;
+
+        if (!it->cur) {
+                it->cur = *(it->tab);
+                return it;
+        }
+
+        // Walk current bucket list
+        if (it->cur->next) {
+                it->cur = it->cur->next;
+                return it;
+        }
+
+        it->cur = NULL;
+        ++it->tab;
+        return cgs_hashtab_iter_mut_next(it);
+}
+
+struct cgs_variant*
+cgs_hashtab_iter_mut_get(struct cgs_hashtab_iter_mut* it)
+{
+        return &it->cur->value;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 

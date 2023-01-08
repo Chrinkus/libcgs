@@ -1,4 +1,5 @@
 #include "cmocka_headers.h"
+#include <stdio.h>
 
 #include "cgs_hashtab.h"
 
@@ -271,6 +272,40 @@ hashtab_rehash_test(void** state)
         cgs_hashtab_free(&ht);
 }
 
+static void
+hashtab_iter_test(void** state)
+{
+        (void)state;
+        struct cgs_hashtab legtab = { 0 };
+        cgs_hashtab_new(&legtab);
+
+        struct cgs_variant* pvar = NULL;
+
+        pvar = cgs_hashtab_get(&legtab, "cat");
+        cgs_variant_set_int(pvar, 4);
+
+        pvar = cgs_hashtab_get(&legtab, "bird");
+        cgs_variant_set_int(pvar, 2);
+
+        pvar = cgs_hashtab_get(&legtab, "snake");
+        cgs_variant_set_int(pvar, 0);
+
+        pvar = cgs_hashtab_get(&legtab, "spider");
+        cgs_variant_set_int(pvar, 8);
+
+        assert_int_equal(cgs_hashtab_length(&legtab), 4);
+
+        struct cgs_hashtab_iter_mut it = cgs_hashtab_begin_mut(&legtab);
+        while (cgs_hashtab_iter_mut_next(&it)) {
+                struct cgs_variant* p = cgs_hashtab_iter_mut_get(&it);
+                int* pi = cgs_variant_get_mut(p);
+                assert_true(*pi == 0 || *pi == 2 || *pi == 4 || *pi == 8);
+                printf("%d\n", *pi);
+        }
+
+        cgs_hashtab_free(&legtab);
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Main
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
@@ -285,6 +320,7 @@ int main(void)
                 cmocka_unit_test(hashtab_remove_test),
                 cmocka_unit_test(hashtab_current_load_test),
                 cmocka_unit_test(hashtab_rehash_test),
+                cmocka_unit_test(hashtab_iter_test),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
