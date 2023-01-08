@@ -145,7 +145,7 @@ void* cgs_variant_xfer(struct cgs_variant* var);
 const void* cgs_variant_get(const struct cgs_variant* var);
 
 /**
- * cgs_variant_get_mutable
+ * cgs_variant_get_mut
  *
  * Get a mutable pointer to the variant data.
  *
@@ -154,5 +154,5 @@ const void* cgs_variant_get(const struct cgs_variant* var);
  * @return	A mutable pointer to the variant data aligned according to
  * 		variant type.
  */
-void* cgs_variant_get_mutable(struct cgs_variant* var);
+void* cgs_variant_get_mut(struct cgs_variant* var);
 

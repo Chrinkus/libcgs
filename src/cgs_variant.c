@@ -68,7 +68,7 @@ void cgs_variant_free_data(struct cgs_variant* var)
 
 void* cgs_variant_xfer(struct cgs_variant* var)
 {
-	void* data = cgs_variant_get_mutable(var);
+	void* data = cgs_variant_get_mut(var);
 	var->type = CGS_VARIANT_TYPE_NULL;
 	var->data.v = NULL;
 	return data;
@@ -87,13 +87,16 @@ const void* cgs_variant_get(const struct cgs_variant* var)
 	}
 }
 
-void* cgs_variant_get_mutable(struct cgs_variant* var)
+void* cgs_variant_get_mut(struct cgs_variant* var)
 {
-	/*
-	 * This is dirty. I tried reversing these and const-casting the
-	 * result from _mutable but the compiler complained. Apparently
-	 * this is acceptable..
-	 */
-	return (void*)cgs_variant_get(var);
+	switch (var->type) {
+	case CGS_VARIANT_TYPE_INT:	return (void*)&var->data.i;
+	case CGS_VARIANT_TYPE_DOUBLE:	return (void*)&var->data.d;
+	case CGS_VARIANT_TYPE_STRING:	return (void*)var->data.s;
+	case CGS_VARIANT_TYPE_DATA:	return var->data.v;
+
+	case CGS_VARIANT_TYPE_NULL:	/* fallthrough */
+	default:			return NULL;
+	}
 }
 

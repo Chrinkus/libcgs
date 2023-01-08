@@ -29,6 +29,7 @@
 #include "cgs_compare.h"
 #include "cgs_defs.h"
 #include "cgs_error.h"
+#include "cgs_hashtab.h"
 #include "cgs_heap.h"
 #include "cgs_io.h"
 #include "cgs_rbt.h"
