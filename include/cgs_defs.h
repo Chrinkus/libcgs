@@ -131,6 +131,19 @@ typedef char** CgsStrIterMut;
 typedef int (*CgsCmp3Way)(const void*, const void*);
 
 /**
+ * CgsHashFunc
+ *
+ * The expected signature of a hash function. 
+ *
+ * @param key   A read-only pointer to a value that the function shall use
+ *              to calculate the hash value.
+ * @param size  The current size of the hash table to bound the hash value.
+ *
+ * @return      An unsigned value within the range of [0:size).
+ */
+typedef size_t (*CgsHashFunc)(const void* key, size_t size);
+
+/**
  * CgsPredicate
  *
  * This comparison function returns non-zero for true and zero for false.

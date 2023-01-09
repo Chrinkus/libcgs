@@ -25,44 +25,21 @@
 #pragma once
 
 #include <stddef.h>
-#include "cgs_variant.h"        // Users will need so include here
+#include "cgs_variant.h"
 #include "cgs_defs.h"
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Struct Forward Declarations
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-struct cgs_bucket;
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Hash Functions
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-/**
- * CgsHashFunc
- *
- * The expected signature of a hash function. 
- */
-typedef size_t (*CgsHashFunc)(const void* key, size_t size);
-
-/**
- * cgs_string_hash
- *
- * Simple hash function for strings.
- *
- * @param key   A void pointer to a string to be hashed.
- * @param size  The number of buckets in the table to compress the hash to.
- *
- * @return      An unsigned value in the range of [0-size).
- */
-size_t
-cgs_string_hash(const void* key, size_t size);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Types
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-enum {
-        CGS_HASHTAB_DEFAULT_SIZE = 31,
-};
+/**
+ * struct cgs_htab_bucket
+ *
+ * FORWARD DECLARATION ONLY
+ *
+ * There is no need for a user to work with buckets.
+ */
+struct cgs_htab_bucket;
 
 /**
  * struct cgs_hashtab
@@ -79,7 +56,7 @@ enum {
  */
 struct cgs_hashtab {
         size_t length;
-        struct cgs_bucket** table;
+        struct cgs_htab_bucket** table;
 
         CgsHashFunc hash;
         CgsCmp3Way cmp;
@@ -113,10 +90,11 @@ cgs_hashtab_new(struct cgs_hashtab* tab);
  *
  * A function to de-allocate a hash table.
  *
- * @param h     A pointer to the hash table object to deallocate.
+ * @param p     A pointer to the hash table object to deallocate. Passed as
+ *              void* to match standard library free.
  */
 void
-cgs_hashtab_free(struct cgs_hashtab* h);
+cgs_hashtab_free(void* p);
 
 /**
  * cgs_hashtab_rehash
@@ -157,9 +135,9 @@ cgs_hashtab_current_load(const struct cgs_hashtab* h)
  * Hash Table Iterator
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 struct cgs_hashtab_iter_mut {
-        struct cgs_bucket** tab;
-        struct cgs_bucket** end;
-        struct cgs_bucket* cur;
+        struct cgs_htab_bucket** tab;
+        struct cgs_htab_bucket** end;
+        struct cgs_htab_bucket*  cur;
 };
 
 struct cgs_hashtab_iter_mut
@@ -218,3 +196,20 @@ cgs_hashtab_get(struct cgs_hashtab* h, const char* key);
  */
 void
 cgs_hashtab_remove(struct cgs_hashtab* h, const char* key);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+/**
+ * cgs_hash_str
+ *
+ * Simple hash function for strings.
+ *
+ * @param key   A void pointer to a string to be hashed.
+ * @param size  The number of buckets in the table to compress the hash to.
+ *
+ * @return      An unsigned value in the range of [0-size).
+ */
+size_t
+cgs_hash_str(const void* key, size_t size);
