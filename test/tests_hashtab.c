@@ -90,8 +90,7 @@ hashtab_new_test(void** state)
 {
         (void)state;
 
-        struct cgs_hashtab h = { 0 };
-        assert_non_null(cgs_hashtab_new(&h));
+        struct cgs_hashtab h = cgs_hashtab_new();
 
         assert_int_equal(cgs_hashtab_length(&h), 0);
 
@@ -103,8 +102,7 @@ hashtab_lookup_fail_test(void** state)
 {
         (void)state;
 
-        struct cgs_hashtab h = { 0 };
-        assert_non_null(cgs_hashtab_new(&h));
+        struct cgs_hashtab h = cgs_hashtab_new();
 
         assert_null(cgs_hashtab_lookup(&h, "article"));
         assert_null(cgs_hashtab_lookup(&h, "section"));
@@ -118,8 +116,7 @@ static void
 hashtab_get_success_test(void** state)
 {
         (void)state;
-        struct cgs_hashtab h = { 0 };
-        assert_non_null(cgs_hashtab_new(&h));
+        struct cgs_hashtab h = cgs_hashtab_new();
 
         for (size_t i = 0; i < top_scorers_len; ++i) {
                 struct cgs_variant* pv = NULL;
@@ -137,8 +134,7 @@ static void
 hashtab_get_lookup_test(void** state)
 {
         (void)state;
-        struct cgs_hashtab h = { 0 };
-        assert_non_null(cgs_hashtab_new(&h));
+        struct cgs_hashtab h = cgs_hashtab_new();
 
         for (size_t i = 0; i < top_scorers_len; ++i) {
                 const struct goal_scorer* gs = &top_scorers[i];
@@ -165,8 +161,7 @@ static void
 hashtab_remove_test(void** state)
 {
         (void)state;
-        struct cgs_hashtab h = { 0 };
-        assert_non_null(cgs_hashtab_new(&h));
+        struct cgs_hashtab h = cgs_hashtab_new();
 
         for (size_t i = 0; i < top_scorers_len; ++i) {
                 const struct goal_scorer* gs = &top_scorers[i];
@@ -194,15 +189,11 @@ hashtab_remove_test(void** state)
         cgs_hashtab_free(&h);
 }
 
+/*
 static void
 hashtab_current_load_test(void** state)
 {
         (void)state;
-
-        /* WARNING: This is not proper table usage. Instead of allocating and
-         * initializing an actual table I am just adjusting the length and
-         * size values to affect a "load".
-         */
 
         // default size of hashtable is 31 elements
         struct cgs_hashtab ht = { .length = 0, .size = 31 };
@@ -221,7 +212,9 @@ hashtab_current_load_test(void** state)
         ht.size = 67;
         assert_float_equal(cgs_hashtab_current_load(&ht), 0.149, 0.01);
 }
+*/
 
+/*
 static void
 hashtab_rehash_test(void** state)
 {
@@ -271,13 +264,13 @@ hashtab_rehash_test(void** state)
 
         cgs_hashtab_free(&ht);
 }
+*/
 
 static void
 hashtab_iter_test(void** state)
 {
         (void)state;
-        struct cgs_hashtab legtab = { 0 };
-        cgs_hashtab_new(&legtab);
+        struct cgs_hashtab legtab = cgs_hashtab_new();
 
         struct cgs_variant* pvar = NULL;
 
@@ -318,8 +311,8 @@ int main(void)
 		cmocka_unit_test(hashtab_get_success_test),
                 cmocka_unit_test(hashtab_get_lookup_test),
                 cmocka_unit_test(hashtab_remove_test),
-                cmocka_unit_test(hashtab_current_load_test),
-                cmocka_unit_test(hashtab_rehash_test),
+                //cmocka_unit_test(hashtab_current_load_test),
+                //cmocka_unit_test(hashtab_rehash_test),
                 cmocka_unit_test(hashtab_iter_test),
 	};
 

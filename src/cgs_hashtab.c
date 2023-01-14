@@ -28,6 +28,7 @@
 #include "cgs_numeric.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Constants
@@ -105,7 +106,7 @@ cgs_htab_bucket_free(void* p)
 
         struct cgs_htab_bucket* b = p;
 
-        //cgs_htab_bucket_free(b->next);
+        cgs_htab_bucket_free(b->next);
         cgs_variant_free_data(&b->value);
         free(b->key);
         free(b);
@@ -114,50 +115,200 @@ cgs_htab_bucket_free(void* p)
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Private Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-static void
-hashtab_check_load_factor(struct cgs_hashtab* ht)
+
+/**
+ * init_null_buckets
+ *
+ * Set all elements of an array of bucket pointers to NULL.
+ *
+ * @param ppb   A pointer to an array of bucket pointers.
+ * @param size  The number of elements in the array.
+ */
+static inline void
+init_null_buckets(struct cgs_htab_bucket** ppb, size_t size)
 {
-        if (cgs_hashtab_current_load(ht) > ht->max_load)
-                cgs_hashtab_rehash(ht, 0);
+        for (size_t i = 0; i < size; ++i)
+                ppb[i] = NULL;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Hash Table Management Functions
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-void*
-cgs_hashtab_new(struct cgs_hashtab* tab)
+/**
+ * hashtab_build
+ *
+ * Perform the initial allocation of an empty hash table.
+ *
+ * @param ht    The newly created hash table.
+ *
+ * @return      A pointer to the hash table on success, NULL on failure.
+ */
+static void*
+hashtab_build(struct cgs_hashtab* ht)
 {
         struct cgs_htab_bucket** ppb = malloc(HTAB_INITIAL_ALLOC);
         if (!ppb)
                 return NULL;
 
-        for (int i = 0; i < HTAB_DEFAULT_SIZE; ++i)
-                ppb[i] = NULL;
+        init_null_buckets(ppb, HTAB_DEFAULT_SIZE);
 
-        tab->length = 0;
-        tab->table = ppb;
-        tab->hash = cgs_hash_str;
-        tab->cmp = cgs_str_cmp;
-        tab->size = HTAB_DEFAULT_SIZE;
-        tab->max_load = HTAB_DEFAULT_LOAD_FACTOR;
+        ht->table = ppb;
+        ht->size = HTAB_DEFAULT_SIZE;
 
-        return tab;
+        return ht;
+}
+
+/**
+ * hashtab_rehash
+ *
+ * Rehash the elements of a hash table into the provided new bucket-pointer
+ * array. Frees the old array allocation.
+ *
+ * @param ht            The hash table.
+ * @param new_tab       The new bucket-pointer array.
+ * @param new_size      The size of the new allocation.
+ */
+static void
+hashtab_rehash(struct cgs_hashtab* ht, struct cgs_htab_bucket** new_htab,
+                size_t new_size)
+{
+        for (size_t i = 0; i < ht->size; ++i) {
+                struct cgs_htab_bucket* bp = ht->table[i];
+                while (bp) {
+                        struct cgs_htab_bucket* tmp = bp->next;
+                        size_t hash = ht->hash(bp->key, new_size);
+                        bp->next = new_htab[hash];
+                        new_htab[hash] = bp;
+                        bp = tmp;
+                }
+        }
+
+        free(ht->table);
+        ht->table = new_htab;
+        ht->size = new_size;
+}
+
+/**
+ * hashtab_grow
+ *
+ * Increase the number of buckets in a hash table.
+ *
+ * @param ht    The hash table.
+ * @param size  The desired minimum size. The allocation may be slightly
+ *              larger. If zero, the number of buckets will be roughly doubled.
+ *
+ * @return      A pointer to the hash table on success, NULL on failure.
+ */
+static void*
+hashtab_grow(struct cgs_hashtab* ht, size_t size)
+{
+        // Get new size or return if smaller
+        size_t new_size = 0;
+        if (size == 0)
+                new_size = cgs_next_prime(ht->size * 2);
+        else if (size > ht->size)
+                new_size = cgs_next_prime(size);
+        else
+                return NULL;
+
+        // Allocate new table
+        struct cgs_htab_bucket** ppb = malloc(new_size * HTAB_BUCKET_PSIZE);
+        if (!ppb)
+                return NULL;
+
+        init_null_buckets(ppb, new_size);
+        hashtab_rehash(ht, ppb, new_size);
+
+        return ht;
+}
+
+/**
+ * hashtab_pre_check_load
+ *
+ * Check if the hash table is able to add an element without going over max
+ * load. Handles empty table.
+ *
+ * @param ht    The hash table.
+ *
+ * @return      A pointer to the hash table if there is room to add the
+ *              element, NULL if there is not.
+ */
+static void*
+hashtab_pre_check_load(struct cgs_hashtab* ht)
+{
+        // check if table is empty
+        if (ht->size == 0)
+                return hashtab_build(ht);
+
+        // will adding an element overload the table?
+        if ((double)(ht->length + 1) / (double)ht->size > ht->max_load)
+                return hashtab_grow(ht, 0);
+        return ht;
+}
+
+/**
+ * hashtab_add_bucket
+ *
+ * Allocates a new bucket and adds it to the hash table.
+ *
+ * @param ht            The hash table.
+ * @param key           The key to add.
+ * @param hashval       The pre-calculated hash-value of the key.
+ * @param value         A pointer to a variant containing the value. Optional,
+ *                      may be NULL.
+ *
+ * @return              A pointer to the value member of the new bucket.
+ */
+static struct cgs_variant*
+hashtab_add_bucket(struct cgs_hashtab* ht, const char* key, size_t hashval,
+                const struct cgs_variant* value)
+{
+        // Ensure space available, re-calculate hashval if necessary
+        size_t size = ht->size;
+        if (!hashtab_pre_check_load(ht))
+                return NULL;
+        if (size != ht->size)
+                hashval = ht->hash(key, ht->size);
+
+        struct cgs_htab_bucket* b = cgs_htab_bucket_new(key);
+        if (!b)
+                return NULL;
+        b->next = ht->table[hashval];
+        ht->table[hashval] = b;
+        ++ht->length;
+
+        if (value)
+                memcpy(&b->value, value, sizeof(*value));
+
+        return &b->value;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Table Management Functions
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+struct cgs_hashtab
+cgs_hashtab_new(void)
+{
+        return (struct cgs_hashtab){
+                .length = 0,
+                .table = NULL,
+                .hash = cgs_hash_str,
+                .cmp = cgs_str_cmp,
+                .size = 0,
+                .max_load = HTAB_DEFAULT_LOAD_FACTOR,
+        };
 }
 
 void
 cgs_hashtab_free(void* p)
 {
-        struct cgs_hashtab* tab = p;
+        struct cgs_hashtab* ht = p;
 
-        for (size_t i = 0; i < tab->size; ++i)
-                while (tab->table[i]) {
-                        struct cgs_htab_bucket* b = tab->table[i];
-                        tab->table[i] = b->next;
-                        cgs_htab_bucket_free(b);
-                }
-        free(tab->table);
+        for (size_t i = 0; i < ht->size; ++i)
+                cgs_htab_bucket_free(ht->table[i]);
+
+        free(ht->table);
 }
 
+/*
 void*
 cgs_hashtab_rehash(struct cgs_hashtab* ht, size_t size)
 {
@@ -196,6 +347,7 @@ cgs_hashtab_rehash(struct cgs_hashtab* ht, size_t size)
 
         return ht;
 }
+*/
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Inline Function Symbols
@@ -203,8 +355,106 @@ cgs_hashtab_rehash(struct cgs_hashtab* ht, size_t size)
 size_t
 cgs_hashtab_length(const struct cgs_hashtab* h);
 
-double
-cgs_hashtab_current_load(const struct cgs_hashtab* h);
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Table Operations
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+const void*
+cgs_hashtab_lookup(const struct cgs_hashtab* ht, const char* key)
+{
+        if (ht->size == 0)      // empty hash table check
+                return NULL;
+
+        const struct cgs_htab_bucket* b = ht->table[ht->hash(key, ht->size)];
+        while (b) {
+                if (ht->cmp(&key, &b->key) == 0)
+                        return cgs_variant_get(&b->value);
+                b = b->next;
+        }
+        return NULL;
+}
+
+void*
+cgs_hashtab_lookup_mut(struct cgs_hashtab* ht, const char* key)
+{
+        if (ht->size == 0)      // empty hash table check
+                return NULL;
+
+        struct cgs_htab_bucket* b = ht->table[ht->hash(key, ht->size)];
+        while (b) {
+                if (ht->cmp(&key, &b->key) == 0)
+                        return cgs_variant_get_mut(&b->value);
+                b = b->next;
+        }
+        return NULL;
+}
+
+struct cgs_variant*
+cgs_hashtab_insert(struct cgs_hashtab* ht, const char* key,
+                const struct cgs_variant* var)
+{
+        size_t hashval = ht->size == 0 ? 0 : ht->hash(key, ht->size);
+        
+        // Check for existing element
+        if (ht->length > 0) {
+                struct cgs_htab_bucket* p = ht->table[hashval];
+                while (p) {
+                        if (ht->cmp(&key, &p->key) == 0)
+                                return NULL;
+                        p = p->next;
+                }
+        }
+
+        // No match in table, add new key-value pair
+        return hashtab_add_bucket(ht, key, hashval, var);
+}
+
+struct cgs_variant*
+cgs_hashtab_get(struct cgs_hashtab* ht, const char* key)
+{
+        size_t hashval = ht->size == 0 ? 0 : ht->hash(key, ht->size);
+
+        // If key exists, return pointer to value
+        if (ht->length > 0) {
+                struct cgs_htab_bucket* p = ht->table[hashval];
+                while (p) {
+                        if (ht->cmp(&key, &p->key) == 0)
+                                return &p->value;
+                        p = p->next;
+                }
+        }
+
+        // No match in table, add new key-value pair
+        return hashtab_add_bucket(ht, key, hashval, NULL);
+}
+
+void
+cgs_hashtab_remove(struct cgs_hashtab* h, const char* key)
+{
+        if (h->length == 0)
+                return;
+
+        size_t hashval = h->hash(key, h->size);
+        struct cgs_htab_bucket* b = h->table[hashval];
+        if (!b)
+                return;
+
+        struct cgs_htab_bucket* parent = NULL;
+        while (b) {
+                if (h->cmp(&b->key, &key) == 0)
+                        break;
+                parent = b;
+                b = b->next;
+        }
+
+        if (parent)
+                parent->next = b->next;
+        else
+                h->table[hashval] = b->next;
+
+        --h->length;
+        cgs_htab_bucket_free(b);
+}
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Iterator
@@ -250,70 +500,6 @@ struct cgs_variant*
 cgs_hashtab_iter_mut_get(struct cgs_hashtab_iter_mut* it)
 {
         return &it->cur->value;
-}
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Hash Table Operations
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-
-const void*
-cgs_hashtab_lookup(const struct cgs_hashtab* h, const char* key)
-{
-        size_t hashval = h->hash(key, h->size);
-        for (const struct cgs_htab_bucket* b = h->table[hashval]; b; b = b->next)
-                if (h->cmp(&b->key, &key) == 0)                 // &!!
-                        return cgs_variant_get(&b->value);
-
-        return NULL;
-}
-
-struct cgs_variant*
-cgs_hashtab_get(struct cgs_hashtab* h, const char* key)
-{
-        size_t hashval = h->hash(key, h->size);
-
-        struct cgs_htab_bucket* p = h->table[hashval];
-        if (p) {
-                for (struct cgs_htab_bucket* tmp = p; tmp; tmp = tmp->next)
-                        if (h->cmp(&tmp->key, &key) == 0)       // &!!
-                                return &tmp->value;
-        }
-
-        struct cgs_htab_bucket* b = cgs_htab_bucket_new(key);
-        if (!b)
-                return NULL;
-        b->next = p;            // works if p is NULL or a list!
-        h->table[hashval] = b;
-        ++h->length;
-
-        hashtab_check_load_factor(h);
-
-        return &b->value;
-}
-
-void
-cgs_hashtab_remove(struct cgs_hashtab* h, const char* key)
-{
-        size_t hashval = h->hash(key, h->size);
-        struct cgs_htab_bucket* b = h->table[hashval];
-        if (!b)
-                return;
-
-        struct cgs_htab_bucket* parent = NULL;
-        while (b) {
-                if (h->cmp(&b->key, &key) == 0)
-                        break;
-                parent = b;
-                b = b->next;
-        }
-
-        if (parent)
-                parent->next = b->next;
-        else
-                h->table[hashval] = b->next;
-
-        --h->length;
-        cgs_htab_bucket_free(b);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

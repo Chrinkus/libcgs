@@ -72,18 +72,15 @@ struct cgs_hashtab {
 /**
  * cgs_hashtab_new
  *
- * A function to allocate and initialize a new hash table.
+ * Create a new, empty, unallocated hash table.
  *
  * Note: Hash and comparison functions are not required for this version. The
  * current implementation uses string keys so these functions are known.
  *
- * @param tab   A pointer to the hash table object to create.
- *
- * @return      A pointer to the hash table object on success or NULL on
- *              failure.
+ * @return      An empty hash table.
  */
-void*
-cgs_hashtab_new(struct cgs_hashtab* tab);
+struct cgs_hashtab
+cgs_hashtab_new(void);
 
 /**
  * cgs_hashtab_free
@@ -113,41 +110,29 @@ cgs_hashtab_free(void* p);
  *
  * @return      A pointer to the hash table if resized or NULL if not.
  */
+/*
 void*
 cgs_hashtab_rehash(struct cgs_hashtab* ht, size_t size);
+*/
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Inline Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+/**
+ * cgs_hashtab_length
+ *
+ * Get the length of a hash table.
+ *
+ * @param ht    The hash table.
+ *
+ * @return      The length of the hash table.
+ */
 inline size_t
-cgs_hashtab_length(const struct cgs_hashtab* h)
+cgs_hashtab_length(const struct cgs_hashtab* ht)
 {
-        return h->length;
+        return ht->length;
 }
-
-inline double
-cgs_hashtab_current_load(const struct cgs_hashtab* h)
-{
-        return (double)h->length / (double)h->size;
-}
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Hash Table Iterator
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
-struct cgs_hashtab_iter_mut {
-        struct cgs_htab_bucket** tab;
-        struct cgs_htab_bucket** end;
-        struct cgs_htab_bucket*  cur;
-};
-
-struct cgs_hashtab_iter_mut
-cgs_hashtab_begin_mut(struct cgs_hashtab* ht);
-
-void*
-cgs_hashtab_iter_mut_next(struct cgs_hashtab_iter_mut* it);
-
-struct cgs_variant*
-cgs_hashtab_iter_mut_get(struct cgs_hashtab_iter_mut* it);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Operations
@@ -169,6 +154,53 @@ const void*
 cgs_hashtab_lookup(const struct cgs_hashtab* h, const char* key);
 
 /**
+ * cgs_hashtab_lookup_mut
+ *
+ * Searches the hash table for a given key and returns a mutable pointer to
+ * the corresponding value if found.
+ *
+ * @param h     The hash table
+ * @param key   The key to look up.
+ *
+ * @return      A mutable pointer to the value object if found or NULL if
+ *              not found.
+ */
+void*
+cgs_hashtab_lookup_mut(struct cgs_hashtab* ht, const char* key);
+
+/**
+ * cgs_hashtab_insert
+ *
+ * Insert a key/value pair into the hash table. The value may be optionally
+ * passed for copy insertion. A pointer to the variant is returned so the
+ * value may be explicitly set after.
+ *
+ * Returns NULL if an element of the given key already exists in the table.
+ *
+ * @param ht    The hash table.
+ * @param key   The key of the element to insert.
+ * @param var   A read-only pointer to a variant to copy as the value.
+ *
+ * @return      A mutable pointer to the variant value on successful insertion,
+ *              NULL on failed insertion.
+ */
+struct cgs_variant*
+cgs_hashtab_insert(struct cgs_hashtab* ht, const char* key,
+                const struct cgs_variant* var);
+
+/**
+ * cgs_hashtab_remove
+ *
+ * Searches the hash table for a given key. If found, removes the bucket from
+ * the table. No error is indicated if the key is not found.
+ *
+ * @param h     The hash table.
+ * @param key   The key of the value to remove.
+ */
+void
+cgs_hashtab_remove(struct cgs_hashtab* h, const char* key);
+
+/**
  * cgs_hashtab_get
  *
  * Searches the hash table for a given key. If not found, creates a
@@ -185,17 +217,23 @@ cgs_hashtab_lookup(const struct cgs_hashtab* h, const char* key);
 struct cgs_variant*
 cgs_hashtab_get(struct cgs_hashtab* h, const char* key);
 
-/**
- * cgs_hashtab_remove
- *
- * Searches the hash table for a given key. If found, removes the bucket from
- * the table. No error is indicated if the key is not found.
- *
- * @param h     The hash table.
- * @param key   The key of the value to remove.
- */
-void
-cgs_hashtab_remove(struct cgs_hashtab* h, const char* key);
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Hash Table Iterator
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+struct cgs_hashtab_iter_mut {
+        struct cgs_htab_bucket** tab;
+        struct cgs_htab_bucket** end;
+        struct cgs_htab_bucket*  cur;
+};
+
+struct cgs_hashtab_iter_mut
+cgs_hashtab_begin_mut(struct cgs_hashtab* ht);
+
+void*
+cgs_hashtab_iter_mut_next(struct cgs_hashtab_iter_mut* it);
+
+struct cgs_variant*
+cgs_hashtab_iter_mut_get(struct cgs_hashtab_iter_mut* it);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Functions
