@@ -280,3 +280,34 @@ cgs_vector_transform(struct cgs_vector* v, CgsUnaryOpMut f, void* data)
                 f(cgs_vector_get_mut(v, i), i, data);
 }
 
+const void*
+cgs_vector_min(const struct cgs_vector* v, CgsCmp3Way cmp)
+{
+        if (v->length == 0)
+                return NULL;
+
+        const void* min = &v->data[0];
+        for (size_t i = 1; i < v->length; ++i) {
+                const void* p = &v->data[i * v->element_size];
+                if (cmp(min, p) > 0)    // min is greater than this element
+                        min = p;
+        }
+
+        return min;
+}
+
+const void*
+cgs_vector_max(const struct cgs_vector* v, CgsCmp3Way cmp)
+{
+        if (v->length == 0)
+                return NULL;
+
+        const void* max = &v->data[0];
+        for (size_t i = 1; i < v->length; ++i) {
+                const void* p1 = &v->data[i * v->element_size];
+                if (cmp(max, p1) < 0)    // max is lesser than this element
+                        max = p1;
+        }
+
+        return max;
+}

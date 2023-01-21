@@ -423,3 +423,38 @@ cgs_vector_foreach(const struct cgs_vector* v, CgsUnaryOp f, void* data);
 void
 cgs_vector_transform(struct cgs_vector* v, CgsUnaryOpMut f, void* data);
 
+/**
+ * cgs_vector_min
+ *
+ * Get a read-only pointer to the smallest item in the vector as determined
+ * by the provided comparison function.
+ *
+ * WARNING: Any pushes to the vector after calling this function may invalidate
+ * any pointers returned from it.
+ *
+ * @param v     The vector.
+ * @param cmp   The comparison function.
+ *
+ * @return      A read-only pointer to the smallest value or NULL if the 
+ *              vector is empty.
+ */
+const void*
+cgs_vector_min(const struct cgs_vector* v, CgsCmp3Way cmp);
+
+/**
+ * cgs_vector_max
+ *
+ * Get a read-only pointer to the largest item in the vector as determined
+ * by the provided comparison function.
+ *
+ * WARNING: Any pushes to the vector after calling this function may invalidate
+ * any pointers returned from it.
+ *
+ * @param v     The vector.
+ * @param cmp   The comparison function.
+ *
+ * @return      A read-only pointer to the largest value or NULL if the 
+ *              vector is empty.
+ */
+const void*
+cgs_vector_max(const struct cgs_vector* v, CgsCmp3Way cmp);

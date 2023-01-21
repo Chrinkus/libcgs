@@ -454,6 +454,65 @@ static void vector_transform_test(void** state)
         cgs_vector_free(&vi);
 }
 
+static void
+vector_min_max_test(void** state)
+{
+        (void)state;
+        struct cgs_vector v1 = cgs_vector_new(sizeof(int));
+
+        const int* min = cgs_vector_min(&v1, cgs_int_cmp);
+        assert_null(min);
+        const int* max = cgs_vector_max(&v1, cgs_int_cmp);
+        assert_null(max);
+
+        int x = 5;
+        cgs_vector_push(&v1, &x);
+        min = cgs_vector_min(&v1, cgs_int_cmp);
+        max = cgs_vector_max(&v1, cgs_int_cmp);
+        assert_non_null(min);
+        assert_non_null(max);
+        assert_int_equal(*min, 5);
+        assert_int_equal(*max, 5);
+
+        x = -2;
+        cgs_vector_push(&v1, &x);
+        min = cgs_vector_min(&v1, cgs_int_cmp);
+        max = cgs_vector_max(&v1, cgs_int_cmp);
+        assert_non_null(min);
+        assert_non_null(max);
+        assert_int_equal(*min, -2);
+        assert_int_equal(*max, 5);
+
+        x = 10;
+        cgs_vector_push(&v1, &x);
+        min = cgs_vector_min(&v1, cgs_int_cmp);
+        max = cgs_vector_max(&v1, cgs_int_cmp);
+        assert_non_null(min);
+        assert_non_null(max);
+        assert_int_equal(*min, -2);
+        assert_int_equal(*max, 10);
+
+        x = 0;
+        cgs_vector_push(&v1, &x);
+        min = cgs_vector_min(&v1, cgs_int_cmp);
+        max = cgs_vector_max(&v1, cgs_int_cmp);
+        assert_non_null(min);
+        assert_non_null(max);
+        assert_int_equal(*min, -2);
+        assert_int_equal(*max, 10);
+
+        x = -73;
+        cgs_vector_push(&v1, &x);
+        min = cgs_vector_min(&v1, cgs_int_cmp);
+        max = cgs_vector_max(&v1, cgs_int_cmp);
+        assert_non_null(min);
+        assert_non_null(max);
+        assert_int_equal(*min, -73);
+        assert_int_equal(*max, 10);
+
+        cgs_vector_free(&v1);
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Main
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
@@ -479,6 +538,7 @@ int main(void)
 				setup_towns, teardown_ptr),
 		cmocka_unit_test(vector_foreach_test),
 		cmocka_unit_test(vector_transform_test),
+		cmocka_unit_test(vector_min_max_test),
 	};
 
 	return cmocka_run_group_tests(tests, setup_random, teardown_ptr);
