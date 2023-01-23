@@ -244,9 +244,14 @@ cgs_string_cmp(const void* a, const void* b)
         return strcmp(cgs_string_data(s1), cgs_string_data(s2));
 }
 
-// Inline symbol
 int
-cgs_string_eq_str(const struct cgs_string* s1, const char* s2);
+cgs_string_eq_str(const void* a, const void* b)
+{
+        const struct cgs_string* s1 = a;
+        const char* s2 = b;
+
+        return strcmp(cgs_string_data(s1), s2) == 0;
+}
 
 void*
 cgs_string_push(struct cgs_string* s, int c)

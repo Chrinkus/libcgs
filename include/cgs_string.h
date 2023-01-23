@@ -336,18 +336,16 @@ cgs_string_cmp(const void* a, const void* b);
 /**
  * cgs_string_eq_str
  *
- * An equality test for comparing a cgs_string to a C-string.
+ * An equality test for comparing a cgs_string to a C-string. Parameters
+ * passed as void*'s to match CgsPredicate signature.
  *
  * @param a     A pointer to a string.
  * @param b     A pointer to a C-string (const char*, const char[]).
  *
  * @return      A boolean integer indicating true(1) or false(0).
  */
-inline int
-cgs_string_eq_str(const struct cgs_string* s1, const char* s2)
-{
-        return strcmp(cgs_string_data(s1), s2) == 0;
-}
+int
+cgs_string_eq_str(const void* a, const void* b);
 
 /**
  * cgs_string_push
