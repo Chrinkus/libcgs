@@ -1,7 +1,12 @@
-# Bring in CMocka
-find_package(cmocka)
+# Get cmocka dependency
+include(FetchContent)
+FetchContent_Declare(cmocka
+        GIT_REPOSITORY  https://gitlab.com/Chrinkus/cmocka.git
+        GIT_TAG         origin/cmake
+)
+FetchContent_MakeAvailable(cmocka)
 
-# Main project
+# Needed for private headers
 include_directories("${PROJECT_SOURCE_DIR}/src")
 
 # Test build target
