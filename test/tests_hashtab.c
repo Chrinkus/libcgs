@@ -189,7 +189,6 @@ hashtab_remove_test(void** state)
         cgs_hashtab_free(&h);
 }
 
-/*
 static void
 hashtab_current_load_test(void** state)
 {
@@ -212,15 +211,12 @@ hashtab_current_load_test(void** state)
         ht.size = 67;
         assert_float_equal(cgs_hashtab_current_load(&ht), 0.149, 0.01);
 }
-*/
 
-/*
 static void
 hashtab_rehash_test(void** state)
 {
         (void)state;
-        struct cgs_hashtab ht = { 0 };
-        cgs_hashtab_new(&ht);
+        struct cgs_hashtab ht = cgs_hashtab_new();
 
         const struct number* pnum = NULL;       // ease of access
         struct cgs_variant* pvar = NULL;        // used to insert elements
@@ -264,7 +260,6 @@ hashtab_rehash_test(void** state)
 
         cgs_hashtab_free(&ht);
 }
-*/
 
 static void
 hashtab_iter_test(void** state)
@@ -311,8 +306,8 @@ int main(void)
 		cmocka_unit_test(hashtab_get_success_test),
                 cmocka_unit_test(hashtab_get_lookup_test),
                 cmocka_unit_test(hashtab_remove_test),
-                //cmocka_unit_test(hashtab_current_load_test),
-                //cmocka_unit_test(hashtab_rehash_test),
+                cmocka_unit_test(hashtab_current_load_test),
+                cmocka_unit_test(hashtab_rehash_test),
                 cmocka_unit_test(hashtab_iter_test),
 	};
 

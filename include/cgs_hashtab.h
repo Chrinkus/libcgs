@@ -94,7 +94,7 @@ void
 cgs_hashtab_free(void* p);
 
 /**
- * cgs_hashtab_rehash
+ * cgs_hashtab_reserve
  *
  * Request a rehash of the table to the new size. The behaviour is dependent
  * on the requested size:
@@ -110,10 +110,8 @@ cgs_hashtab_free(void* p);
  *
  * @return      A pointer to the hash table if resized or NULL if not.
  */
-/*
 void*
-cgs_hashtab_rehash(struct cgs_hashtab* ht, size_t size);
-*/
+cgs_hashtab_reserve(struct cgs_hashtab* ht, size_t size);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Hash Table Inline Functions
@@ -132,6 +130,22 @@ inline size_t
 cgs_hashtab_length(const struct cgs_hashtab* ht)
 {
         return ht->length;
+}
+
+/**
+ * cgs_hashtab_current_load
+ *
+ * Get the current load factor of the hash table.
+ *
+ * @param ht    The hash table.
+ *
+ * @return      A floating point value representing the ratio of elements to
+ *              buckets in the table.
+ */
+inline double
+cgs_hashtab_current_load(const struct cgs_hashtab* ht)
+{
+        return (double)ht->length / (double)ht->size;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
