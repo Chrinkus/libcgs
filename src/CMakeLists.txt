@@ -5,6 +5,7 @@ add_library(${LIB_NAME}
         "cgs_hashtab.c"
         "cgs_heap.c"
 	"cgs_io.c"
+        "cgs_iter.c"
         "cgs_numeric.c"
 	"cgs_rbt.c"
 	"cgs_sort.c"

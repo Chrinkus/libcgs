@@ -161,7 +161,7 @@ void*
 cgs_vector_xfer(struct cgs_vector* v, size_t* len);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Array Inline Getters
+ * Vector Inline Getters
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
@@ -308,7 +308,7 @@ cgs_vector_clear(struct cgs_vector* v)
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Array Standard Operations
+ * Vector Standard Operations
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
@@ -365,7 +365,7 @@ void
 cgs_vector_remove_fast(struct cgs_vector* v, size_t i);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Array Standard Algorithms
+ * Vector Standard Algorithms
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 /**
