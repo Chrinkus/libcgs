@@ -175,5 +175,22 @@ typedef void (*CgsFreeFunc)(void*);
  *
  * The signature that a custom copy function needs to interact with
  * `cgs_vector_copy_with()`.
+ *
+ * @param s     The source object.
+ * @param d     The destination object.
+ *
+ * @return      A pointer to the destination object on success, NULL
+ *              on failure.
  */
-typedef void* (*CgsCopyFunc)(const void*, void*);
+typedef void* (*CgsCopyFunc)(const void* s, void* d);
+
+/**
+ * CgsMoveFunc
+ *
+ * The signature that a custom move function needs to interact with
+ * `cgs_vector_push_with()`.
+ *
+ * @param s     The source object.
+ * @param d     The destination object.
+ */
+typedef void (*CgsMoveFunc)(void* s, void* d);

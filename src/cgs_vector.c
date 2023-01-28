@@ -96,7 +96,8 @@ void*
 cgs_vector_copy_with(const struct cgs_vector* src, struct cgs_vector* dst,
                 CgsCopyFunc f)
 {
-        char* p = malloc(src->length * src->element_size);
+        // calloc called to set all "members" of empty elements to zero
+        char* p = calloc(src->length, src->element_size);
         if (!p)
                 return NULL;
 
@@ -216,6 +217,18 @@ cgs_vector_push(struct cgs_vector* v, const void* src)
 	memcpy(dst, src, v->element_size);
 	++v->length;
 	return dst;
+}
+
+void*
+cgs_vector_push_with(struct cgs_vector* v, void* src, CgsMoveFunc f)
+{
+        if (v->length == v->capacity && !cgs_vector_grow(v))
+                return NULL;
+
+        char* dst = cgs_vector_get_mut(v, v->length);
+        f(src, dst);
+        ++v->length;
+        return dst;
 }
 
 void*

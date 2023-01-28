@@ -66,8 +66,11 @@ cgs_string_copy(const void* s, void* d)
 }
 
 void
-cgs_string_move(struct cgs_string* src, struct cgs_string* dst)
+cgs_string_move(void* s, void* d)
 {
+        struct cgs_string* src = s;
+        struct cgs_string* dst = d;
+
         dst->length = src->length;
         dst->capacity = src->capacity;
         dst->data = src->data;

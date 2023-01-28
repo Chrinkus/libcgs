@@ -326,6 +326,22 @@ void*
 cgs_vector_push(struct cgs_vector* v, const void* src);
 
 /**
+ * cgs_vector_push_with
+ *
+ * Add an element to the end of the vector by moving from the source object
+ * using the provided function.
+ *
+ * @param v     The vector.
+ * @param src   A mutable pointer to the element to move from.
+ * @param f     The move function to use. Signature should match:
+ *              `void (*CgsMoveFunc)(void* src, void* dst)`
+ *
+ * @return      A mutable pointer to the element added.
+ */
+void*
+cgs_vector_push_with(struct cgs_vector* v, void* src, CgsMoveFunc f);
+
+/**
  * cgs_vector_pop
  *
  * Remove the last element of the vector, copying it into the provided

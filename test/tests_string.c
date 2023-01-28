@@ -52,6 +52,18 @@ string_move_test(void** state)
         assert_int_equal(s1.capacity, 0);
 
         cgs_string_free(&s2);
+
+        struct cgs_string s3 = cgs_string_new();
+        cgs_string_from("Dances with Wolves", &s3);
+        struct cgs_string s4 = cgs_string_new();
+        cgs_string_from("Dirty Dancing", &s4);
+
+        cgs_string_move(&s4, &s3);
+        assert_string_equal(s3.data, "Dirty Dancing");
+        assert_string_equal(s4.data, "");
+
+        cgs_string_free(&s3);
+        // Original content of s3 should not leak, check valgrind!
 }
 
 static void

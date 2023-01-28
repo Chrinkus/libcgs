@@ -66,8 +66,9 @@ cgs_string_new(void);
 /**
  * cgs_string_copy
  *
- * Copy a source string to a destination string. Signature consists of
- * `void*`'s to match CgsCopyFunc.
+ * Copy a source string to a destination string.
+ *
+ * NOTE: Signature consists of `void*`'s to match CgsCopyFunc.
  *
  * @param s     A read-only pointer to the string to copy from.
  * @param d     A mutable pointer to the string to copy to.
@@ -82,12 +83,14 @@ cgs_string_copy(const void* s, void* d);
  *
  * Move the members of one string to another and set the source string's data
  * to an empty string.
+ * 
+ * NOTE: Signature consists of `void*`'s to match CgsMoveFunc.
  *
  * @param src   The string to move from.
  * @param dst   The string to move to.
  */
 void
-cgs_string_move(struct cgs_string* src, struct cgs_string* dst);
+cgs_string_move(void* s, void* d);
 
 /**
  * cgs_string_from

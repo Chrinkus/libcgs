@@ -10,19 +10,15 @@ vector_of_strings_test(void** state)
 
         struct cgs_vector v1 = cgs_vector_new(sizeof(struct cgs_string));
         struct cgs_string buffer = cgs_string_new();
-        struct cgs_string mover = cgs_string_new();
 
         cgs_string_from("Hello darling", &buffer);
-        cgs_string_move(&buffer, &mover);
-        cgs_vector_push(&v1, &mover);
+        cgs_vector_push_with(&v1, &buffer, cgs_string_move);
 
         cgs_string_from("Nice to see you", &buffer);
-        cgs_string_move(&buffer, &mover);
-        cgs_vector_push(&v1, &mover);
+        cgs_vector_push_with(&v1, &buffer, cgs_string_move);
 
         cgs_string_from("It's BEEN A LONG TIIIIIME", &buffer);
-        cgs_string_move(&buffer, &mover);
-        cgs_vector_push(&v1, &mover);
+        cgs_vector_push_with(&v1, &buffer, cgs_string_move);
 
         assert_int_equal(cgs_vector_length(&v1), 3);
 
