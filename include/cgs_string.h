@@ -438,6 +438,20 @@ cgs_string_trunc(struct cgs_string* s, size_t n);
 void
 cgs_string_reverse(struct cgs_string* s);
 
+/**
+ * cgs_string_replace
+ *
+ * @param s     The string to replace within.
+ * @param pos   The position in the string to start replacement.
+ * @param count The number of characters to replace.
+ * @param rep   The string to replace with.
+ *
+ * @return      The pointer 's' on success or NULL on failure.
+ */
+void*
+cgs_string_replace(struct cgs_string* s, size_t pos, size_t count,
+                const struct cgs_string* rep);
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Strsub Type
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 

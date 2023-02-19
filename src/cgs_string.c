@@ -317,6 +317,27 @@ cgs_string_reverse(struct cgs_string* s)
                 CGS_SWAP(*b, *e, char);
 }
 
+void*
+cgs_string_replace(struct cgs_string* s, size_t pos, size_t count,
+                const struct cgs_string* rep)
+{
+        if (count > s->length - pos)    // counts in excess of string tail
+                return NULL;            // length are errors
+
+        size_t new_cap = s->length - count + rep->length + 1;
+        if (s->capacity < new_cap && !cgs_string_grow_len(s, new_cap))
+                return NULL;
+
+        memmove(&s->data[pos + rep->length],            // gap for new string
+                        &s->data[pos + count],          // tail to keep
+                        s->length - pos - count + 1);
+
+        strncpy(&s->data[pos], rep->data, rep->length);
+
+        s->length = s->length - count + rep->length;
+        return s;
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * Strsub Inline Symbols
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 

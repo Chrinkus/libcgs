@@ -55,6 +55,8 @@ string_move_test(void** state)
 
         struct cgs_string s3 = cgs_string_new();
         cgs_string_from("Dances with Wolves", &s3);
+        cgs_string_free(&s3);   // no more auto-freeing of moved-to string
+
         struct cgs_string s4 = cgs_string_new();
         cgs_string_from("Dirty Dancing", &s4);
 
@@ -63,7 +65,6 @@ string_move_test(void** state)
         assert_string_equal(s4.data, "");
 
         cgs_string_free(&s3);
-        // Original content of s3 should not leak, check valgrind!
 }
 
 static void
@@ -238,6 +239,40 @@ string_reverse_test(void** state)
         cgs_string_free(&s1);
 }
 
+static void
+replace_test(void** state)
+{
+        (void)state;
+
+        // Intended usage
+        struct cgs_string s1 = cgs_string_new();
+        cgs_string_from("Hello World!", &s1);
+
+        struct cgs_string s2 = cgs_string_new();
+        cgs_string_from("City", &s2);
+
+        assert_non_null(cgs_string_replace(&s1, 6, 5, &s2));
+        assert_string_equal(cgs_string_data(&s1), "Hello City!");
+        assert_int_equal(cgs_string_length(&s1), 11);
+
+        cgs_string_free(&s1);
+        cgs_string_free(&s2);
+
+        // Null byte copied correctly on total tail replacement
+        struct cgs_string s3 = cgs_string_new();
+        cgs_string_from("Washington Redskins", &s3);    // horrible name
+
+        struct cgs_string s4 = cgs_string_new();
+        cgs_string_from("Commanders", &s4);
+
+        assert_non_null(cgs_string_replace(&s3, 11, 8, &s4));
+        assert_string_equal(cgs_string_data(&s3), "Washington Commanders");
+        assert_int_equal(cgs_string_length(&s3), 21);
+
+        cgs_string_free(&s3);
+        cgs_string_free(&s4);
+}
+
 /*
 int string_clear_test(void* data)
 {
@@ -388,6 +423,7 @@ int main(void)
                 cmocka_unit_test(string_cat_test),
                 cmocka_unit_test(string_trunc_test),
                 cmocka_unit_test(string_reverse_test),
+                cmocka_unit_test(replace_test),
         };
 
         return cmocka_run_group_tests(tests, NULL, NULL);
