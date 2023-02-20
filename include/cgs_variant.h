@@ -24,14 +24,20 @@
  */
 #pragma once
 
+#include "cgs_defs.h"
+
 /*
  * Type Constants
  */
 enum cgs_type {
 	CGS_VARIANT_TYPE_NULL = 0,
 	CGS_VARIANT_TYPE_INT,
+	CGS_VARIANT_TYPE_LONG,
+	CGS_VARIANT_TYPE_UINT,
+	CGS_VARIANT_TYPE_ULONG,
+	CGS_VARIANT_TYPE_FLOAT,
 	CGS_VARIANT_TYPE_DOUBLE,
-	CGS_VARIANT_TYPE_STRING,
+	CGS_VARIANT_TYPE_C_STR,
 	CGS_VARIANT_TYPE_DATA,
 };
 
@@ -41,12 +47,20 @@ enum cgs_type {
  * A union of common data types.
  *
  * @member i	An integer type.
+ * @member l	A long integer type.
+ * @member u	An unsigned integer type.
+ * @member ul   An unsigned long integer type.
+ * @member f	A float type.
  * @member d	A double float type.
- * @member s	A char pointer to a string.
+ * @member s	A char pointer to a c-string.
  * @member v	A pointer to arbitrary data.
  */
 union cgs_data {
 	int i;
+        long l;
+        unsigned u;
+        unsigned long ul;
+        float f;
 	double d;
 	char* s;
 	void* v;
@@ -57,12 +71,12 @@ union cgs_data {
  *
  * A variable type for use in data structures.
  *
- * @member data		The union.
  * @member type		The data type of the union.
+ * @member data		The union.
  */
 struct cgs_variant {
-	union cgs_data data;
 	enum cgs_type type;
+	union cgs_data data;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -74,22 +88,33 @@ struct cgs_variant {
  * value is stored directly in the variant.
  *
  * @param var	A pointer to the variant.
- * @param n	An integer value.
+ * @param n	A numeric value.
  */
-void cgs_variant_set_int(struct cgs_variant* var, int n);
-void cgs_variant_set_double(struct cgs_variant* var, double n);
+void
+cgs_variant_set_int(struct cgs_variant* var, int n);
+void
+cgs_variant_set_long(struct cgs_variant* var, long n);
+void
+cgs_variant_set_uint(struct cgs_variant* var, unsigned n);
+void
+cgs_variant_set_ulong(struct cgs_variant* var, unsigned long n);
+void
+cgs_variant_set_float(struct cgs_variant* var, float n);
+void
+cgs_variant_set_double(struct cgs_variant* var, double n);
 
 /**
- * cgs_variant_set_string
+ * cgs_variant_set_cstr
  *
  * Sets the type and data of the variant to char*. The provided string is
  * copied into a separate allocation with strdup. The memory should be cleaned
- * up with cgs_variant_free_data or transferred out with cgs_variant_xfer.
+ * up with cgs_variant_free or transferred out with cgs_variant_xfer.
  *
  * @param var	A pointer to the variant.
- * @param s	A string.
+ * @param s	A c-string.
  */
-void cgs_variant_set_string(struct cgs_variant* var, const char* s);
+void
+cgs_variant_set_cstr(struct cgs_variant* var, const char* s);
 
 /**
  * cgs_variant_set_data
@@ -101,22 +126,26 @@ void cgs_variant_set_string(struct cgs_variant* var, const char* s);
  * @param var	A pointer to the variant.
  * @param v	A pointer to some dynamically allocated data.
  */
-void cgs_variant_set_data(struct cgs_variant* var, void* v);
+void
+cgs_variant_set_data(struct cgs_variant* var, void* v);
 
 /**
- * cgs_variant_free_data
+ * cgs_variant_free
  *
- * Frees the data if string or void* data. If type is CGS_VARIANT_TYPE_DATA
- * and the data member requires non-trivial memory management, call
- * cgs_variant_xfer to surrender ownership of contained data and free
- * accordingly.
+ * Frees the data if string or void* data, does nothing when called on other
+ * variant types. Calls standard library `free` on the contained pointer. If
+ * the data value is non-trivially freed, an optional freeing function may be
+ * passed that will be called on the object first.
  *
  * DOES NOT FREE THE VARIANT. If the variant itself is allocated it must
  * be freed manually.
  *
  * @param var	A pointer to the variant.
+ * @param ff    An optional function to free the data value with before
+ *              freeing the data object or NULL.
  */
-void cgs_variant_free_data(struct cgs_variant* var);
+void
+cgs_variant_free(struct cgs_variant* var, CgsFreeFunc ff);
 
 /**
  * cgs_variant_xfer
@@ -130,7 +159,8 @@ void cgs_variant_free_data(struct cgs_variant* var);
  * @return	A pointer to the variant data. Data will no longer be 
  * 		accessible through the variant.
  */
-void* cgs_variant_xfer(struct cgs_variant* var);
+void*
+cgs_variant_xfer(struct cgs_variant* var);
 
 /**
  * cgs_variant_get
@@ -142,7 +172,8 @@ void* cgs_variant_xfer(struct cgs_variant* var);
  * @return	A read-only pointer to the variant data aligned according to
  * 		variant type.
  */
-const void* cgs_variant_get(const struct cgs_variant* var);
+const void*
+cgs_variant_get(const struct cgs_variant* var);
 
 /**
  * cgs_variant_get_mut
@@ -154,5 +185,5 @@ const void* cgs_variant_get(const struct cgs_variant* var);
  * @return	A mutable pointer to the variant data aligned according to
  * 		variant type.
  */
-void* cgs_variant_get_mut(struct cgs_variant* var);
-
+void*
+cgs_variant_get_mut(struct cgs_variant* var);

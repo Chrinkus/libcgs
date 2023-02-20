@@ -107,7 +107,7 @@ cgs_htab_bucket_free(void* p)
         struct cgs_htab_bucket* b = p;
 
         cgs_htab_bucket_free(b->next);
-        cgs_variant_free_data(&b->value);
+        cgs_variant_free(&b->value, NULL);
         free(b->key);
         free(b);
 }

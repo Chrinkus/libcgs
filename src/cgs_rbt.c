@@ -68,7 +68,7 @@ cgs_rbt_node_free(struct cgs_rbt_node* node)
 
         cgs_rbt_node_free(node->left);
         cgs_rbt_node_free(node->right);
-        cgs_variant_free_data(&node->data);
+        cgs_variant_free(&node->data, NULL);
         if (node->parent) {
                 if (node == node->parent->left)
                         node->parent->left = NULL;

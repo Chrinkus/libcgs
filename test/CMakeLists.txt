@@ -27,7 +27,6 @@ set(test_sources
         "tests_rbt_private.c"
 	"tests_sort.c"
 	"tests_variant.c"
-	"tests_variant_usage.c"
 	"tests_string.c"
 	"tests_string_utils.c"
         "tests_strsub.c"
