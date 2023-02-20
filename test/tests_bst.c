@@ -1,27 +1,47 @@
 #include "cmocka_headers.h"
 
+#include <stdlib.h>
+
 #include "cgs_bst.h"
 #include "cgs_compare.h"
+#include "cgs_string.h"
 
-const int garr[] = { 10, 14, 2, -13, 37, -6, 100, 0, -1, 8, -67, 72 };
-const int glen = sizeof(garr) / sizeof(garr[0]);
+const int ints[] = { 10, 14, 2, -13, 37, -6, 100, 0, -1, 8, -67, 72 };
+const int ints_len = sizeof(ints) / sizeof(ints[0]);
 
-static void bst_int_new_test(void** state)
+const char* shows[] = {
+        "Community",
+        "Twin Peaks",
+        "IT Crowd",
+        "Dark",
+        "It's Always Sunny in Philadelphia",
+        "Star Trek",
+        "The Mandalorian",
+        "Modern Family",
+        "Crash Landing on You",
+};
+const int shows_len = sizeof(shows) / sizeof(shows[0]);
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+static void
+bst_int_new_test(void** state)
 {
 	(void)state;
 
-        struct cgs_bst tree = cgs_bst_new(cgs_int_cmp);
+        struct cgs_bst tree = cgs_bst_new(cgs_int_cmp, NULL);
 
 	assert_int_equal(cgs_bst_length(&tree), 0);
 
 	cgs_bst_free(&tree);
 }
 
-static void bst_int_insert_test(void** state)
+static void
+bst_int_insert_test(void** state)
 {
 	(void)state;
 
-        struct cgs_bst tree = cgs_bst_new(cgs_int_cmp);
+        struct cgs_bst tree = cgs_bst_new(cgs_int_cmp, NULL);
 
 	struct cgs_variant var = { 0 };
 	cgs_variant_set_int(&var, 5);
@@ -39,15 +59,16 @@ static void bst_int_insert_test(void** state)
 	cgs_bst_free(&tree);
 }
 
-void bst_int_search_test(void** state)
+static void
+bst_int_search_test(void** state)
 {
 	(void)state;
 
-        struct cgs_bst tree = cgs_bst_new(cgs_int_cmp);
+        struct cgs_bst tree = cgs_bst_new(cgs_int_cmp, NULL);
 
 	struct cgs_variant var = { 0 };
-	for (int i = 0; i < glen; ++i) {
-		cgs_variant_set_int(&var, garr[i]);
+	for (int i = 0; i < ints_len; ++i) {
+		cgs_variant_set_int(&var, ints[i]);
 		cgs_bst_insert(&tree, &var);
 	}
 
@@ -55,12 +76,12 @@ void bst_int_search_test(void** state)
 	const struct cgs_variant* pv;
 	const int* pi;
 
-	for (int i = 0; i < glen; ++i) {
-		cgs_variant_set_int(&var, garr[i]);
+	for (int i = 0; i < ints_len; ++i) {
+		cgs_variant_set_int(&var, ints[i]);
 		pv = cgs_bst_search(&tree, &var);
 		assert_non_null(pv);
 		pi = cgs_variant_get(pv);
-		assert_int_equal(*pi, garr[i]);
+		assert_int_equal(*pi, ints[i]);
 	}
 
 	// find fail
@@ -87,18 +108,19 @@ void bst_int_search_test(void** state)
 	cgs_bst_free(&tree);
 }
 
-static void bst_int_minmax_test(void** state)
+static void
+bst_int_minmax_test(void** state)
 {
 	(void)state;
 
-        struct cgs_bst tree = cgs_bst_new(cgs_int_cmp);
+        struct cgs_bst tree = cgs_bst_new(cgs_int_cmp, NULL);
 
 	struct cgs_variant var = { 0 };
 
 	// Add elements in groups and check min and max values
 	int i = 0;
 	for ( ; i < 3; ++i) {
-		cgs_variant_set_int(&var, garr[i]);
+		cgs_variant_set_int(&var, ints[i]);
 		cgs_bst_insert(&tree, &var);
 	}
 
@@ -109,7 +131,7 @@ static void bst_int_minmax_test(void** state)
 	assert_int_equal(cgs_bst_length(&tree), 3);
 
 	for ( ; i < 10; ++i) {
-		cgs_variant_set_int(&var, garr[i]);
+		cgs_variant_set_int(&var, ints[i]);
 		cgs_bst_insert(&tree, &var);
 	}
 
@@ -119,8 +141,8 @@ static void bst_int_minmax_test(void** state)
 	assert_int_equal(*max, 100);
 	assert_int_equal(cgs_bst_length(&tree), 10);
 
-	for ( ; i < glen; ++i) {
-		cgs_variant_set_int(&var, garr[i]);
+	for ( ; i < ints_len; ++i) {
+		cgs_variant_set_int(&var, ints[i]);
 		cgs_bst_insert(&tree, &var);
 	}
 
@@ -133,6 +155,43 @@ static void bst_int_minmax_test(void** state)
 	cgs_bst_free(&tree);
 }
 
+static void
+complex_data_test(void** state)
+{
+        (void)state;
+
+        struct cgs_bst b1 = cgs_bst_new(cgs_string_cmp, cgs_string_free);
+
+        for (int i = 0; i < shows_len; ++i) {
+                struct cgs_string* p = malloc(sizeof(struct cgs_string));
+                *p = cgs_string_new();
+                cgs_string_from(shows[i], p);
+
+                struct cgs_variant v1 = { 0 };
+                cgs_variant_set_data(&v1, p);
+                assert_non_null(cgs_bst_insert(&b1, &v1));
+        }
+
+        assert_int_equal(cgs_bst_length(&b1), 9);
+
+        const struct cgs_string* min = cgs_bst_min(&b1);
+        assert_string_equal(cgs_string_data(min), "Community");
+
+        const struct cgs_string* max = cgs_bst_max(&b1);
+        assert_string_equal(cgs_string_data(max), "Twin Peaks");
+
+        struct cgs_string* p2 = malloc(sizeof(struct cgs_string));
+        *p2 = cgs_string_new();
+        cgs_string_from("Two and a Half Men", p2);
+        struct cgs_variant v2 = { 0 };
+        cgs_variant_set_data(&v2, p2);
+
+        assert_null(cgs_bst_search(&b1, &v2));
+        cgs_variant_free(&v2, cgs_string_free);
+
+        cgs_bst_free(&b1);
+}
+
 int main(void)
 {
 	const struct CMUnitTest tests[] = {
@@ -140,8 +199,8 @@ int main(void)
 		cmocka_unit_test(bst_int_insert_test),
 		cmocka_unit_test(bst_int_search_test),
 		cmocka_unit_test(bst_int_minmax_test),
+		cmocka_unit_test(complex_data_test),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }
-

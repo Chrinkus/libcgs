@@ -66,11 +66,14 @@ struct cgs_bst_node;
  * @member root         The root node of the tree.
  * @member length       The number of elements in the tree.
  * @member cmp          A comparison function to order the tree with.
+ * @member ff           An optional freeing function for the elements of
+ *                      the tree or NULL if they are trivially deallocated.
  */
 struct cgs_bst {
         struct cgs_bst_node* root;
         size_t length;
         CgsCmp3Way cmp;
+        CgsFreeFunc ff;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -83,18 +86,20 @@ struct cgs_bst {
  * Create a new binary search tree.
  *
  * @param cmp   The comparison function to order the tree with.
+ * @param ff    An optional freeing function for the elements of the tree or
+ *              NULL if they are trivially deallocated.
  *
  * @return      An empty bst struct.
  */
 struct cgs_bst
-cgs_bst_new(CgsCmp3Way cmp);
+cgs_bst_new(CgsCmp3Way cmp, CgsFreeFunc ff);
 
 /**
  * cgs_bst_free
  *
  * Deallocate the nodes of a binary search tree.
  *
- * @param tree  Tree to be freed. May be NULL.
+ * @param tree  Tree to be freed.
  */
 void
 cgs_bst_free(struct cgs_bst* tree);
@@ -177,4 +182,3 @@ cgs_bst_min(const struct cgs_bst* tree);
  */
 const void*
 cgs_bst_max(const struct cgs_bst* tree);
-

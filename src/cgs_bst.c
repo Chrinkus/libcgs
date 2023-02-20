@@ -26,13 +26,33 @@
 #include <string.h>
 
 #include "cgs_bst.h"
-#include "cgs_bst_private.h"
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * BST Node Private Types
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
+
+/**
+ * struct cgs_bst_node
+ *
+ * A data structure representing a node in a binary search tree.
+ *
+ * @member data         A variant containing the value of this node.
+ * @member parent       The parent of this node or NULL if node is root.
+ * @member left         The left child of this node or NULL if node is a leaf.
+ * @member right        The right child of this node or NULL if node is a leaf.
+ */
+struct cgs_bst_node {
+        struct cgs_variant data;
+        struct cgs_bst_node* parent;
+        struct cgs_bst_node* left;
+        struct cgs_bst_node* right;
+};
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * BST Node Management Functions
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-struct cgs_bst_node*
+static struct cgs_bst_node*
 cgs_bst_node_new(const struct cgs_variant* data)
 {
         struct cgs_bst_node* node = malloc(sizeof(struct cgs_bst_node));
@@ -47,14 +67,15 @@ cgs_bst_node_new(const struct cgs_variant* data)
         return node;
 }
 
-void
-cgs_bst_node_free(struct cgs_bst_node* node)
+static void
+cgs_bst_node_free(struct cgs_bst_node* node, CgsFreeFunc ff)
 {
-        if (node) {
-                cgs_bst_node_free(node->left);
-                cgs_bst_node_free(node->right);
-                cgs_variant_free(&node->data, NULL);
-        }
+        if (!node)
+                return;
+
+        cgs_bst_node_free(node->left, ff);
+        cgs_bst_node_free(node->right, ff);
+        cgs_variant_free(&node->data, ff);
         free(node);
 }
 
@@ -63,20 +84,20 @@ cgs_bst_node_free(struct cgs_bst_node* node)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 struct cgs_bst
-cgs_bst_new(CgsCmp3Way cmp)
+cgs_bst_new(CgsCmp3Way cmp, CgsFreeFunc ff)
 {
         return (struct cgs_bst){
                 .root = NULL,
                 .length = 0,
                 .cmp = cmp,
+                .ff = ff,
         };
 }
 
 void
 cgs_bst_free(struct cgs_bst* tree)
 {
-        if (tree)
-                cgs_bst_node_free(tree->root);
+        return cgs_bst_node_free(tree->root, tree->ff);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -151,4 +172,3 @@ cgs_bst_max(const struct cgs_bst* tree)
                 node = node->right;
         return node ? cgs_variant_get(&node->data) : NULL;
 }
-
