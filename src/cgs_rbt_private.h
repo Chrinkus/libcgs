@@ -85,7 +85,7 @@ cgs_rbt_node_new(const struct cgs_variant* data);
  * @param node	The node to free.
  */
 void
-cgs_rbt_node_free(struct cgs_rbt_node* node);
+cgs_rbt_node_free(struct cgs_rbt_node* node, CgsFreeFunc ff);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  * RBT Inspection (Testing)
@@ -154,4 +154,3 @@ cgs_rbt_node_black_height(const struct cgs_rbt_node* node);
  */
 int
 cgs_rbt_node_red_children_test(const struct cgs_rbt_node* node);
-

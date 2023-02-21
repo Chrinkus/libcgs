@@ -476,7 +476,7 @@ static int fake_tree_bad_rc_setup(void** state)
 static int rbt_insert_tree_setup(void** state)
 {
         struct cgs_rbt* tree = malloc(sizeof(struct cgs_rbt));
-	*tree = cgs_rbt_new(cgs_int_cmp);
+	*tree = cgs_rbt_new(cgs_int_cmp, NULL);
 
 	const int arr[] = {
 		2, 17, 16, 1, 8, 14, 15, 5, 6, 10,
@@ -500,7 +500,7 @@ static int rbt_insert_tree_setup(void** state)
 static int tree_node_teardown(void** state)
 {
 	struct cgs_rbt_node* node = *(struct cgs_rbt_node**)state;
-	cgs_rbt_node_free(node);
+	cgs_rbt_node_free(node, NULL);
 	return 0;
 }
 

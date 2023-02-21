@@ -4,22 +4,27 @@
 #include "cgs_compare.h"	// cgs_int_cmp
 #include "cgs_defs.h"		// CGS_ARRAY_LENGTH
 
-static void rbt_new_test(void** state)
+#include <stdlib.h>
+#include "cgs_string.h"
+
+static void
+rbt_new_test(void** state)
 {
         (void)state;
 
-        struct cgs_rbt tree = cgs_rbt_new(cgs_int_cmp);
+        struct cgs_rbt tree = cgs_rbt_new(cgs_int_cmp, NULL);
 
         assert_int_equal(cgs_rbt_length(&tree), 0);
 
         cgs_rbt_free(&tree);
 }
 
-static void rbt_insert_test(void** state)
+static void
+rbt_insert_test(void** state)
 {
         (void)state;
 
-        struct cgs_rbt tree = cgs_rbt_new(cgs_int_cmp);
+        struct cgs_rbt tree = cgs_rbt_new(cgs_int_cmp, NULL);
 
 	// establish initial size
         assert_int_equal(cgs_rbt_length(&tree), 0);
@@ -39,11 +44,12 @@ static void rbt_insert_test(void** state)
 	cgs_rbt_free(&tree);
 }
 
-static void rbt_minmax_test(void** state)
+static void
+rbt_minmax_test(void** state)
 {
         (void)state;
 
-        struct cgs_rbt tree = cgs_rbt_new(cgs_int_cmp);
+        struct cgs_rbt tree = cgs_rbt_new(cgs_int_cmp, NULL);
 
         // insert single value
         struct cgs_variant v = { 0 };
@@ -72,11 +78,12 @@ static void rbt_minmax_test(void** state)
         cgs_rbt_free(&tree);
 }
 
-static void rbt_search_test(void** state)
+static void
+rbt_search_test(void** state)
 {
         (void)state;
 
-        struct cgs_rbt tree = cgs_rbt_new(cgs_int_cmp);
+        struct cgs_rbt tree = cgs_rbt_new(cgs_int_cmp, NULL);
         struct cgs_variant v1 = { 0 };
 
         // insert a bunch of values
@@ -117,6 +124,56 @@ static void rbt_search_test(void** state)
         cgs_rbt_free(&tree);
 }
 
+const char* shows[] = {
+        "Community",
+        "Twin Peaks",
+        "IT Crowd",
+        "Dark",
+        "It's Always Sunny in Philadelphia",
+        "Star Trek",
+        "The Mandalorian",
+        "Modern Family",
+        "Crash Landing on You",
+};
+const int shows_len = sizeof(shows) / sizeof(shows[0]);
+
+static void
+complex_data_test(void** state)
+{
+        (void)state;
+
+        struct cgs_rbt t1 = cgs_rbt_new(cgs_string_cmp, cgs_string_free);
+
+        for (int i = 0; i < shows_len; ++i) {
+                struct cgs_string* p1 = malloc(sizeof(struct cgs_string));
+                *p1 = cgs_string_new();
+                cgs_string_from(shows[i], p1);
+
+                struct cgs_variant v1 = { 0 };
+                cgs_variant_set_data(&v1, p1);
+                assert_non_null(cgs_rbt_insert(&t1, &v1));
+        }
+
+        assert_int_equal(cgs_rbt_length(&t1), shows_len);
+
+        const struct cgs_string* min = cgs_rbt_min(&t1);
+        assert_string_equal(cgs_string_data(min), "Community");
+
+        const struct cgs_string* max = cgs_rbt_max(&t1);
+        assert_string_equal(cgs_string_data(max), "Twin Peaks");
+
+        struct cgs_string* p2 = malloc(sizeof(struct cgs_string));
+        *p2 = cgs_string_new();
+        cgs_string_from("Two and a Half Men", p2);
+        struct cgs_variant v2 = { 0 };
+        cgs_variant_set_data(&v2, p2);
+
+        assert_null(cgs_rbt_search(&t1, &v2));
+        cgs_variant_free(&v2, cgs_string_free);
+
+        cgs_rbt_free(&t1);
+}
+
 int main(void)
 {
 	const struct CMUnitTest tests[] = {
@@ -124,6 +181,7 @@ int main(void)
 		cmocka_unit_test(rbt_insert_test),
 		cmocka_unit_test(rbt_minmax_test),
 		cmocka_unit_test(rbt_search_test),
+		cmocka_unit_test(complex_data_test),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

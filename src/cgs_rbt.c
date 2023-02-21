@@ -61,14 +61,14 @@ cgs_rbt_node_new(const struct cgs_variant* data)
 }
 
 void
-cgs_rbt_node_free(struct cgs_rbt_node* node)
+cgs_rbt_node_free(struct cgs_rbt_node* node, CgsFreeFunc ff)
 {
         if (!node)
                 return;
 
-        cgs_rbt_node_free(node->left);
-        cgs_rbt_node_free(node->right);
-        cgs_variant_free(&node->data, NULL);
+        cgs_rbt_node_free(node->left, ff);
+        cgs_rbt_node_free(node->right, ff);
+        cgs_variant_free(&node->data, ff);
         if (node->parent) {
                 if (node == node->parent->left)
                         node->parent->left = NULL;
@@ -227,12 +227,13 @@ cgs_rbt_rebalance(struct cgs_rbt* tree, struct cgs_rbt_node* node)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 struct cgs_rbt
-cgs_rbt_new(CgsCmp3Way cmp)
+cgs_rbt_new(CgsCmp3Way cmp, CgsFreeFunc ff)
 {
         return (struct cgs_rbt){
                 .root = NULL,
                 .length = 0,
                 .cmp = cmp,
+                .ff = ff,
         };
 }
 
@@ -240,7 +241,7 @@ void
 cgs_rbt_free(struct cgs_rbt* tree)
 {
 	if (tree)
-		cgs_rbt_node_free(tree->root);
+		cgs_rbt_node_free(tree->root, tree->ff);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 

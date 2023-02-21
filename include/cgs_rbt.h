@@ -73,11 +73,14 @@ struct cgs_rbt_node;
  * @member root         The root node of the tree.
  * @member length       The number of elements in the tree.
  * @member cmp          A comparison function to order the tree with.
+ * @member ff           An optional freeing function for the elements of
+ *                      the tree or NULL if they are trivially deallocated.
  */
 struct cgs_rbt {
         struct cgs_rbt_node* root;
         size_t length;
         CgsCmp3Way cmp;
+        CgsFreeFunc ff;
 };
 
 
@@ -91,11 +94,13 @@ struct cgs_rbt {
  * Create a new red-black tree.
  *
  * @param cmp   The comparison function to order the tree with.
+ * @param ff    An optional freeing function for the elements of the tree or
+ *              NULL if they are trivially deallocated.
  *
  * @return      An empty red-black tree.
  */
 struct cgs_rbt
-cgs_rbt_new(CgsCmp3Way cmp);
+cgs_rbt_new(CgsCmp3Way cmp, CgsFreeFunc ff);
 
 /**
  * cgs_rbt_free
