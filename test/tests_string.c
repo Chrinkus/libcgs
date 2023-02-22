@@ -273,6 +273,44 @@ replace_test(void** state)
         cgs_string_free(&s4);
 }
 
+static void
+find_test(void** state)
+{
+        (void)state;
+        struct cgs_string s1 = cgs_string_new();
+        cgs_string_from("So happy its Tuesday", &s1);
+
+        // Good finds
+        struct cgs_string s2 = cgs_string_new();
+        cgs_string_from("So", &s2);
+        struct cgs_string s3 = cgs_string_new();
+        cgs_string_from("ppy it", &s3);
+        struct cgs_string s4 = cgs_string_new();
+        cgs_string_from("Tuesday", &s4);
+
+        // Found
+        assert_int_equal(cgs_string_find(&s1, &s2), 0);
+        assert_int_equal(cgs_string_find(&s1, &s3), 5);
+        assert_int_equal(cgs_string_find(&s1, &s4), 13);
+
+        // Bad finds
+        struct cgs_string s5 = cgs_string_new();
+        cgs_string_from("Tuesdays", &s5);
+        struct cgs_string s6 = cgs_string_new();
+        cgs_string_from("Monday", &s6);
+
+        // Not found
+        assert_int_equal(cgs_string_find(&s1, &s5), s1.length);
+        assert_int_equal(cgs_string_find(&s1, &s6), s1.length);
+
+        cgs_string_free(&s1);
+        cgs_string_free(&s2);
+        cgs_string_free(&s3);
+        cgs_string_free(&s4);
+        cgs_string_free(&s5);
+        cgs_string_free(&s6);
+}
+
 /*
 int string_clear_test(void* data)
 {
@@ -424,6 +462,7 @@ int main(void)
                 cmocka_unit_test(string_trunc_test),
                 cmocka_unit_test(string_reverse_test),
                 cmocka_unit_test(replace_test),
+                cmocka_unit_test(find_test),
         };
 
         return cmocka_run_group_tests(tests, NULL, NULL);

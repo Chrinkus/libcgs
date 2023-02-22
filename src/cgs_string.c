@@ -301,6 +301,22 @@ cgs_string_sort(struct cgs_string* s)
 	qsort(s->data, s->length, sizeof(char), cgs_char_cmp);
 }
 
+size_t
+cgs_string_find(const struct cgs_string* s, const struct cgs_string* sub)
+{
+        size_t i = 0;
+        while (i < s->length) {
+                for (size_t j = 0; j < sub->length; ++j)
+                        if ((i + j >= s->length)
+                                        || (s->data[i+j] != sub->data[j]))
+                                goto next_iter;
+                return i;
+next_iter:
+                ++i;
+        }
+        return s->length;
+}
+
 void
 cgs_string_trunc(struct cgs_string* s, size_t n)
 {

@@ -417,6 +417,21 @@ void
 cgs_string_sort(struct cgs_string* s);
 
 /**
+ * cgs_string_find
+ *
+ * Search a string for a substring. If found, return the position within the
+ * string. If not found, return the string's length.
+ *
+ * @param s     The string to search.
+ * @param sub   The substring to search for.
+ *
+ * @return      The position of the start of the substring within the string
+ *              if found, the string's length if not found.
+ */
+size_t
+cgs_string_find(const struct cgs_string* s, const struct cgs_string* sub);
+
+/**
  * cgs_string_trunc
  *
  * Shortens a string to the given length by removing from the end. Does 
