@@ -131,6 +131,18 @@ io_readlines_test(void** state)
 	cgs_vector_free_all_with(&lines, cgs_string_free);
 }
 
+static void
+readfile_test(void** state)
+{
+        (void)state;
+        struct cgs_string buff1 = cgs_string_new();
+
+        assert_non_null(cgs_io_readfile(data_path, &buff1));
+        assert_int_equal(cgs_string_length(&buff1), 45);
+
+        cgs_string_free(&buff1);
+}
+
 int main(void)
 {
 	const struct CMUnitTest tests[] = {
@@ -140,6 +152,7 @@ int main(void)
 				setup_file_read, teardown_file_read),
 		cmocka_unit_test_setup_teardown(io_readlines_test,
 				setup_file_read, teardown_file_read),
+                cmocka_unit_test(readfile_test),
 	};
 
 	return cmocka_run_group_tests(tests, setup_file_content, NULL);

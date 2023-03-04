@@ -73,3 +73,5 @@ cgs_io_readline(FILE* file);
 void*
 cgs_io_readlines(FILE* file, struct cgs_vector* lines);
 
+void*
+cgs_io_readfile(const char* fname, struct cgs_string* buff);

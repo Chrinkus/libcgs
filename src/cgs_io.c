@@ -74,3 +74,21 @@ error_cleanup:
         return NULL;
 }
 
+void*
+cgs_io_readfile(const char* fname, struct cgs_string* buff)
+{
+        FILE* file = fopen(fname, "r");
+        if (!file)
+                return NULL;
+
+        for (int c; (c = fgetc(file)) != EOF; )
+                if (!cgs_string_push(buff, c))
+                        goto error_cleanup;
+
+        fclose(file);
+        return buff;
+
+error_cleanup:
+        fclose(file);
+        return NULL;
+}
