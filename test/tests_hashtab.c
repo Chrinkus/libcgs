@@ -90,7 +90,7 @@ hashtab_new_test(void** state)
 {
         (void)state;
 
-        struct cgs_hashtab h = cgs_hashtab_new();
+        struct cgs_hashtab h = cgs_hashtab_new(NULL);
 
         assert_int_equal(cgs_hashtab_length(&h), 0);
 
@@ -102,7 +102,7 @@ hashtab_lookup_fail_test(void** state)
 {
         (void)state;
 
-        struct cgs_hashtab h = cgs_hashtab_new();
+        struct cgs_hashtab h = cgs_hashtab_new(NULL);
 
         assert_null(cgs_hashtab_lookup(&h, "article"));
         assert_null(cgs_hashtab_lookup(&h, "section"));
@@ -116,7 +116,7 @@ static void
 hashtab_get_success_test(void** state)
 {
         (void)state;
-        struct cgs_hashtab h = cgs_hashtab_new();
+        struct cgs_hashtab h = cgs_hashtab_new(NULL);
 
         for (size_t i = 0; i < top_scorers_len; ++i) {
                 struct cgs_variant* pv = NULL;
@@ -134,7 +134,7 @@ static void
 hashtab_get_lookup_test(void** state)
 {
         (void)state;
-        struct cgs_hashtab h = cgs_hashtab_new();
+        struct cgs_hashtab h = cgs_hashtab_new(NULL);
 
         for (size_t i = 0; i < top_scorers_len; ++i) {
                 const struct goal_scorer* gs = &top_scorers[i];
@@ -161,7 +161,7 @@ static void
 hashtab_remove_test(void** state)
 {
         (void)state;
-        struct cgs_hashtab h = cgs_hashtab_new();
+        struct cgs_hashtab h = cgs_hashtab_new(NULL);
 
         for (size_t i = 0; i < top_scorers_len; ++i) {
                 const struct goal_scorer* gs = &top_scorers[i];
@@ -216,7 +216,7 @@ static void
 hashtab_rehash_test(void** state)
 {
         (void)state;
-        struct cgs_hashtab ht = cgs_hashtab_new();
+        struct cgs_hashtab ht = cgs_hashtab_new(NULL);
 
         const struct number* pnum = NULL;       // ease of access
         struct cgs_variant* pvar = NULL;        // used to insert elements
@@ -265,7 +265,7 @@ static void
 hashtab_iter_test(void** state)
 {
         (void)state;
-        struct cgs_hashtab legtab = cgs_hashtab_new();
+        struct cgs_hashtab legtab = cgs_hashtab_new(NULL);
 
         struct cgs_variant* pvar = NULL;
 

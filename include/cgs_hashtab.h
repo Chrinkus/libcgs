@@ -49,6 +49,7 @@ struct cgs_htab_bucket;
  * @member length       The number of elements currently in the table.
  * @member table        The hash table.
  * @member hash         A function to hash the elements.
+ * @member ff           A function used to free the elements, if necessary.
  * @member cmp          The function used for lookup matching.
  * @member size         The number of buckets in the table.
  * @member max_load     The highest the ratio of length to size is allowed to
@@ -59,6 +60,7 @@ struct cgs_hashtab {
         struct cgs_htab_bucket** table;
 
         CgsHashFunc hash;
+        CgsFreeFunc ff;
         CgsCmp3Way cmp;
 
         size_t size;
@@ -77,10 +79,12 @@ struct cgs_hashtab {
  * Note: Hash and comparison functions are not required for this version. The
  * current implementation uses string keys so these functions are known.
  *
+ * @param ff    A function to use to free the elements if necessary or NULL.
+ *
  * @return      An empty hash table.
  */
 struct cgs_hashtab
-cgs_hashtab_new(void);
+cgs_hashtab_new(CgsFreeFunc ff);
 
 /**
  * cgs_hashtab_free

@@ -99,15 +99,15 @@ cgs_htab_bucket_new(const char* key)
  * @param b     The bucket to free.
  */
 static void
-cgs_htab_bucket_free(void* p)
+cgs_htab_bucket_free(void* p, CgsFreeFunc ff)
 {
         if (!p)
                 return;
 
         struct cgs_htab_bucket* b = p;
 
-        cgs_htab_bucket_free(b->next);
-        cgs_variant_free(&b->value, NULL);
+        cgs_htab_bucket_free(b->next, ff);
+        cgs_variant_free(&b->value, ff);
         free(b->key);
         free(b);
 }
@@ -285,12 +285,13 @@ hashtab_add_bucket(struct cgs_hashtab* ht, const char* key, size_t hashval,
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
 struct cgs_hashtab
-cgs_hashtab_new(void)
+cgs_hashtab_new(CgsFreeFunc ff)
 {
         return (struct cgs_hashtab){
                 .length = 0,
                 .table = NULL,
                 .hash = cgs_hash_str,
+                .ff = ff,
                 .cmp = cgs_str_cmp,
                 .size = 0,
                 .max_load = HTAB_DEFAULT_LOAD_FACTOR,
@@ -303,7 +304,7 @@ cgs_hashtab_free(void* p)
         struct cgs_hashtab* ht = p;
 
         for (size_t i = 0; i < ht->size; ++i)
-                cgs_htab_bucket_free(ht->table[i]);
+                cgs_htab_bucket_free(ht->table[i], ht->ff);
 
         free(ht->table);
 }
@@ -421,7 +422,7 @@ cgs_hashtab_remove(struct cgs_hashtab* h, const char* key)
                 h->table[hashval] = b->next;
 
         --h->length;
-        cgs_htab_bucket_free(b);
+        cgs_htab_bucket_free(b, h->ff);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
